@@ -1,10 +1,17 @@
 /** @format */
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "../src/Page/Home/HomePage";
+import NavBarLogo from "./Components/Uitily/navbarlogo";
 
 function App() {
   return (
     <>
-      <HomePage />
+      <NavBarLogo />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
