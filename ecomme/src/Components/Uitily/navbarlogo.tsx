@@ -1,5 +1,6 @@
 /** @format */
 import { Search, Box, ShoppingCart } from "lucide-react";
+import mohamed from "../../images/mohamed.jpg";
 
 function NavBarLogo() {
   return (
@@ -27,15 +28,14 @@ function NavBarLogo() {
 
       {/* Right side: notifications + avatar */}
       <div className="flex items-center gap-4 shrink-0">
-        <ShoppingCart className="mr-5" />
+        <ShoppingCart className="mr-1" />
         <img
-          src="https://i.pravatar.cc/40?img=12"
-          alt="Photo Persone "
-          className="w-8 h-8 rounded-full object-cover border border-white/10"
+          src={mohamed}
+          alt="User avatar"
+          className="w-6 h-6 rounded-full object-cover border border-white/10"
         />
       </div>
     </nav>
   );
 }
-
 export default NavBarLogo;

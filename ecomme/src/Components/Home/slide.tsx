@@ -26,7 +26,7 @@ function Slide({ slides = defaultSlides }) {
           {slides.map((slide) => (
             <div
               key={slide.id}
-              className="min-w-full flex items-center justify-center h-64 bg-indigo-500/10 border border-indigo-500/20 text-white text-lg">
+              className="min-w-full flex items-center justify-center h-64 bg-indigo-900/10 border-indigo-900/20 text-white text-lg">
               {slide.content}
             </div>
           ))}
@@ -35,12 +35,14 @@ function Slide({ slides = defaultSlides }) {
 
       {/* Prev / Next buttons */}
       <button
-        onClick={() => goTo(current - 1)}aria-label="السابق"
+        onClick={() => goTo(current - 1)}
+        aria-label="السابق"
         className="absolute top-1/2 left-3 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors cursor-pointer">
         <ChevronLeft size={20} />
       </button>
       <button
-        onClick={() => goTo(current + 1)}aria-label="التالي"
+        onClick={() => goTo(current + 1)}
+        aria-label="التالي"
         className="absolute top-1/2 right-3 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors cursor-pointer">
         <ChevronRight size={20} />
       </button>
@@ -49,7 +51,9 @@ function Slide({ slides = defaultSlides }) {
       <div className="flex justify-center gap-2 mt-4">
         {slides.map((_, i) => (
           <button
-            key={i}onClick={ () => goTo(i)} aria-label={`الانتقال إلى الشريحة ${i + 1}`}
+            key={i}
+            onClick={() => goTo(i)}
+            aria-label={`الانتقال إلى الشريحة ${i + 1}`}
             className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-indigo-500" : "bg-white/20"}`}
           />
         ))}
