@@ -26,7 +26,7 @@ function Slide({ slides = defaultSlides }) {
           {slides.map((slide) => (
             <div
               key={slide.id}
-              className="min-w-full flex items-center justify-center h-64 bg-indigo-900/10 border-indigo-900/20 text-white text-lg">
+              className="min-w-full flex items-center justify-center h-64 bg-[#12141c] text-white text-lg">
               {slide.content}
             </div>
           ))}

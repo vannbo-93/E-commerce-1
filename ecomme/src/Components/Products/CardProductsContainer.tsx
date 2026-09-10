@@ -1,10 +1,17 @@
 /** @format */
 import ProductCard from "./ProductCard";
-import SubTitle from "../Uitily/SubTitle";
+import SubTitle from "../Utility/SubTitle";
 
-interface ProductCardContainerProps {title: string;btntitle: string;pathText: string;}
+interface ProductCardContainerProps {
+  title: string;
+  btntitle: string;
+  pathText: string;
+}
 
-const CardProductsContainer = ({title,btntitle,}: ProductCardContainerProps) => {
+const CardProductsContainer = ({
+  title,
+  btntitle,
+}: ProductCardContainerProps) => {
   return (
     <div className="container">
       <SubTitle title={title} btnTitle={btntitle} />

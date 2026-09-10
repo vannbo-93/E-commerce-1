@@ -6,7 +6,7 @@ import phone from "../../images/phone.png";
 
 const Footer = () => {
   return (
-    <footer className="footer-background bg-gray-900 text-white mt-3">
+    <footer className="footer-background bg-[#12141c] text-white mt-3">
       <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-300">
           <a

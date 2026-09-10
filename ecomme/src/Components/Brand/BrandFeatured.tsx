@@ -1,11 +1,17 @@
 /** @format */
 import BrandCard from "./BrandCard";
-import SubTitle from "../Uitily/SubTitle.js";
+import SubTitle from "../Utility/SubTitle.js";
 import brand1 from "../../images/brand1.png";
 import brand2 from "../../images/brand2.png";
 import brand3 from "../../images/brand3.png";
 
-const BrandFeatured = ({title,btntitle,}: {title: string;btntitle: string;}) => {
+const BrandFeatured = ({
+  title,
+  btntitle,
+}: {
+  title: string;
+  btntitle: string;
+}) => {
   return (
     <div className="my-3">
       <div>
