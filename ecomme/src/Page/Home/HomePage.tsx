@@ -3,8 +3,7 @@ import Slide from "../../Components/Home/slide";
 import HomeCategory from "../../Components/Home/HomeCategory";
 import CardProductsContainer from "../../Components/Products/CardProductsContainer";
 import DiscountSection from "../../Components/Home/DiscountSection";
-import BrandFeatured from "../../Components/Brand/BrandFeatured";
-
+import BrandFeatured from "../Brand/BrandFeatured";
 
 const HomePage = () => {
   return (
@@ -17,7 +16,11 @@ const HomePage = () => {
         pathText="/products"
       />
       <DiscountSection />
-      <BrandFeatured title="Featured Products" btntitle="View All" />
+      <BrandFeatured
+        title="Featured Brands"
+        btntitle="View All"
+        pathText="/allbrand"
+      />
     </>
   );
 };
