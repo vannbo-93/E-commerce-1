@@ -1,6 +1,8 @@
 /** @format */
+
 import ProductGallery from "./ProductGallery";
 import ProductsText from "./ProductText";
+import RateContainer from "../Rate/RateContainer";
 
 const ProductDetails = () => {
   return (
@@ -13,9 +15,9 @@ const ProductDetails = () => {
           <ProductsText />
         </div>
       </div>
+      <RateContainer />
     </div>
   );
 };
 
 export default ProductDetails;
- 
