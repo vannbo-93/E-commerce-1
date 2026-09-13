@@ -16,6 +16,11 @@ const HomePage = () => {
         pathText="/products"
       />
       <DiscountSection />
+      <CardProductsContainer
+        title="Featured Products"
+        btntitle="View All"
+        pathText="/products"
+      />
       <BrandFeatured
         title="Featured Brands"
         btntitle="View All"

@@ -7,24 +7,32 @@ import LoginPage from "../src/Page/Auth/LoginPage";
 import RegisterPage from "../src/Page/Auth/RegisterPage";
 import AllCategoryPage from "./Page/Category/AllCategoryPage";
 import AllBrandPage from "../src/Page/Brand/AllBrandPage";
+import ShopProductsPage from "../src/Components/Products/ShopProductsPage";
+import ProductDetailsPage from "../src/Components/Products/ProductDetailsPage";
 
 function App() {
   return (
-    <>
+    <div className="min-h-screen flex flex-col" dir="ltr">
       <NavBarLogo />
+
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/allcategory" element={<AllCategoryPage />} />
-          <Route
-            path="/allbrand"
-            element={<AllBrandPage title="All Brands" pathText="/allbrand" />}/>
-        </Routes>
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/allcategory" element={<AllCategoryPage />} />
+            <Route
+              path="/allbrand"
+              element={<AllBrandPage title="All Brands" pathText="/allbrand" />}
+            />
+            <Route path="/products" element={<ShopProductsPage />} />
+            <Route path="/products/:id" element={<ProductDetailsPage />} />
+          </Routes>
+        </main>
+        <Footer />
       </BrowserRouter>
-      <Footer />
-    </>
+    </div>
   );
 }
 
