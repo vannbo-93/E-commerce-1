@@ -36,13 +36,13 @@ function Slide({ slides = defaultSlides }) {
       {/* Prev / Next buttons */}
       <button
         onClick={() => goTo(current - 1)}
-        aria-label="السابق"
+        aria-label="Previous"
         className="absolute top-1/2 left-3 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors cursor-pointer">
         <ChevronLeft size={20} />
       </button>
       <button
         onClick={() => goTo(current + 1)}
-        aria-label="التالي"
+        aria-label="Next"
         className="absolute top-1/2 right-3 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors cursor-pointer">
         <ChevronRight size={20} />
       </button>
@@ -53,7 +53,7 @@ function Slide({ slides = defaultSlides }) {
           <button
             key={i}
             onClick={() => goTo(i)}
-            aria-label={`الانتقال إلى الشريحة ${i + 1}`}
+            aria-label={`Go to slide ${i + 1}`}
             className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-indigo-500" : "bg-white/20"}`}
           />
         ))}

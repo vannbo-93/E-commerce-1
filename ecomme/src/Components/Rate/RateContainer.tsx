@@ -6,19 +6,19 @@ import RatePost from "./RatePost";
 import RatingBadge from "./RatingBadge";
 import PaginationComponent from "../Utility/Pagination";
 
-// TODO: استبدل هذا باسم المستخدم الفعلي من نظام تسجيل الدخول لديك
+// TODO: Replace this with the actual username from the login system.
 const CURRENT_USER_NAME = "Mohamed El Aissaoui";
 
 const RateContainer = () => {
   const [userRating, setUserRating] = useState(0);
   const [comment, setComment] = useState("");
-  // مفتاح ديناميكي: تغييره يجبر React على إعادة تركيب ReactStars بالكامل،
-  // لأن المكتبة لا تعيد قراءة value بعد أول تحميل (انظر الشرح أعلاه)
+  // Changing this key forces ReactStars to remount because the library does
+  // not reread the value after the initial load.
   const [widgetKey, setWidgetKey] = useState(0);
 
   const handleSubmit = () => {
     if (userRating === 0 || comment.trim() === "") return;
-    // TODO: استبدل هذا باستدعاء API فعلي لإرسال التقييم للسيرفر
+    // TODO: Replace this with an actual API call to submit the rating.
     console.log({ rating: userRating, comment });
     setComment("");
     setUserRating(0);
@@ -48,8 +48,8 @@ const RateContainer = () => {
         onChange={(e) => setComment(e.target.value)}
         placeholder="Write your comment..."
         rows={3}
-        className="w-full border border-gray-300 rounded-lg p-3 mt-2 text-gray-800 
-        focus:outline-none focus:ring-1 focus:ring-gray-400"
+        className="w-full border border-gray-300 rounded-lg p-3 mt-2 text-white 
+        focus:outline-none focus:ring-1 focus:ring-gray-400 "
       />
 
       <button

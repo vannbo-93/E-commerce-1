@@ -1,3 +1,3 @@
 /** @format */
 
-export const brands = ["الكل", "ابل", "سامسونج"];
+export const brands = ["All", "Apple", "Samsung"];

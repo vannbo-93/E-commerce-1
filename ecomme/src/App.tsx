@@ -9,13 +9,13 @@ import AllCategoryPage from "./Page/Category/AllCategoryPage";
 import AllBrandPage from "../src/Page/Brand/AllBrandPage";
 import ShopProductsPage from "../src/Components/Products/ShopProductsPage";
 import ProductDetailsPage from "../src/Components/Products/ProductDetailsPage";
+import CartPage from "../src/Page/cart/CartPage";
 
 function App() {
   return (
     <div className="min-h-screen flex flex-col" dir="ltr">
-      <NavBarLogo />
-
       <BrowserRouter>
+        <NavBarLogo />
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -28,6 +28,8 @@ function App() {
             />
             <Route path="/products" element={<ShopProductsPage />} />
             <Route path="/products/:id" element={<ProductDetailsPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/order/paymethoud" element={<ChoosePayMethoudPage />} />
           </Routes>
         </main>
         <Footer />

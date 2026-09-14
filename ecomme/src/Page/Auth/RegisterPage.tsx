@@ -8,7 +8,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {e.preventDefault();// TODO: استدعاء API التسجيل
+  const handleSubmit = (e: React.FormEvent) => {e.preventDefault();// TODO: Call the registration API.
 };
   return (
     <div className="min-h-[900px]">

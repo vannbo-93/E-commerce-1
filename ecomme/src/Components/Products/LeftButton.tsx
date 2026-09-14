@@ -10,7 +10,7 @@ interface LeftButtonProps {
 }
 
 const LeftButton = ({ onClick, disabled = false }: LeftButtonProps) => {
-  console.log("leftButton تم تحميله!");
+  console.log("Left button loaded!");
   const handleClick = (event?: React.MouseEvent<HTMLImageElement>) => {
     if (!disabled) {
       onClick(event);
@@ -20,7 +20,7 @@ const LeftButton = ({ onClick, disabled = false }: LeftButtonProps) => {
   return (
     <img
       src={next}
-      alt="السابق"
+      alt="Previous"
       width={35}
       height={35}
       onClick={handleClick}

@@ -1,8 +1,15 @@
 /** @format */
-import { Search, Box, ShoppingCart } from "lucide-react";
+import { Search, Box } from "lucide-react";
+import ShoppingCart from "@mui/icons-material/ShoppingCart";
+import { Badge, IconButton } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import mohamed from "../../images/mohamed.jpg";
 
 function NavBarLogo() {
+  const navigate = useNavigate();
+  const handlerCart = () => {
+    navigate("/cart");
+  };
   return (
     <nav className="w-full h-16 bg-[#12141c] border-b border-white/5 flex items-center px-6 gap-6">
       {/* Logo */}
@@ -28,11 +35,15 @@ function NavBarLogo() {
 
       {/* Right side: notifications + avatar */}
       <div className="flex items-center gap-4 shrink-0">
-        <ShoppingCart className="mr-1" />
+        <IconButton aria-label="cart" onClick={handlerCart}>
+          <Badge badgeContent={4} color="secondary">
+            <ShoppingCart sx={{ color: "#ffffff" }} />
+          </Badge>
+        </IconButton>
         <img
           src={mohamed}
           alt="User avatar"
-          className="w-6 h-6 rounded-full object-cover border border-white/10"
+          className="w-8 h-8 rounded-full object-cover border border-white/10 cursor-pointer"
         />
       </div>
     </nav>

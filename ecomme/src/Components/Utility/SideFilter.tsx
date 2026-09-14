@@ -3,21 +3,21 @@
 import { useState } from "react";
 
 const categories = [
-  { id: "all", labelAr: "الكل", labelEn: "All" },
+  { id: "all", labelAr: "All", labelEn: "All" },
   {
     id: "home_appliances",
-    labelAr: "اجهزة منزلية",
+    labelAr: "Home Appliances",
     labelEn: "Home Appliances",
   },
-  { id: "electronics", labelAr: "الكترونيات", labelEn: "Electronics" },
-  { id: "clothes", labelAr: "ملابس", labelEn: "Clothes" },
-  { id: "sales", labelAr: "تخفيضات", labelEn: "Discounts" },
+  { id: "electronics", labelAr: "Electronics", labelEn: "Electronics" },
+  { id: "clothes", labelAr: "Clothes", labelEn: "Clothes" },
+  { id: "sales", labelAr: "Discounts", labelEn: "Discounts" },
 ];
 
 const brands = [
-  { id: "all", labelAr: "الكل", labelEn: "All" },
-  { id: "apple", labelAr: "ابل", labelEn: "Apple" },
-  { id: "samsung", labelAr: "سامسونج", labelEn: "Samsung" },
+  { id: "all", labelAr: "All", labelEn: "All" },
+  { id: "apple", labelAr: "Apple", labelEn: "Apple" },
+  { id: "samsung", labelAr: "Samsung", labelEn: "Samsung" },
 ];
 
 const SideFilter = () => {

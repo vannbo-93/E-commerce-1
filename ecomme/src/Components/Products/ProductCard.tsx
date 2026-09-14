@@ -19,7 +19,7 @@ const ProductCard = ({id,title,price = 880,ratingValue = 4.5,}: ProductCardProps
 
           <div className="p-3">
             <div className="card-title font-medium mb-2">
-              {title || "ساعة يد ذكية"}
+              {title || "Smart watch"}
             </div>
 
             <div className="flex justify-between">

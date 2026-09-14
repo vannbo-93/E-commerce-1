@@ -9,7 +9,7 @@ interface RightButtonProps {
 }
 
 const RightButton = ({ onClick, disabled = false }: RightButtonProps) => {
-    console.log("RightButton تم تحميله!");
+  console.log("Right button loaded!");
   const handleClick = (event?: React.MouseEvent<HTMLImageElement>) => {
     if (!disabled) {
       onClick(event);
@@ -19,7 +19,7 @@ const RightButton = ({ onClick, disabled = false }: RightButtonProps) => {
   return (
     <img
       src={prev}
-      alt="التالي"
+      alt="Next"
       width={35}
       height={35}
       onClick={handleClick}

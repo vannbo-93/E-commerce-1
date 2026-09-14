@@ -19,7 +19,7 @@ const SearchCountResult = ({ title }: SearchCountResultProps) => {
   const [selected, setSelected] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // إغلاق القائمة عند الضغط خارجها — ضروري بما أنها لم تعد تعتمد على hover فقط
+  // Close the menu when clicking outside because it no longer relies on hover alone.
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
