@@ -10,6 +10,7 @@ import AllBrandPage from "../src/Page/Brand/AllBrandPage";
 import ShopProductsPage from "../src/Components/Products/ShopProductsPage";
 import ProductDetailsPage from "../src/Components/Products/ProductDetailsPage";
 import CartPage from "../src/Page/cart/CartPage";
+import ChoosePayMethoudPage from "../src/Page/Checkout/ChoosePayMethoudPage";
 
 function App() {
   return (

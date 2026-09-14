@@ -4,6 +4,7 @@ import ShoppingCart from "@mui/icons-material/ShoppingCart";
 import { Badge, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import mohamed from "../../images/mohamed.jpg";
+import { Link } from "react-router-dom";
 
 function NavBarLogo() {
   const navigate = useNavigate();
@@ -13,10 +14,11 @@ function NavBarLogo() {
   return (
     <nav className="w-full h-16 bg-[#12141c] border-b border-white/5 flex items-center px-6 gap-6">
       {/* Logo */}
-      <div className="flex items-center shrink-0">
-        <Box />
-      </div>
-
+      <Link to="/">
+        <div className="flex items-center shrink-0">
+          <Box />
+        </div>
+      </Link>
       {/* Search bar - centered */}
       <div className="flex-1 flex justify-center">
         <div className="relative w-full max-w-md">
