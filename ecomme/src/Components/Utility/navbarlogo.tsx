@@ -42,11 +42,13 @@ function NavBarLogo() {
             <ShoppingCart sx={{ color: "#ffffff" }} />
           </Badge>
         </IconButton>
-        <img
-          src={mohamed}
-          alt="User avatar"
-          className="w-8 h-8 rounded-full object-cover border border-white/10 cursor-pointer"
-        />
+        <Link to="admin/allproducts">
+          <img
+            src={mohamed}
+            alt="User avatar"
+            className="w-8 h-8 rounded-full object-cover border border-white/10 cursor-pointer"
+          />
+        </Link>
       </div>
     </nav>
   );
