@@ -16,6 +16,7 @@ import AdminAllOrdersPage from "./Page/Admin/AdminAllOrdersPage";
 import AdminOrderDetalisPage from "./Page/Admin/AdminOrderDetalisPage ";
 import AdminAddbrandPage from "../src/Page/Admin/AdminAddBrandPage";
 import AdminAddCategoryPage from "../src/Page/Admin/AdminAddCategoryPage";
+import AdminAddSubCategoryPage from "../src/Page/Admin/AdminAddSubCategoryPage";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
             />
             <Route path="/admin/addbrand" element={<AdminAddbrandPage />} />
             <Route path="/admin/addcategory" element={<AdminAddCategoryPage />}/>
+            <Route path="/admin/addsubcategory" element={<AdminAddSubCategoryPage />}/>
           </Routes>
         </main>
         <Footer />
