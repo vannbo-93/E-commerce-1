@@ -12,6 +12,8 @@ import ProductDetailsPage from "../src/Components/Products/ProductDetailsPage";
 import CartPage from "../src/Page/cart/CartPage";
 import ChoosePayMethoudPage from "../src/Page/Checkout/ChoosePayMethoudPage";
 import AdminAllProductsPage from "./Page/Admin/AdminAllProductsPage";
+import AdminAllOrdersPage from "./Page/Admin/AdminAllOrdersPage";
+import AdminOrderDetalisPage from "./Page/Admin/AdminOrderDetalisPage ";
 
 // Placeholder admin components are not yet implemented in this app so the admin
 // routes are guarded behind a simple conditional component to avoid TS errors.
@@ -48,14 +50,9 @@ function App() {
               path="/admin/allproducts"
               element={<AdminAllProductsPage />}
             />
-            {/* <Route path="/admin" element={<AdminLayout />}>
-              <Route path="allorders" element={<AdminAllOrdersPage />} />
-              <Route path="allproducts" element={<AdminAllProductsPage />} />
-              <Route path="addbrand" element={<AddBrandPage />} />
-              <Route path="addcategory" element={<AddCategoryPage />} />
-              <Route path="addsubcategory" element={<AddSubcategoryPage />} />
-              <Route path="addproducts" element={<AddProductPage />} />
-            </Route> */}
+            <Route path="/admin/allorders" element={<AdminAllOrdersPage />} />
+            <Route path="/admin/orders/:id" element={<AdminOrderDetalisPage />}
+            />
           </Routes>
         </main>
         <Footer />

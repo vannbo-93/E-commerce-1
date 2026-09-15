@@ -1,6 +1,9 @@
 /** @format */
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Almarai", sans-serif;
+}
 :root {
   --text: #6b6375;
   --text-h: #08060d;
