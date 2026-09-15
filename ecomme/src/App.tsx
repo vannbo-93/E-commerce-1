@@ -14,15 +14,7 @@ import ChoosePayMethoudPage from "../src/Page/Checkout/ChoosePayMethoudPage";
 import AdminAllProductsPage from "./Page/Admin/AdminAllProductsPage";
 import AdminAllOrdersPage from "./Page/Admin/AdminAllOrdersPage";
 import AdminOrderDetalisPage from "./Page/Admin/AdminOrderDetalisPage ";
-
-// Placeholder admin components are not yet implemented in this app so the admin
-// routes are guarded behind a simple conditional component to avoid TS errors.
-// const AdminLayout = () => <>{null}</const>;
-// const AdminAllOrdersPage = () => null;
-// const AddBrandPage = () => null;
-// const AddCategoryPage = () => null;
-// const AddSubcategoryPage = () => null;
-// const AddProductPage = () => null;
+import AdminAddbrandPage from "../src/Page/Admin/AdminAddBrandPage";
 
 function App() {
   return (
@@ -51,8 +43,11 @@ function App() {
               element={<AdminAllProductsPage />}
             />
             <Route path="/admin/allorders" element={<AdminAllOrdersPage />} />
-            <Route path="/admin/orders/:id" element={<AdminOrderDetalisPage />}
+            <Route
+              path="/admin/orders/:id"
+              element={<AdminOrderDetalisPage />}
             />
+            <Route path="/admin/addbrand" element={<AdminAddbrandPage />} />
           </Routes>
         </main>
         <Footer />

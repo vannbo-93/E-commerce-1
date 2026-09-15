@@ -116,3 +116,17 @@ code {
   background: var(--code-bg);
   /* background-color: #9ca3af; */
 }
+
+/* @keyframes pulse-scale {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 1.8s ease-in-out infinite;
+} */
