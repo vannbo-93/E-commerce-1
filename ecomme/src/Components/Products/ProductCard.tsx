@@ -4,17 +4,36 @@ import favoff from "../../images/fav-off.png";
 import rate from "../../images/rate.png";
 import { Link } from "react-router-dom";
 
-type ProductCardProps = {id: string | number;title?: string;price?: number;ratingValue?: number;};
-const ProductCard = ({id,title,price = 880,ratingValue = 4.5,}: ProductCardProps) => {
+type ProductCardProps = {
+  id: string | number;
+  title?: string;
+  price?: number;
+  ratingValue?: number;
+};
+const ProductCard = ({
+  id,
+  title,
+  price = 880,
+  ratingValue = 4.5,
+}: ProductCardProps) => {
   return (
-    <div className="w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/3 flex p-2">
+    <div className="flex p-2">
       <Link to={`/products/${id}`} className="no-underline w-full">
-        <div className="my-2 w-full h-[345px] rounded-lg border-none bg-white
-         shadow-[0_2px_2px_0_rgba(151,151,151,0.5)] overflow-hidden">
-          <img src={prod1} alt={title || "product"} className="h-[228px] w-full object-cover"/>
+        <div
+          className="my-2 w-full rounded-lg border-none bg-white
+ shadow-[0_2px_2px_0_rgba(151,151,151,0.5)] overflow-hidden">
+          <img
+            src={prod1}
+            alt={title || "product"}
+            className="w-full aspect-square object-cover"
+          />
 
           <div className="flex justify-end mx-2">
-            <img src={favoff} alt="favorite toggle" className="h-6 w-[26px] text-center"/>
+            <img
+              src={favoff}
+              alt="favorite toggle"
+              className="h-6 w-[26px] text-center"
+            />
           </div>
 
           <div className="p-3">
