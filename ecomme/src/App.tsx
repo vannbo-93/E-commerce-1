@@ -17,6 +17,7 @@ import AdminOrderDetalisPage from "./Page/Admin/AdminOrderDetalisPage ";
 import AdminAddbrandPage from "../src/Page/Admin/AdminAddBrandPage";
 import AdminAddCategoryPage from "../src/Page/Admin/AdminAddCategoryPage";
 import AdminAddSubCategoryPage from "../src/Page/Admin/AdminAddSubCategoryPage";
+import AdminAddProductsPage from "./Page/Admin/AdminAddProductsPage";
 
 function App() {
   return (
@@ -50,8 +51,15 @@ function App() {
               element={<AdminOrderDetalisPage />}
             />
             <Route path="/admin/addbrand" element={<AdminAddbrandPage />} />
-            <Route path="/admin/addcategory" element={<AdminAddCategoryPage />}/>
-            <Route path="/admin/addsubcategory" element={<AdminAddSubCategoryPage />}/>
+            <Route
+              path="/admin/addcategory"
+              element={<AdminAddCategoryPage />}
+            />
+            <Route
+              path="/admin/addsubcategory"
+              element={<AdminAddSubCategoryPage />}
+            />
+            <Route path="/admin/addproducts" element={<AdminAddProductsPage />} />
           </Routes>
         </main>
         <Footer />

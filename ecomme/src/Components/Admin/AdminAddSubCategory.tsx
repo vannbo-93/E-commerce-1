@@ -10,19 +10,31 @@ const AdminAddSubCategory = () => {
 
       <div className="bg-[#1E1E2E] border border-gray-700/50 rounded-2xl p-6 w-full">
         <div className="flex flex-col gap-2 mb-5">
-          <label htmlFor="subcategory-name"
-            className="text-sm font-semibold text-gray-300 underline decoration-blue-400 decoration-1 underline-offset-4"> Subcategory Name
+          <label
+            htmlFor="subcategory-name"
+            className="text-sm font-semibold text-gray-300 underline decoration-blue-400 decoration-1 underline-offset-4">
+            {" "}
+            Subcategory Name
           </label>
-          <input id="subcategory-name" type="text" placeholder="Subcategory Name"
-            className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"/>
+          <input
+            id="subcategory-name"
+            type="text"
+            placeholder="Subcategory Name"
+            className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"
+          />
         </div>
 
         <div className="flex flex-col gap-2 mb-6">
-          <label htmlFor="parent-category"
+          <label
+            htmlFor="parent-category"
             className="text-sm font-semibold text-gray-300 underline decoration-blue-400 decoration-1 underline-offset-4">
             Parent Category
           </label>
-          <select id="parent-category" name="languages" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}
+          <select
+            id="parent-category"
+            name="languages"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
             className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400">
             <option value="val">First Category</option>
             <option value="val2">Second Category</option>
@@ -32,7 +44,9 @@ const AdminAddSubCategory = () => {
         </div>
 
         <div className="flex justify-end">
-          <button className="h-10 px-6 rounded-md bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors"> Save Changes
+          <button className="h-10 px-6 rounded-md bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors">
+            {" "}
+            Save Changes
           </button>
         </div>
       </div>

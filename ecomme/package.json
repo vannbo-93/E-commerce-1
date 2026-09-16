@@ -24,6 +24,7 @@
     "react-image-gallery": "^2.1.2",
     "react-rating-stars-component": "^2.2.0",
     "react-router-dom": "^7.18.3",
+    "react-select": "^5.10.2",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
