@@ -21,7 +21,8 @@ import AdminAddProductsPage from "./Page/Admin/AdminAddProductsPage";
 import UserAllOrdersPage from "./Page/User/UserAllOrdersPage";
 import UserFavoriteProductsPage from "../src/Page/User/UserFavoriteProductsPage";
 import UserAllAddressPage from "../src/Page/User/UserAllAddressPage";
-import UserAddAddressPage from "../src/Page/User/UserAddAddressPage"
+import UserAddAddressPage from "../src/Page/User/UserAddAddressPage";
+import UserEditAddressPage from "../src/Page/User/UserEditAddressPage";
 
 function App() {
   return (
@@ -74,6 +75,10 @@ function App() {
             />
             <Route path="/user/address" element={<UserAllAddressPage />} />
             <Route path="/user/add-address" element={<UserAddAddressPage />} />
+            <Route
+              path="/user/edit-address"
+              element={<UserEditAddressPage />}
+            />
           </Routes>
         </main>
         <Footer />

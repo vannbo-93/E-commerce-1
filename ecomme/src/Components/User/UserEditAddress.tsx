@@ -1,9 +1,12 @@
 /** @format */
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 
-const UserAddAddress = () => {
-  const [form, setForm] = useState({ label: "", details: "", phone: "" });
+const UserEditAddress = () => {
+  const [form, setForm] = useState({
+    label: "Home",
+    details: "Let Al Amal knetra morocco",
+    phone: "+212667500649",
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -13,13 +16,13 @@ const UserAddAddress = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: call API to save the address
+    // TODO: call API to save the changes
     console.log(form);
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col items-start">
-      <div className=" text-lg font-bold text-white mb-4">Add New Address</div>
+      <div className=" text-lg font-bold text-white mb-4">Edit Address</div>
 
       <div className="w-full sm:w-8/12 flex flex-col">
         <input
@@ -27,15 +30,16 @@ const UserAddAddress = () => {
           name="label"
           value={form.label}
           onChange={handleChange}
-          className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"
+          className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm
+           focus:outline-none focus:border-blue-400"
           placeholder="Address label, for example (Home - Work)"
         />
         <textarea
           name="details"
           value={form.details}
           onChange={handleChange}
-          className="input-form-area p-2 mt-3 h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white
-           text-sm focus:outline-none focus:border-blue-400"
+          className="input-form-area p-2 mt-3 h-10 bg-[#2A2A3C] border border-gray-600 rounded-md 
+          px-3 text-white text-sm focus:outline-none focus:border-blue-400"
           rows={4}
           cols={50}
           placeholder="Address details"
@@ -45,22 +49,22 @@ const UserAddAddress = () => {
           name="phone"
           value={form.phone}
           onChange={handleChange}
-          className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"
+          className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm 
+          focus:outline-none focus:border-blue-400"
           placeholder="Phone number"
         />
       </div>
 
       <div className="w-full sm:w-8/12 flex justify-end">
-        <Link to="/user/edit-address">
-          <button
-            type="submit"
-            className=" h-10 px-6 rounded-md bg-blue-500 text-white 
+        <button
+          type="submit"
+          className=" h-10 px-6 rounded-md bg-blue-500 text-white 
           text-sm font-semibold hover:bg-blue-600 transition-colors mt-6">
-            Add Address
-          </button>
-        </Link>
+          {" "}
+          Save Address Changes
+        </button>
       </div>
     </form>
   );
 };
-export default UserAddAddress;
+export default UserEditAddress;
