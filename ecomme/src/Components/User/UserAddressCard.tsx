@@ -11,12 +11,16 @@ const UserAddressCard = () => {
 
           <div className="flex p-2">
             <div className="flex items-center gap-2">
-              <button type="button"  aria-label="Edit order"
+              <button
+                type="button"
+                aria-label="Edit order"
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 
                 text-blue-400 transition-colors hover:bg-blue-500 hover:text-white">
                 <IconPencil size={16} className="h-5 w-5" />
               </button>
-              <button type="button" aria-label="Remove order"
+              <button
+                type="button"
+                aria-label="Remove order"
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/10 text-red-400 
                 transition-colors hover:bg-red-500 hover:text-white">
                 <IconTrash size={16} className="h-5 w-5" />
