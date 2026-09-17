@@ -8,7 +8,7 @@ const UserFavoriteProduct = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="admin-content-text">preferable products</div>
+      <div className="admin-content-text text-lg font-bold text-white mb-4">preferable products</div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
         {favoriteProducts.map((title, index) => (

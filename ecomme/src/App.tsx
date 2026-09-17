@@ -20,6 +20,7 @@ import AdminAddSubCategoryPage from "../src/Page/Admin/AdminAddSubCategoryPage";
 import AdminAddProductsPage from "./Page/Admin/AdminAddProductsPage";
 import UserAllOrdersPage from "./Page/User/UserAllOrdersPage";
 import UserFavoriteProductsPage from "../src/Page/User/UserFavoriteProductsPage";
+import UserAllAddressPage from "../src/Page/User/UserAllAddressPage";
 
 function App() {
   return (
@@ -66,7 +67,11 @@ function App() {
               element={<AdminAddProductsPage />}
             />
             <Route path="/user/allorders" element={<UserAllOrdersPage />} />
-            <Route path="/user/favoriteproducts" element={<UserFavoriteProductsPage />} />
+            <Route
+              path="/user/favoriteproducts"
+              element={<UserFavoriteProductsPage />}
+            />
+            <Route path="/user/address" element={<UserAllAddressPage />} />
           </Routes>
         </main>
         <Footer />
