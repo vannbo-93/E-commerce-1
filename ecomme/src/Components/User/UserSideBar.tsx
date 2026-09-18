@@ -6,8 +6,6 @@ const links = [
   { to: "/user/allorders", label: "Order Management" },
   { to: "/user/favoriteproducts", label: "Wishlist" },
   { to: "/user/address", label: "Personal Address" },
-  //   { to: "/user/add-address", label: "Add Personal Address" },
-  //   { to: "/user/edit-address", label: "Edit Address" },
   { to: "/user/profile", label: "Profile" },
 ];
 
