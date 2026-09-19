@@ -1,10 +1,10 @@
 /** @format */
 import ProductCard from "./ProductCard";
 import SubTitle from "../Utility/SubTitle";
-import fitness from "../../../src/images/allProducts/tracker.png";
-import drone from "../../../src/images/allProducts/drone.png";
-import headphones from "../../../src/images/allProducts/wirelessheadphones.png";
-import earbuds from "../../../src/images/allProducts/wirelessearbuds.png";
+import charger from "../../../src/images/allProducts/wirelesscharger.png";
+import securitycamera from "../../../src/images/allProducts/wificamera.png";
+import headset from "../../../src/images/allProducts/headset.png";
+import keyboard from "../../../src/images/allProducts/keyboard.png";
 
 interface ProductCardContainerProps {
   title?: string;
@@ -16,43 +16,43 @@ interface ProductCardContainerProps {
 const products = [
   {
     id: "1",
-    title: "fitness tracke",
-    image: fitness,
+    title: "wireless charger",
+    image: charger,
     ratingValue: 4.5,
-    ratingCount: 33,
-    price: 54.99,
-    oldPrice: 70.99,
+    ratingCount: 56,
+    price: 32.99,
+    oldPrice: 44.99,
   },
   {
     id: "2",
-    title: "camera drone",
-    image: drone,
-    ratingValue: 4.6,
-    ratingCount: 128,
-    price: 699.99,
-    oldPrice: 700.99,
+    title: "security camera",
+    image: securitycamera,
+    ratingValue: 4.1,
+    ratingCount: 34,
+    price: 23.99,
+    oldPrice: 30.99,
   },
   {
     id: "3",
-    title: "wireless headphones",
-    image: headphones,
-    ratingValue: 4.9,
-    ratingCount: 76,
-    price: 99.99,
-    oldPrice: 129.99,
+    title: "headset",
+    image: headset,
+    ratingValue: 4.4,
+    ratingCount: 23,
+    price: 236.99,
+    oldPrice: 299.99,
   },
   {
     id: "4",
-    title: "wireless earbuds",
-    image: earbuds,
-    ratingValue: 4.3,
-    ratingCount: 45,
-    price: 89.99,
-    oldPrice: 112.99,
+    title: "mechanical keyboard",
+    image: keyboard,
+    ratingValue: 4.9,
+    ratingCount: 655,
+    price: 120.99,
+    oldPrice: 150.99,
   },
 ];
 
-const CardProductsContainer = ({
+const NewArrivals = ({
   title,
   btntitle,
   pathText,
@@ -73,4 +73,4 @@ const CardProductsContainer = ({
   );
 };
 
-export default CardProductsContainer;
+export default NewArrivals;

@@ -13,13 +13,13 @@ export default function CustomIcons() {
           renderItem={(item) => <PaginationItem {...item} />}
           sx={{
             "& .MuiPaginationItem-root": {
-              color: "white",
+              color: "black",
               fontSize: "1.25rem",
               width: 44,
               height: 44,
               "&:hover": {
                 color: "black",
-                backgroundColor: "white",
+                backgroundColor: "sky-blue-700",
               },
             },
           }}

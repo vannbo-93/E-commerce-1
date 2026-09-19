@@ -2,17 +2,23 @@
 
 const CategoryCard = ({ title, img }: { title: string; img: string }) => {
   return (
-    <div className="flex flex-col items-center justify-center gap-2">
-      <img
-        src={img}
-        alt={title}
-        className="w-30 h-30 rounded-lg object-cover cursor-pointer "
-      />
-      <h3
-        className="text-sm font-medium bg-linear-to-r from-pink-200 to-violet-400
-       bg-clip-text text-6xl text-transparent text-shadow-lg">
-        {title}
-      </h3>
+    <div className="group cursor-pointer">
+      <div
+        className="flex flex-col items-center rounded-xl p-3
+          transition-all duration-300 hover:-translate-y-1">
+        <img
+          src={img}
+          alt={title}
+          className="h-30 w-30 rounded-xl object-cover shadow-sm
+          transition-transform duration-300 group-hover:scale-105"
+        />
+
+        <h3
+          className="mt-3 text-sm font-semibold transition-colors duration-300
+          group-hover:text-sky-500">
+          {title}
+        </h3>
+      </div>
     </div>
   );
 };

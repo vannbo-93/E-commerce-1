@@ -1,60 +1,88 @@
 /** @format */
-import prod1 from "../../images/item.png";
-import favoff from "../../images/fav-off.png";
-import rate from "../../images/rate.png";
-import { Link } from "react-router-dom";
 
-type ProductCardProps = {
+import { Link } from "react-router-dom";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import StarIcon from "@mui/icons-material/Star";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+
+interface ProductCardProps {
   id: string | number;
+  image: string;
   title?: string;
-  price?: number;
-  ratingValue?: number;
-};
-const ProductCard = ({
+  ratingValue: number;
+  ratingCount?: number;
+  price: number;
+  oldPrice?: number;
+  onAddToCart?: (id: string | number) => void;
+}
+
+export default function ProductCard({
   id,
+  image,
   title,
-  price = 880,
-  ratingValue = 4.5,
-}: ProductCardProps) => {
+  ratingValue,
+  ratingCount,
+  price,
+  oldPrice,
+  onAddToCart,
+}: ProductCardProps) {
   return (
     <div className="flex p-2">
-      <Link to={`/products/${id}`} className="no-underline w-full">
-        <div
-          className="my-2 w-full rounded-lg border-none bg-white
- shadow-[0_2px_2px_0_rgba(151,151,151,0.5)] overflow-hidden">
-          <img
-            src={prod1}
-            alt={title || "product"}
-            className="w-full aspect-square object-cover"
-          />
-
-          <div className="flex justify-end mx-2">
+      <div className="my-2 w-full overflow-hidden rounded-2xl bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.12)]">
+        {/* منطقة الصورة*/}
+        <div className="relative bg-gray-50">
+          <Link to={`/products/${id}`}>
             <img
-              src={favoff}
-              alt="favorite toggle"
-              className="h-6 w-[26px] text-center"
+              src={image}
+              alt={title || "product"}
+              className="w-full aspect-square object-contain p-2 rounded-2xl "
             />
-          </div>
-
-          <div className="p-3">
-            <div className="card-title font-medium mb-2">
-              {title || "Smart watch"}
-            </div>
-
-            <div className="flex justify-between">
-              <div className="flex items-center">
-                <img src={rate} alt="rating" className="h-4 w-4" />
-                <div className="card-rate mx-2">{ratingValue}</div>
-              </div>
-              <div className="flex">
-                <div className="card-price">{price}</div>
-                <div className="card-currency mx-1">MAD</div>
-              </div>
-            </div>
-          </div>
+          </Link>
+          {/* زر المفضلة */}
+          <button
+            type="button"
+            aria-label="favorite toggle"
+            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md duration-500 
+            hover:-translate-y-0.5 hover:text-red-500">
+            <FavoriteBorderIcon className="!h-5 !w-5" />
+          </button>
         </div>
-      </Link>
+
+        {/* المحتوى */}
+        <div className="p-4">
+          <Link to={`/products/${id}`} className="no-underline text-gray-900">
+            <div className="text-base font-medium">{title || "product"}</div>
+          </Link>
+
+          <div className="mt-2 flex items-center gap-1 text-sm">
+            <StarIcon className="!h-4 !w-4 text-yellow-500" />
+            <span className="font-bold">{ratingValue}</span>
+            {ratingCount !== undefined && (
+              <span className="text-gray-400">({ratingCount})</span>
+            )}
+          </div>
+
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-xl font-bold text-gray-900">
+              ${price.toFixed(2)}
+            </span>
+            {oldPrice !== undefined && (
+              <span className="text-sm text-gray-400 line-through">
+                ${oldPrice.toFixed(2)}
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onAddToCart?.(id)}
+            className="mt-4 flex w-full items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-medium px-5 py-3 rounded-lg transition-colors cursor-pointer">
+            <ShoppingCartOutlinedIcon className="!h-5 !w-5" />
+            Add to Cart
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
-export default ProductCard;
+}
+//"flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-medium px-5 py-3 rounded-lg transition-colors"

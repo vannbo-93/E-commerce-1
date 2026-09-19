@@ -34,7 +34,10 @@ const Footer = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-sky-500 hover:-translate-y-0.5 transition-all duration-200">
-            <Phone size={23} />
+            <div className="flex items-center gap-3">
+              <Phone size={23} />
+              <p>+212938573498</p>
+            </div>
           </a>
           <span className="w-px h-6 bg-gray-600 hidden sm:block" />
           <div className="flex items-center gap-4">
