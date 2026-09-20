@@ -1,8 +1,11 @@
 /** @format */
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
 import CartItem from "../../Components/Cart/CartItem";
 import CartCheckout from "../../Components/Cart/CartCheckout";
-import mobile from "../../images/mobile.png";
+import smartphone from "../../../src/images/allProducts/smartphone.png";
+import watch from "../../../src/images/allProducts/smartwatch.png";
 
 interface CartItemData {
   id: number;
@@ -19,25 +22,25 @@ interface CartItemData {
 const initialItems: CartItemData[] = [
   {
     id: 1,
-    image: mobile,
-    category: "electronics",
-    title: "iPhone XR with 128GB storage and 4G LTE support",
-    rate: 4.5,
-    brand: "Apple",
-    color: "#E52C2C",
-    quantity: 1,
-    price: 3000,
-  },
-  {
-    id: 2,
-    image: mobile,
+    image: watch,
     category: "electronics",
     title: "Samsung Galaxy S21",
     rate: 4.2,
     brand: "Samsung",
     color: "#2C2CE5",
     quantity: 1,
-    price: 4500,
+    price: 78,
+  },
+  {
+    id: 2,
+    image: smartphone,
+    category: "electronics",
+    title: "Samsung Galaxy S21",
+    rate: 4.2,
+    brand: "Samsung",
+    color: "#f40000",
+    quantity: 1,
+    price: 560,
   },
 ];
 
@@ -61,38 +64,67 @@ const CartPage = () => {
     0,
   );
 
+  const itemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
   const handleApplyCoupon = (code: string) => {
     console.log("Applying coupon:", code);
   };
 
   return (
-    <div className="container mx-auto px-4" style={{ minHeight: "680px" }}>
-      <h1 className="text-xl font-bold mt-6 mb-4">Shopping Cart</h1>
+    <div className="container mx-auto min-h-[680px] px-4 pb-10">
+      {/* حجم العنوان بـ style لأن CSS عامًا على h1 قد يتغلب على فئات Tailwind */}
+      <div className="mb-5 mt-6 flex items-center gap-3">
+        <h1 className="font-bold text-gray-900" style={{ fontSize: "1.75rem" }}>
+          Shopping Cart
+        </h1>
+        {items.length > 0 ? (
+          <span className="rounded-full bg-sky-50 px-3 py-1 text-sm font-medium text-sky-600">
+            {itemsCount} {itemsCount === 1 ? "item" : "items"}
+          </span>
+        ) : null}
+      </div>
 
-      <div className="flex flex-col md:flex-row gap-6 items-start">
-        <div className="w-full md:w-2/3 border border-gray-700 rounded-xl px-4">
+      <div className="flex flex-col items-start gap-6 md:flex-row">
+        <div className="w-full rounded-2xl bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.1)] md:w-2/3">
           {items.length === 0 ? (
-            <div className="text-center py-10 text-gray-500">The cart is empty</div>
+            <div className="flex flex-col items-center gap-3 px-4 py-14 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-sky-50 text-sky-500">
+                <ShoppingCart size={28} />
+              </div>
+              <p className="text-base font-semibold text-gray-900">
+                Your cart is empty
+              </p>
+              <p className="text-sm text-gray-500">
+                Looks like you haven't added anything yet.
+              </p>
+              <Link
+                to="/shop"
+                className="mt-2 rounded-lg bg-sky-500 px-6 py-3 text-sm font-medium text-white no-underline transition-colors hover:bg-sky-600">
+                Continue Shopping
+              </Link>
+            </div>
           ) : (
-            items.map((item) => (
-              <CartItem
-                key={item.id}
-                image={item.image}
-                category={item.category}
-                title={item.title}
-                rate={item.rate}
-                brand={item.brand}
-                color={item.color}
-                quantity={item.quantity}
-                price={item.price}
-                onQuantityChange={(q) => handleQuantityChange(item.id, q)}
-                onDelete={() => handleDelete(item.id)}
-              />
-            ))
+            <div className="divide-y divide-gray-100 px-4">
+              {items.map((item) => (
+                <CartItem
+                  key={item.id}
+                  image={item.image}
+                  category={item.category}
+                  title={item.title}
+                  rate={item.rate}
+                  brand={item.brand}
+                  color={item.color}
+                  quantity={item.quantity}
+                  price={item.price}
+                  onQuantityChange={(q) => handleQuantityChange(item.id, q)}
+                  onDelete={() => handleDelete(item.id)}
+                />
+              ))}
+            </div>
           )}
         </div>
 
-        <div className="w-full md:w-1/3">
+        <div className="w-full md:sticky md:top-24 md:w-1/3">
           <CartCheckout total={total} onApplyCoupon={handleApplyCoupon} />
         </div>
       </div>
