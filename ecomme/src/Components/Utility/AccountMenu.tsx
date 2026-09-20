@@ -134,16 +134,16 @@ const AccountMenu = ({
                 role="menuitem"
                 onClick={close}
                 className={itemClass}>
-                <LogIn size={18} />
-                Sign in
+                {" "}
+                <LogIn size={18} /> Sign in
               </Link>
               <Link
                 to="/register"
                 role="menuitem"
                 onClick={close}
                 className={itemClass}>
-                <UserPlus size={18} />
-                Create account
+                {" "}
+                <UserPlus size={18} /> Create account
               </Link>
             </div>
           )}

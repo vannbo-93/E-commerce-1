@@ -76,7 +76,8 @@ export default function ProductCard({
           <button
             type="button"
             onClick={() => onAddToCart?.(id)}
-            className="mt-4 flex w-full items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-medium px-5 py-3 rounded-lg transition-colors cursor-pointer">
+            className="mt-4 flex w-full items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white 
+            font-medium px-5 py-3 rounded-lg transition-colors cursor-pointer whitespace-nowrap px-2 text-sm md:text-base">
             <ShoppingCartOutlinedIcon className="!h-5 !w-5" />
             Add to Cart
           </button>
@@ -85,4 +86,3 @@ export default function ProductCard({
     </div>
   );
 }
-//"flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-medium px-5 py-3 rounded-lg transition-colors"

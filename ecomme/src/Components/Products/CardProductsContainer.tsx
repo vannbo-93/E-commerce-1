@@ -11,7 +11,6 @@ interface ProductCardContainerProps {
   btntitle?: string;
   pathText?: string;
 }
-
 // بيانات مؤقتة: استبدلها لاحقًا ببيانات الـ API
 const products = [
   {
@@ -62,7 +61,7 @@ const CardProductsContainer = ({
       {title ? (
         <SubTitle title={title} btnTitle={btntitle} pathText={pathText} />
       ) : null}
-      <div className=" grid grid-cols-2 gap-2 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
         {products.map((product) => (
           <div key={product.id} className="min-w-0">
             <ProductCard {...product} />

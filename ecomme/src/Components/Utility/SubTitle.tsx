@@ -14,7 +14,8 @@ const SubTitle = ({
   return (
     <div className="flex justify-between items-center pt-5 p-5 ">
       <h2 className="text-lg font-bold">{title}</h2>
-      <div className="hover:bg-gray-50 cursor-pointer font-bold text-sky-400   hover:-translate-y-0.5 transition-all duration-200">
+      <div className="hover:bg-gray-50 cursor-pointer font-bold text-sky-400  
+       hover:-translate-y-0.5 transition-all duration-200">
         {btnTitle && pathText ? (
           <Link to={pathText}>
             <div className="flex items-center font-bold">

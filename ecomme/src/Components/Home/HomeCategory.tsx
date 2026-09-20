@@ -6,13 +6,11 @@ import controller from "../../../src/images/allProducts/controller.png";
 import smartphone from "../../../src/images/allProducts/smartphone.png";
 import watch from "../../../src/images/allProducts/smartwatch.png";
 import microphone from "../../../src/images/allProducts/microphone.png";
-// import headset from "../../../src/images/allProducts/headset.png";
 
 const HomeCategory = () => {
   return (
     <>
       <SubTitle
-        // title="Featured Products"
         title="Shop by Category"
         btnTitle="View All Category"
         pathText="/allcategory"
@@ -23,7 +21,6 @@ const HomeCategory = () => {
         <CategoryCard title="Smartphones" img={smartphone} />
         <CategoryCard title="Smartwatches" img={watch} />
         <CategoryCard title="Microphones" img={microphone} />
-        {/* <CategoryCard title="vr headset" img={headset} /> */}
       </div>
     </>
   );

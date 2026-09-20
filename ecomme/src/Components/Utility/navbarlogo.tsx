@@ -4,6 +4,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import shop from "../../../src/images/Logo/shop.png";
 import AccountMenu from "./AccountMenu";
+import { Heart } from "lucide-react";
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -15,9 +16,10 @@ const navItems = [
 interface NavBarLogoProps {
   cartCount?: number; // اربطه بحالة السلة الفعلية
   accountPath?: string; // صفحة الحساب أو تسجيل الدخول
+  favoritesCount?: number;
 }
 
-function NavBarLogo({ cartCount = 0 }: NavBarLogoProps) {
+function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -40,18 +42,10 @@ function NavBarLogo({ cartCount = 0 }: NavBarLogoProps) {
 
   const searchForm = (className: string) => (
     <form onSubmit={handleSearch} role="search" className={className}>
-      <Search
-        size={16}
-        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-      />
-      <input
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search"
-        aria-label="Search products"
-        className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-sky-400"
-      />
+      <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
+      <input type="search" value={query} onChange={(e) => setQuery(e.target.value)}  placeholder="Search"
+        aria-label="Search products" className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none 
+        transition-colors placeholder:text-gray-400 focus:border-sky-400"/>
     </form>
   );
 
@@ -71,6 +65,7 @@ function NavBarLogo({ cartCount = 0 }: NavBarLogoProps) {
               to={item.path}
               end={item.path === "/"}
               className={linkClass}>
+              {" "}
               {item.label}
             </NavLink>
           ))}
@@ -79,6 +74,18 @@ function NavBarLogo({ cartCount = 0 }: NavBarLogoProps) {
         {/* الجهة اليمنى */}
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           {searchForm("relative hidden w-40 md:block lg:w-64")}
+
+          <Link
+            to="/user/favorite"
+            aria-label={`Wishlist, ${favoritesCount} items`}
+            className="relative hidden h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 hover:text-sky-500 sm:flex">
+            <Heart size={22} />
+            {favoritesCount > 0 ? (
+              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 px-1 text-xs font-semibold text-white">
+                {favoritesCount > 99 ? "99+" : favoritesCount}
+              </span>
+            ) : null}
+          </Link>
 
           <Link
             to="/cart"
