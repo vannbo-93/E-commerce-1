@@ -39,7 +39,8 @@ const CartCheckout: React.FC<CartCheckoutProps> = ({
       {/* الكوبون: min-w-0 يسمح للحقل بالانكماش فلا يُقص الزر */}
       <form onSubmit={handleApply} className="flex gap-2">
         <input
-          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-sky-400"
+          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none transition-colors
+           placeholder:text-gray-400 focus:border-sky-400"
           placeholder="Coupon code"
           aria-label="Coupon code"
           value={couponCode}
@@ -48,7 +49,8 @@ const CartCheckout: React.FC<CartCheckoutProps> = ({
         <button
           type="submit"
           disabled={!canApply}
-          className="shrink-0 rounded-lg bg-sky-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500">
+          className="shrink-0 rounded-lg bg-sky-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-600 
+          disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500">
           Apply
         </button>
       </form>
@@ -59,10 +61,11 @@ const CartCheckout: React.FC<CartCheckoutProps> = ({
           {formatPrice(total)}
         </span>
       </div>
-
+      
       {canCheckout ? (
         <Link
           to={CHECKOUT_PATH}
+          state={{ total }}
           className="mt-4 block w-full rounded-lg bg-sky-500 py-3 text-center font-semibold text-white no-underline transition-colors hover:bg-sky-600">
           Checkout
         </Link>
@@ -76,5 +79,4 @@ const CartCheckout: React.FC<CartCheckoutProps> = ({
     </div>
   );
 };
-
 export default CartCheckout;

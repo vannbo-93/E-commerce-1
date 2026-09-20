@@ -30,6 +30,11 @@ const paymentOptions: {
   },
 ];
 
+const formatPrice = (value: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+    value,
+  );
+
 const ChoosePayMethoud: React.FC<ChoosePayMethoudProps> = ({
   total,
   onConfirm,
@@ -46,81 +51,95 @@ const ChoosePayMethoud: React.FC<ChoosePayMethoudProps> = ({
   };
 
   return (
-    <div className="max-w-xl mx-auto">
-      <h2 className="text-xl font-bold pt-8 mb-1">Choose a payment method</h2>
-      <p className="text-sm text-gray-400 mb-6">
-        Select the preferred method to complete your payment
-      </p>
+    <div className="mx-auto max-w-xl px-4 pb-10">
+      <div className="mt-8 rounded-2xl bg-white p-6 shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
+        {/* حجم العنوان بـ style لأن CSS عامًا على العناوين قد يتغلب على Tailwind */}
+        <h2
+          className="mb-1 font-bold text-gray-900"
+          style={{ fontSize: "1.5rem" }}>
+          Choose a payment method
+        </h2>
+        <p className="mb-6 text-sm text-gray-500">
+          Select the preferred method to complete your payment
+        </p>
 
-      <div className="flex flex-col gap-3">
-        {paymentOptions.map((option) => {
-          const isSelected = selectedMethod === option.id;
-          return (
-            <label
-              key={option.id}
-              htmlFor={option.id}
-              className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
-                ${
-                  isSelected
-                    ? "border-blue-500 bg-blue-500/10"
-                    : "border-gray-700 hover:border-gray-500"
-                }`}>
-              <input
-                type="radio"
-                name="paymentMethod"
-                id={option.id}
-                value={option.id}
-                checked={isSelected}
-                onChange={() => setSelectedMethod(option.id)}
-                className="hidden"
-              />
+        <fieldset>
+          <legend className="sr-only">Payment method</legend>
+          <div className="flex flex-col gap-3">
+            {paymentOptions.map((option) => {
+              const isSelected = selectedMethod === option.id;
+              return (
+                <label
+                  key={option.id}
+                  htmlFor={option.id}
+                  className={`flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-colors has-[:focus-visible]:ring-2 
+                    has-[:focus-visible]:ring-sky-300 ${
+                      isSelected
+                        ? "border-sky-500 bg-sky-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}>
+                  {/* sr-only بدل hidden ليبقى الاختيار ممكنًا بلوحة المفاتيح */}
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    id={option.id}
+                    value={option.id}
+                    checked={isSelected}
+                    onChange={() => setSelectedMethod(option.id)}
+                    className="sr-only"
+                  />
 
-              <div
-                className={`w-11 h-11 flex items-center justify-center rounded-full shrink-0
-                  ${
-                    isSelected
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-700 text-gray-300"
-                  }`}>
-                {option.icon}
-              </div>
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors ${
+                      isSelected
+                        ? "bg-sky-500 text-white"
+                        : "bg-gray-100 text-gray-600"
+                    }`}>
+                    {option.icon}
+                  </div>
 
-              <div className="flex-1">
-                <div className="font-semibold text-sm">{option.label}</div>
-                <div className="text-xs text-gray-400 mt-0.5">
-                  {option.description}
-                </div>
-              </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-gray-900">
+                      {option.label}
+                    </div>
+                    <div className="mt-0.5 text-xs text-gray-500">
+                      {option.description}
+                    </div>
+                  </div>
 
-              <div
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
-                  ${
-                    isSelected
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-gray-500"
-                  }`}>
-                {isSelected && <Check size={12} className="text-white" />}
-              </div>
-            </label>
-          );
-        })}
-      </div>
+                  <div
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                      isSelected
+                        ? "border-sky-500 bg-sky-500"
+                        : "border-gray-300"
+                    }`}>
+                    {isSelected && <Check size={12} className="text-white" />}
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
 
-      <div className="flex justify-between items-center gap-3 mt-8 pt-5 border-t border-gray-700">
-        <div className="flex flex-col">
-          <span className="text-xs text-gray-400 font-bold">Amount due</span>
-          <span className="text-lg font-bold">{total} MAD</span>
+        <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 pt-5">
+          <div className="flex flex-col">
+            <span className="text-xs font-medium text-gray-500">
+              Amount due
+            </span>
+            <span className="text-xl font-bold text-gray-900">
+              {formatPrice(total)}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            disabled={!selectedMethod || total <= 0}
+            onClick={handleConfirm}
+            className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-sky-600 active:scale-95 
+            disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500 disabled:active:scale-100">
+            Complete purchase
+          </button>
         </div>
-
-        <button
-          type="button"
-          disabled={!selectedMethod}
-          onClick={handleConfirm}
-          className="px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold
-            disabled:opacity-40 disabled:cursor-not-allowed
-            hover:bg-blue-700 active:scale-95 transition-all">
-          Complete purchase
-        </button>
       </div>
     </div>
   );

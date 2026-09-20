@@ -24,9 +24,9 @@ const initialItems: CartItemData[] = [
     id: 1,
     image: watch,
     category: "electronics",
-    title: "Samsung Galaxy S21",
-    rate: 4.2,
-    brand: "Samsung",
+    title: "Smart watch",
+    rate: 4.6,
+    brand: "LG",
     color: "#2C2CE5",
     quantity: 1,
     price: 78,
@@ -35,7 +35,7 @@ const initialItems: CartItemData[] = [
     id: 2,
     image: smartphone,
     category: "electronics",
-    title: "Samsung Galaxy S21",
+    title: "Samsung Galaxy",
     rate: 4.2,
     brand: "Samsung",
     color: "#f40000",
@@ -74,7 +74,10 @@ const CartPage = () => {
     <div className="container mx-auto min-h-[680px] px-4 pb-10">
       {/* حجم العنوان بـ style لأن CSS عامًا على h1 قد يتغلب على فئات Tailwind */}
       <div className="mb-5 mt-6 flex items-center gap-3">
-        <h1 className="font-bold text-gray-900" style={{ fontSize: "1.75rem" }}>
+        <h1
+          className="font-bold text-gray-900 "
+          style={{ fontSize: "1.75rem" }}>
+          {" "}
           Shopping Cart
         </h1>
         {items.length > 0 ? (
@@ -92,14 +95,17 @@ const CartPage = () => {
                 <ShoppingCart size={28} />
               </div>
               <p className="text-base font-semibold text-gray-900">
+                {" "}
                 Your cart is empty
               </p>
               <p className="text-sm text-gray-500">
+                {" "}
                 Looks like you haven't added anything yet.
               </p>
               <Link
                 to="/shop"
-                className="mt-2 rounded-lg bg-sky-500 px-6 py-3 text-sm font-medium text-white no-underline transition-colors hover:bg-sky-600">
+                className="mt-2 rounded-lg bg-sky-500 px-6 py-3 text-sm font-medium text-white no-underline
+                 transition-colors hover:bg-sky-600">
                 Continue Shopping
               </Link>
             </div>
@@ -131,5 +137,4 @@ const CartPage = () => {
     </div>
   );
 };
-
 export default CartPage;

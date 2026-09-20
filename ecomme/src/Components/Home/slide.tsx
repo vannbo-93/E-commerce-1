@@ -49,7 +49,7 @@ function Slide({ slides = defaultSlides }) {
         NEW COLLECTION 2026
       </span>
       <h1
-        className="font-bold leading-none"
+        className="font-bold leading-none text-gray-900"
         style={{ fontSize: headingSize, margin: "0.15em 0" }}>
         DISCOVER PRODUCTS
       </h1>

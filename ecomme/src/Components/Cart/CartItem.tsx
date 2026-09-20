@@ -1,6 +1,6 @@
 /** @format */
 import React from "react";
-import mobile from "../../images/mobile.png";
+import smartphone from "../../../src/images/allProducts/smartphone.png";
 import { Minus, Plus, Star, Trash2 } from "lucide-react";
 
 interface CartItemProps {
@@ -28,7 +28,7 @@ const stepperBtn =
   "flex h-8 w-8 items-center justify-center text-gray-600 transition-colors hover:text-sky-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-gray-600";
 
 const CartItem: React.FC<CartItemProps> = ({
-  image = mobile,
+  image = smartphone,
   category,
   title,
   rate,
@@ -58,18 +58,23 @@ const CartItem: React.FC<CartItemProps> = ({
             type="button"
             onClick={onDelete}
             aria-label={`Remove ${title}`}
-            className="-mr-1 -mt-1 flex h-8 w-8 items-center justify-center rounded-full text-red-500 transition-colors hover:bg-red-50">
+            className="-mr-1 -mt-1 flex h-8 w-8 items-center justify-center rounded-full text-red-500 
+            transition-colors hover:bg-red-50">
             <Trash2 size={18} />
           </button>
         </div>
 
         {/* العنوان والتقييم */}
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2">
+        <div className="mt-0.5 flex flex-col gap-1">
           <h3 className="line-clamp-2 text-sm font-medium text-gray-900 md:text-base">
             {title}
           </h3>
-          <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-gray-700">
-            <Star size={12} className="fill-yellow-400 text-yellow-400" />
+
+          <span className="shrink-0 text-xs font-semibold text-gray-700">
+            <Star
+              size={14}
+              className="mr-1 inline fill-yellow-400 text-yellow-400 align-[-2px]"
+            />
             {rate}
           </span>
         </div>
