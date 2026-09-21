@@ -1,142 +1,145 @@
 /** @format */
-import { IconTrash } from "@tabler/icons-react";
-import mobile from "../../images/mobile.png";
+import { useState } from "react";
+import { IconStar, IconTrash } from "@tabler/icons-react";
+import vacuum from "../../images/allProducts/vacuum.png";
+
+const cardClass = "rounded-2xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.08)]";
+
+const customer = [
+  { label: "Name", value: "mohamed el aissaoui" },
+  { label: "Phone", value: "+212667500649" },
+  { label: "Email", value: "isawimed@gmail.com" },
+];
 
 const AdminOrderDetalis = () => {
+  const [status, setStatus] = useState("");
+
+  const handleSave = () => {
+    // TODO: Call the API to update the order status.
+    console.log("Save status:", status);
+  };
+
   return (
     <div className="w-full">
-      <div className="admin-content-text mb-3 font-bold ">
+      <div className="mb-4 text-lg font-bold text-gray-900 pt-3">
+        {" "}
         Order Details #5777ae
       </div>
-      <div className="w-full my-2 px-2 gap-3 bg-[#1E1E2E] rounded-xl p-3 border border-gray-700/50">
-        <div className="flex gap-3">
-          <img
-            width="160"
-            height="197"
-            src={mobile}
-            alt=""
-            className="rounded-lg object-cover"
-          />
-          <div className="w-full">
-            <div className="flex flex-row justify-between">
-              <div className="pt-2 text-sm text-gray-300">Electronics</div>
+
+      {/* المنتج */}
+      <div className={`${cardClass} p-3`}>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex h-44 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 sm:w-40">
+            <img
+              src={vacuum}
+              alt="iPhone XR 128GB"
+              className="max-h-[85%] max-w-[85%] object-contain"
+            />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-xs text-gray-500">Electronics</span>
               <button
                 type="button"
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/10
-                 text-red-400 hover:bg-red-500 hover:text-white transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                }}>
-                <IconTrash size={16} />
+                aria-label="Remove product"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-500">
+                <IconTrash size={17} />
               </button>
             </div>
 
-            <div className="flex flex-row justify-start items-start gap-2 mt-2">
-              <div className="text-sm font-semibold text-orange-400">
-                iPhone XR with 128GB storage, 4G LTE support, and FaceTime
-              </div>
-              <div className="pt-1 text-sm text-yellow-400 whitespace-nowrap">
-                {" "}
-                4.5{" "}
-              </div>
+            <h3 className="min-w-0 flex-1 text-sm font-semibold leading-snug text-gray-900">
+              {" "}
+              robot vacuum
+            </h3>
+
+            <div className="flex shrink-0 items-center gap-1 pt-0.5 pt-2">
+              <IconStar size={14} className="fill-amber-400 text-amber-400" />
+              <span className="text-xs font-semibold text-gray-600">4.5</span>
             </div>
 
-            <div className="mt-2 flex items-center gap-2">
-              <div className="text-sm text-gray-400">Brand:</div>
-              <div className="text-sm text-gray-200 font-medium">Apple</div>
-              <div
-                className="w-5 h-5 rounded-full border border-gray-500"
-                style={{ backgroundColor: "#E52C2C" }}></div>
+            <div className="mt-2 flex items-center gap-2 text-sm">
+              <span className="text-gray-500">Brand:</span>
+              <span className="font-medium text-gray-900">Ammmm</span>
+              <span
+                className="ml-1 h-4 w-4 rounded-full border border-gray-200"
+                style={{ backgroundColor: "#E52C2C" }}
+              />
             </div>
 
-            <div className="flex flex-row justify-between mt-2">
-              <div className="flex items-center pt-2 gap-2">
-                <div className="text-sm text-gray-400">Quantity</div>
+            <div className="mt-3 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm">
+                <label htmlFor="quantity" className="text-gray-500">
+                  {" "}
+                  Quantity
+                </label>
                 <input
+                  id="quantity"
                   type="number"
                   min="1"
                   defaultValue={1}
-                  className="w-14 h-7 bg-[#2A2A3C] border border-gray-600 rounded-md px-2 text-white text-sm 
-                  focus:outline-none focus:border-blue-400"
+                  className="h-8 w-16 rounded-lg border border-gray-200 bg-gray-50 px-2 text-center text-sm text-gray-900 focus:border-sky-400 focus:outline-none 
+                  focus:ring-2 focus:ring-sky-400/40"
                 />
               </div>
-              <div className="pt-2 text-sm text-white font-semibold">
+              <span className="text-base font-bold text-gray-900">
                 {" "}
-                3,000 MAD{" "}
-              </div>
+                3,000 MAD
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="w-full mt-4 bg-[#1E1E2E] rounded-xl border border-gray-700/50 p-4 user-data">
-        <div className="admin-content-text pb-3 border-b border-gray-700/50 mb-3 font-bold">
+      {/* بيانات العميل */}
+      <div className={`${cardClass} mt-4 p-4`}>
+        <div className="mb-3 border-b border-gray-100 pb-3 font-bold text-gray-900">
           {" "}
-          Customer Details{" "}
+          Customer Details
         </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <div
-              style={{ fontFamily: "Almarai" }}
-              className="text-[#979797] text-sm w-24">
-              {" "}
-              name:{" "}
+        <dl className="grid grid-cols-[6.5rem_1fr] gap-x-2 gap-y-2 text-sm">
+          {customer.map((item) => (
+            <div key={item.label} className="contents">
+              <dt className="text-gray-500">{item.label}</dt>
+              <dd className="min-w-0 break-words text-gray-900">
+                {" "}
+                {item.value}
+              </dd>
             </div>
-            <div
-              style={{ fontFamily: "Almarai" }}
-              className="text-gray-200 text-sm">
-              {" "}
-              mohamed el aissaoui{" "}
-            </div>
-          </div>
+          ))}
+        </dl>
 
-          <div className="flex items-center gap-2">
-            <div
-              style={{ fontFamily: "Almarai" }}
-              className="text-[#979797] text-sm w-24">
-              {" "}
-              Phone Number:{" "}
-            </div>
-            <div
-              style={{ fontFamily: "Almarai" }}
-              className="text-gray-200 text-sm">
-              {" "}
-              +212667500649{" "}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div
-              style={{ fontFamily: "Almarai" }}
-              className="text-[#979797] text-sm w-24">
-              {" "}
-              Email:{" "}
-            </div>
-            <div
-              style={{ fontFamily: "Almarai" }}
-              className="text-gray-200 text-sm">
-              {" "}
-              isawimed@gmail.com
-            </div>
-          </div>
+        <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
+          <span className="text-sm text-gray-500">Total</span>
+          <span className="text-lg font-bold text-gray-900">3,000 $</span>
         </div>
 
-        <div className="mt-4 inline-block px-4 py-2 border border-gray-700/50 rounded-lg text-sm text-white">
-          Total: 4,000 MAD{" "}
-        </div>
-
-        <div className="flex items-center gap-2 mt-4">
+        <div className="mt-4 flex items-center gap-2">
+          <label htmlFor="order-status" className="sr-only">
+            {" "}
+            Order status
+          </label>
           <select
-            name="languages"
-            id="lang"
-            className="h-9 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-sm text-white text-center flex-1 focus:outline-none focus:border-blue-400">
-            <option value="val">Order Status</option>
-            <option value="val2">In Progress</option>
-            <option value="val3">Completed</option>
-            <option value="val4">Cancelled</option>
+            id="order-status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="h-10 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-900 focus:border-sky-400 focus:outline-none focus:ring-2
+             focus:ring-sky-400/40">
+            <option value="" disabled>
+              {" "}
+              Order Status
+            </option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
           </select>
-          <button className="h-9 px-4 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-600 transition-colors">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!status}
+            className="h-10 rounded-lg bg-sky-500 px-5 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed 
+            disabled:opacity-50 disabled:hover:bg-sky-500">
             {" "}
             Save
           </button>

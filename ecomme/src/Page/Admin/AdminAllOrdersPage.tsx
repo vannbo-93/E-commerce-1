@@ -6,12 +6,12 @@ import AdminAllOrders from "../../Components/Admin/AdminAllOrders";
 
 const AdminAllOrdersPage = () => {
   return (
-    <div className="w-full pl-4 pr-8">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-[16.66%]">
+    <div className="w-full px-4">
+      <div className="flex flex-col gap-4 md:flex-row">
+        <div className="w-full shrink-0 md:w-56">
           <AdminSideBar />
         </div>
-        <div className="w-full md:w-[83.33%]">
+        <div className="min-w-0 flex-1">
           <AdminAllOrders />
           <PaginationCompontent />
         </div>
