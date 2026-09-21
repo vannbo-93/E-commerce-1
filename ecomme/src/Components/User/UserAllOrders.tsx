@@ -4,8 +4,8 @@ import UserAllOrdersItem from "./UserAllOrdersItem";
 
 const UserAllOrders = () => {
   return (
-    <div className="w-full flex flex-col ">
-      <div className="admin-content-text text-lg font-bold text-white mb-4">
+    <div className="flex w-full flex-col">
+      <div className="mb-4 text-lg font-bold text-gray-900">
         Hello Mohamed El Aissaoui
       </div>
       <UserAllOrdersItem />

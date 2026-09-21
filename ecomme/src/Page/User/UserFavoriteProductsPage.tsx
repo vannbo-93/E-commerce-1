@@ -5,12 +5,12 @@ import UserSideBar from "../../Components/User/UserSideBar";
 
 const UserFavoriteProductPage = () => {
   return (
-    <div className="w-full max-w-7xl mx-auto px-4">
-      <div className="flex flex-col sm:flex-row py-3 gap-4">
-        <div className="w-full sm:w-3/12 md:w-2/12">
+    <div className="w-full px-4">
+      <div className="flex flex-col gap-4 py-3 md:flex-row">
+        <div className="w-full shrink-0 md:w-56">
           <UserSideBar />
         </div>
-        <div className="w-full sm:w-9/12 md:w-10/12">
+        <div className="min-w-0 flex-1">
           <UserFavoriteProduct />
         </div>
       </div>

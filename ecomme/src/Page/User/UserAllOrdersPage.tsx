@@ -5,13 +5,13 @@ import UserSideBar from "../../Components/User/UserSideBar";
 const UserAllOrdersPage = () => {
   return (
     <div className="w-full px-4">
-      <div className="flex flex-col sm:flex-row py-3 gap-4">
-        <div className="w-full sm:w-3/12 md:w-2/12">
+      <div className="flex flex-col gap-4 py-3 md:flex-row">
+        <aside className="w-full shrink-0 md:w-56">
           <UserSideBar />
-        </div>
-        <div className="w-full sm:w-9/12 md:w-10/12">
+        </aside>
+        <main className="min-w-0 flex-1">
           <UserAllOrders />
-        </div>
+        </main>
       </div>
     </div>
   );

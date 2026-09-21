@@ -6,18 +6,17 @@ import UserAddressCard from "./UserAddressCard";
 const UserAllAddress = () => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="admin-content-text text-lg font-bold text-white mb-4">
-        Address Book</div>
+      <div className="text-lg font-bold text-gray-900">Address Book</div>
 
       <UserAddressCard />
       <UserAddressCard />
 
       <div className="flex justify-center">
-        <Link to="/user/add-address" className="no-underline">
-          <button className=" h-10 px-6 rounded-md bg-blue-500 text-white 
-          text-sm font-semibold hover:bg-blue-600 transition-colors">
-            Add New Address
-          </button>
+        <Link
+          to="/user/add-address"
+          className="inline-flex h-10 items-center rounded-lg bg-sky-500 px-6 text-sm font-semibold 
+          text-white no-underline transition-colors hover:bg-sky-600">
+          Add New Address
         </Link>
       </div>
     </div>
