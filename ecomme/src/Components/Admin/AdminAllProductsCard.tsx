@@ -23,55 +23,52 @@ const AdminAllProductsCard: React.FC<AdminAllProductsCardProps> = ({
   onEdit,
 }) => {
   return (
-    <div className="group rounded-2xl bg-[#1E1F2B] text-white overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-white/5">
-      <div className="flex justify-end gap-2 px-3 pt-3">
+    <div
+      className="group flex h-full flex-col rounded-2xl bg-white p-2 shadow-[0_2px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300
+     hover:shadow-[0_6px_24px_rgba(0,0,0,0.12)]">
+      <Link to={`/products/${id}`} className="block flex-1 no-underline">
+        <div className="flex h-52 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
+          <img
+            src={image}
+            alt={title}
+            className="max-h-[85%] max-w-[85%] object-contain transition-transform duration-300 group-hover:scale-105 rounded-2xl"
+          />
+        </div>
+
+        <div className="px-2 pt-3">
+          <h3 className="line-clamp-2 min-h-10 text-sm font-medium text-gray-900">
+            {title}
+          </h3>
+
+          <div className="mt-1 flex items-center gap-1">
+            <Star size={14} className="fill-amber-400 text-amber-400" />
+            <span className="text-xs font-semibold text-gray-600">{rate}</span>
+          </div>
+
+          <p className="mt-2 text-lg font-bold text-gray-900">
+            ${price.toFixed(2)}
+          </p>
+        </div>
+      </Link>
+
+      <div className="mt-3 flex gap-2 px-2 pb-2">
+        <button
+          type="button"
+          onClick={onEdit}
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-sky-500 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-600 ">
+          <Pencil size={15} />
+          Edit
+        </button>
         <button
           type="button"
           onClick={onDelete}
           aria-label="Remove product"
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-colors">
+          className="flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-semibold text-red-500 transition-colors 
+          hover:bg-red-500 hover:text-white ">
           <Trash2 size={15} />
-        </button>
-        <button
-          type="button"
-          onClick={onEdit}
-          aria-label="Edit product"
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-colors">
-          <Pencil size={15} />
+          Delete
         </button>
       </div>
-
-      <Link to={`/products/${id}`} className="no-underline block">
-        <div className="px-3 pt-2">
-          <div className="w-full h-[200px] rounded-xl bg-[#2A2C3B] flex items-center justify-center overflow-hidden">
-            <img
-              src={image}
-              alt={title}
-              className="max-w-[85%] max-h-[85%] object-contain group-hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-        </div>
-
-        <div className="p-4">
-          <h3 className="text-sm font-medium text-gray-100 line-clamp-2 min-h-[2.5rem]">
-            {" "}
-            {title}
-          </h3>
-
-          <div className="flex justify-between items-center mt-3">
-            <div className="flex items-center gap-1">
-              <Star size={14} className="fill-amber-400 text-amber-400" />
-              <span className="text-xs font-semibold text-gray-300">
-                {rate}
-              </span>
-            </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-base font-bold text-white">{price}</span>
-              <span className="text-xs text-gray-400">MAD</span>
-            </div>
-          </div>
-        </div>
-      </Link>
     </div>
   );
 };

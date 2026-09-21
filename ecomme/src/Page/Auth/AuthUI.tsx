@@ -1,8 +1,19 @@
 /** @format */
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode} from "react";
+import type {
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+} from "react";
 
 /* الصفحة + البطاقة البيضاء المستديرة (نفس بطاقات السلة والدفع) */
-export const AuthCard = ({ title, subtitle, children,}: { title: string; subtitle?: string; children: ReactNode;
+export const AuthCard = ({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
 }) => (
   <div className="min-h-screen flex items-center justify-center bg-white px-4 py-10">
     <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">

@@ -2,19 +2,19 @@
 
 import AdminSideBar from "../../Components/Admin/AdminSideBar";
 import AdminAllProducts from "../../Components/Admin/AdminAllProducts";
-import PaginationCompontent from "../../Components/Utility/Pagination";
+import PaginationComponent from "../../Components/Utility/Pagination";
 
 const AdminAllProductsPage = () => {
   return (
-    <div className="w-full pl-4 pr-8">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-[16.66%]">
+    <div className="w-full px-4">
+      <div className="flex flex-col gap-4 md:flex-row">
+        <aside className="w-full shrink-0 md:w-56">
           <AdminSideBar />
-        </div>
-        <div className="w-full md:w-[83.33%]">
+        </aside>
+        <main className="min-w-0 flex-1">
           <AdminAllProducts />
-          <PaginationCompontent />
-        </div>
+          <PaginationComponent />
+        </main>
       </div>
     </div>
   );

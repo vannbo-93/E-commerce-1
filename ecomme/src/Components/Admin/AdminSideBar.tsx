@@ -13,26 +13,24 @@ const links = [
 
 const AdminSideBar = () => {
   return (
-    <div className="w-full">
-      <div className="flex flex-col">
+    <nav className="w-full shrink-0 rounded-2xl bg-white p-3 shadow-[0_2px_16px_rgba(0,0,0,0.08)] md:w-56">
+      <div className="flex flex-col gap-1">
         {links.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}
             className={({ isActive }) =>
-              `no-underline block text-center py-2.5 px-3 mt-1 border-b border-white/5
-             text-sm transition-colors duration-200 rounded-lg
-              ${
+              `block rounded-lg px-3 py-2.5 text-center text-sm font-medium no-underline transition-colors duration-200 ${
                 isActive
-                  ? "bg-blue-500/15 text-blue-400 font-medium"
-                  : "text-gray-300 hover:bg-white/5 hover:text-blue-400"
+                  ? "bg-sky-500 text-white"
+                  : "text-gray-700 hover:bg-sky-50 hover:text-sky-600"
               }`
             }>
             {link.label}
           </NavLink>
         ))}
       </div>
-    </div>
+    </nav>
   );
 };
 
