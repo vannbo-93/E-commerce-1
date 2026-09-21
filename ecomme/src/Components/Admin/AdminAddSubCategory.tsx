@@ -1,41 +1,59 @@
 /** @format */
 import { useState } from "react";
-
+const fieldClass =
+  "h-10 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40";
 const AdminAddSubCategory = () => {
-  const [selectedCategory, setSelectedCategory] = useState("val");
+  const [name, setName] = useState("");
+  const [parentCategory, setParentCategory] = useState("");
+
+  const canSave = name.trim() !== "" && parentCategory !== "";
+
+  const handleSave = () => {
+    // TODO: Call the API to save the subcategory.
+    console.log("Save subcategory:", { name: name.trim(), parentCategory });
+  };
 
   return (
     <div className="w-full">
-      <h2 className="text-lg font-bold text-white mb-4">Add New Subcategory</h2>
+      <h2 className="mb-4! text-lg! font-bold! text-gray-900 pt-3">
+        {" "}
+        Add New Subcategory
+      </h2>
 
-      <div className="bg-[#1E1E2E] border border-gray-700/50 rounded-2xl p-6 w-full">
-        <div className="flex flex-col gap-2 mb-5">
+      <div className="w-full rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
+        <div className="mb-5 flex flex-col gap-2">
           <label
             htmlFor="subcategory-name"
-            className="text-sm font-semibold text-gray-300 underline decoration-blue-400 decoration-1 underline-offset-4">
+            className="text-sm font-medium text-gray-700">
             {" "}
-            Subcategory Name
+            Subcategory name
           </label>
           <input
             id="subcategory-name"
             type="text"
-            placeholder="Subcategory Name"
-            className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"
+            placeholder="Enter subcategory name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={fieldClass}
           />
         </div>
 
-        <div className="flex flex-col gap-2 mb-6">
+        <div className="mb-6 flex flex-col gap-2">
           <label
             htmlFor="parent-category"
-            className="text-sm font-semibold text-gray-300 underline decoration-blue-400 decoration-1 underline-offset-4">
-            Parent Category
+            className="text-sm font-medium text-gray-700">
+            {" "}
+            Parent category
           </label>
           <select
             id="parent-category"
-            name="languages"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400">
+            value={parentCategory}
+            onChange={(e) => setParentCategory(e.target.value)}
+            className={fieldClass}>
+            <option value="" disabled>
+              {" "}
+              Select a category
+            </option>
             <option value="val">First Category</option>
             <option value="val2">Second Category</option>
             <option value="val3">Third Category</option>
@@ -44,14 +62,18 @@ const AdminAddSubCategory = () => {
         </div>
 
         <div className="flex justify-end">
-          <button className="h-10 px-6 rounded-md bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!canSave}
+            className="h-10 rounded-lg bg-sky-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed 
+            disabled:opacity-50 disabled:hover:bg-sky-500">
             {" "}
-            Save Changes
+            Save changes
           </button>
         </div>
       </div>
     </div>
   );
 };
-
 export default AdminAddSubCategory;

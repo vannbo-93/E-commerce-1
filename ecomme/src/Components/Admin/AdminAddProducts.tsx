@@ -1,165 +1,340 @@
 /** @format */
-import { useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from "react";
 import Select from "react-select";
 import type { StylesConfig } from "react-select";
-import add from "../../images/add.png";
+import { IconPlus } from "@tabler/icons-react";
 import ImageIcon from "@mui/icons-material/Image";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
-type ProductOption = {
-  name: string;
-  id: number;
+type ProductOption = { name: string; id: number };
+
+// بيانات تجريبية: استبدلها بقائمة من الخادم
+const subCategoryOptions: ProductOption[] = [
+  { name: "First Category", id: 1 },
+  { name: "Second Category", id: 2 },
+];
+
+const baseField =
+  "rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40";
+const inputClass = `h-10 ${baseField}`;
+
+const Field = ({
+  label,
+  htmlFor,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  children: ReactNode;
+}) => (
+  <div className="flex flex-col gap-2">
+    {htmlFor ? (
+      <label htmlFor={htmlFor} className="text-sm font-medium text-gray-700">
+        {" "}
+        {label}
+      </label>
+    ) : (
+      <span className="text-sm font-medium text-gray-700">{label}</span>
+    )}
+    {children}
+  </div>
+);
+
+const selectStyles: StylesConfig<ProductOption, true> = {
+  control: (base, state) => ({
+    ...base,
+    backgroundColor: "#f9fafb",
+    borderColor: state.isFocused ? "#38bdf8" : "#e5e7eb",
+    borderRadius: "0.5rem",
+    minHeight: "2.5rem",
+    boxShadow: state.isFocused ? "0 0 0 2px rgba(56,189,248,0.4)" : "none",
+    "&:hover": { borderColor: "#38bdf8" },
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: "#ffffff",
+    borderRadius: "0.75rem",
+    overflow: "hidden",
+    boxShadow: "0 6px 24px rgba(0,0,0,0.12)",
+    zIndex: 20,
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isFocused ? "#f0f9ff" : "#ffffff",
+    color: state.isFocused ? "#0284c7" : "#111827",
+    cursor: "pointer",
+    "&:active": { backgroundColor: "#e0f2fe" },
+  }),
+  multiValue: (base) => ({
+    ...base,
+    backgroundColor: "#e0f2fe",
+    borderRadius: "0.375rem",
+  }),
+  multiValueLabel: (base) => ({ ...base, color: "#0369a1" }),
+  multiValueRemove: (base) => ({
+    ...base,
+    color: "#0369a1",
+    "&:hover": { backgroundColor: "#fee2e2", color: "#dc2626" },
+  }),
+  input: (base) => ({ ...base, color: "#111827" }),
+  placeholder: (base) => ({ ...base, color: "#9ca3af" }),
+  singleValue: (base) => ({ ...base, color: "#111827" }),
 };
 
 const AdminAddProducts = () => {
-  const options: ProductOption[] = [
-    { name: "First Category", id: 1 },
-    { name: "Second Category", id: 2 },
-  ];
-
   const colorInputRef = useRef<HTMLInputElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [priceBeforeDiscount, setPriceBeforeDiscount] = useState("");
   const [price, setPrice] = useState("");
-  const [mainCategory, setMainCategory] = useState("val");
-  const [brand, setBrand] = useState("val");
+  const [mainCategory, setMainCategory] = useState("");
+  const [brand, setBrand] = useState("");
   const [colors, setColors] = useState(["#E52C2C", "#FFFFFF", "#000000"]);
-  const [selectedSubCategories, setSelectedSubCategories] = useState<ProductOption[]>([]);
+  const [selectedSubCategories, setSelectedSubCategories] = useState<
+    ProductOption[]
+  >([]);
 
-  const handleAddColor = () => { colorInputRef.current?.click();};
+  // يحرر الذاكرة عند تغيير الصورة أو مغادرة الصفحة
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
-  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedColor = event.target.value;
-    setColors((prevColors) => prevColors.includes(selectedColor) ? prevColors : [...prevColors, selectedColor], );};
+  const canSave =
+    productName.trim() !== "" &&
+    price !== "" &&
+    mainCategory !== "" &&
+    brand !== "";
 
-  const handleImageClick = () => { imageInputRef.current?.click(); };
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => { const file = event.target.files?.[0];
-
-    if (file) { setPreview(URL.createObjectURL(file));}
+  const handleAddColor = () => {
+    colorInputRef.current?.click();
   };
 
-  const selectStyles: StylesConfig<ProductOption, true> = {
-    control: (base, state) => ({
-      ...base,
-      backgroundColor: "#2A2A3C",
-      borderColor: state.isFocused ? "#fb923c" : "#4B5563",
-      borderRadius: "0.375rem",
-      minHeight: "2.5rem",
-      boxShadow: "none",
-      "&:hover": {
-        borderColor: "#fb923c",
-      },
-    }),
-    menu: (base) => ({
-      ...base,
-      backgroundColor: "#2A2A3C",
-      border: "1px solid #4B5563",
-      zIndex: 20,
-    }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isFocused ? "#3A3A4C" : "#2A2A3C",
-      color: "white",
-      cursor: "pointer",
-    }),
-    multiValue: (base) => ({
-      ...base,
-      backgroundColor: "#3A3A4C",
-    }),
-    multiValueLabel: (base) => ({
-      ...base,
-      color: "white",
-    }),
-    multiValueRemove: (base) => ({
-      ...base,
-      color: "#f87171",
-      "&:hover": {
-        backgroundColor: "#7f1d1d",
-        color: "white",
-      },
-    }),
-    input: (base) => ({
-      ...base,
-      color: "white",
-    }),
-    placeholder: (base) => ({
-      ...base,
-      color: "#9CA3AF",
-    }),
-    singleValue: (base) => ({
-      ...base,
-      color: "white",
-    }),
+  const handleColorChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedColor = event.target.value.toUpperCase();
+    setColors((prev) =>
+      prev.includes(selectedColor) ? prev : [...prev, selectedColor],
+    );
+  };
+
+  const handleRemoveColor = (color: string) => {
+    setColors((prev) => prev.filter((c) => c !== color));
+  };
+
+  const handleImageClick = () => {
+    imageInputRef.current?.click();
+  };
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSave = () => {
+    // TODO: Call the API to save the product.
+    console.log("Save product:", {
+      productName: productName.trim(),
+      description,
+      priceBeforeDiscount,
+      price,
+      mainCategory,
+      subCategories: selectedSubCategories.map((s) => s.id),
+      brand,
+      colors,
+      imageFile,
+    });
   };
 
   return (
     <div className="w-full">
-      <input ref={colorInputRef} type="color" onChange={handleColorChange} className="hidden"/>
-      <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden"/>
-      <h2 className="text-lg font-bold text-white mb-4">Add New Product</h2>
+      <input
+        ref={colorInputRef}
+        type="color"
+        onChange={handleColorChange}
+        className="hidden"
+      />
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="hidden"
+      />
 
-      <div className="bg-[#1E1E2E] border border-gray-700/50 rounded-2xl p-6 w-full sm:w-8/12 flex flex-col gap-5">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-300 underline decoration-blue-400 decoration-1 underline-offset-4">
-            Product Images
-          </label>
-          {preview ? (
-            <img src={preview} alt="" height="100" width="120" onClick={handleImageClick} className="cursor-pointer rounded-md object-cover"/>
-          ) : (
-            <div
-              onClick={handleImageClick}
-              className="relative cursor-pointer w-[120px] h-[100px] bg-[#2A2A3C] border border-gray-600 rounded-md flex items-center justify-center 
-              hover:bg-[#333347] transition-colors">
-              <ImageIcon sx={{ fontSize: 28 }} className="text-gray-400" />
-              <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
-                <FileUploadIcon sx={{ fontSize: 14 }} className="text-white animate-pulse-scale"/>
-              </div>
-            </div>
-          )}
+      <h2 className="mb-4! text-lg! font-bold! text-gray-900 pt-3">
+        Add New Product
+      </h2>
+
+      <div className="flex w-full flex-col gap-5 rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
+        <Field label="Product image">
+          <button
+            type="button"
+            onClick={handleImageClick}
+            aria-label={
+              preview ? "Change product image" : "Upload product image"
+            }
+            className="relative flex h-[100px] w-[120px] items-center justify-center rounded-xl border border-dashed border-gray-300 bg-slate-50 transition-colors 
+            hover:border-sky-400 hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-400/40">
+            {preview ? (
+              <img
+                src={preview}
+                alt="Product preview"
+                className="h-full w-full rounded-xl object-contain p-2"
+              />
+            ) : (
+              <>
+                <ImageIcon sx={{ fontSize: 28 }} className="text-gray-400" />
+                <span className="absolute -left-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-sky-500">
+                  <FileUploadIcon
+                    sx={{ fontSize: 14 }}
+                    className="animate-pulse-scale text-white"
+                  />
+                </span>
+              </>
+            )}
+          </button>
+        </Field>
+
+        <Field label="Product name" htmlFor="product-name">
+          <input
+            id="product-name"
+            type="text"
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+            placeholder="Enter product name"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Product description" htmlFor="product-description">
+          <textarea
+            id="product-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            placeholder="Enter product description"
+            className={`resize-none py-2 ${baseField}`}
+          />
+        </Field>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <Field label="Price before discount" htmlFor="price-before">
+            <input
+              id="price-before"
+              type="number"
+              min="0"
+              value={priceBeforeDiscount}
+              onChange={(e) => setPriceBeforeDiscount(e.target.value)}
+              placeholder="0.00"
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Product price" htmlFor="price">
+            <input
+              id="price"
+              type="number"
+              min="0"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="0.00"
+              className={inputClass}
+            />
+          </Field>
         </div>
 
-        <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Product Name" className="h-10 bg-[#2A2A3C] 
-        border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"/>
+        <Field label="Main category" htmlFor="main-category">
+          <select
+            id="main-category"
+            value={mainCategory}
+            onChange={(e) => setMainCategory(e.target.value)}
+            className={inputClass}>
+            <option value="" disabled>
+              Select a category
+            </option>
+            <option value="val1">First Category</option>
+            <option value="val2">Second Category</option>
+            <option value="val3">Third Category</option>
+            <option value="val4">Fourth Category</option>
+          </select>
+        </Field>
 
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Product Description"
-          className="bg-[#2A2A3C] border border-gray-600 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-400 resize-none"/>
+        <Field label="Subcategories" htmlFor="sub-categories">
+          <Select<ProductOption, true>
+            inputId="sub-categories"
+            isMulti
+            options={subCategoryOptions}
+            value={selectedSubCategories}
+            onChange={(selected) =>
+              setSelectedSubCategories(selected as ProductOption[])
+            }
+            getOptionLabel={(option) => option.name}
+            getOptionValue={(option) => option.id.toString()}
+            placeholder="Select subcategories"
+            styles={selectStyles}
+          />
+        </Field>
 
-        <input type="number" value={priceBeforeDiscount} onChange={(e) => setPriceBeforeDiscount(e.target.value)} placeholder="Price Before Discount"
-          className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"/>
+        <Field label="Brand" htmlFor="brand">
+          <select
+            id="brand"
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
+            className={inputClass}>
+            <option value="" disabled>
+              Select a brand
+            </option>
+            <option value="val1">First Brand</option>
+            <option value="val2">Second Brand</option>
+            <option value="val3">Third Brand</option>
+          </select>
+        </Field>
 
-        <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Product Price" className="h-10 bg-[#2A2A3C] 
-        border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"/>
-
-        <select value={mainCategory} onChange={(e) => setMainCategory(e.target.value)} 
-        className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400"> 
-        <option value="val">Main Category</option> <option value="val1">First Category</option> <option value="val2">Second Category</option> 
-        <option value="val3">Third Category</option> <option value="val4">Fourth Category</option>
-        </select>
-
-        <Select<ProductOption, true> isMulti options={options} value={selectedSubCategories} onChange={(selected) => setSelectedSubCategories(selected as ProductOption[]) }
-          getOptionLabel={(option) => option.name} getOptionValue={(option) => option.id.toString()} placeholder="Subcategory" styles={selectStyles}/>
-
-        <select
-          value={brand} onChange={(e) => setBrand(e.target.value)}
-          className="h-10 bg-[#2A2A3C] border border-gray-600 rounded-md px-3 text-white text-sm focus:outline-none focus:border-blue-400">
-          <option value="val">Brand</option> <option value="val1">First Brand</option> <option value="val2">Second Brand</option> <option value="val3">Third Brand</option>
-        </select>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-300"> Available Product Colors</label>
-          <div className="flex items-center gap-2">
-            {colors.map((c, i) => (
-              <div key={i} className="w-6 h-6 rounded-full border border-gray-500" style={{ backgroundColor: c }}></div> ))}
-            <img src={add} alt="Add Color" width="30" height="35" className="cursor-pointer" onClick={handleAddColor}/>
+        <Field label="Available product colors">
+          <div className="flex flex-wrap items-center gap-2">
+            {colors.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => handleRemoveColor(c)}
+                aria-label={`Remove color ${c}`}
+                title="Click to remove"
+                className="h-7 w-7 rounded-full border border-gray-200 transition-shadow hover:ring-2 hover:ring-red-300"
+                style={{ backgroundColor: c }}
+              />
+            ))}
+            <button
+              type="button"
+              onClick={handleAddColor}
+              aria-label="Add color"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-sky-400 
+              hover:bg-sky-50 hover:text-sky-600">
+              <IconPlus size={16} />
+            </button>
           </div>
-        </div>
+        </Field>
 
         <div className="flex justify-end">
-          <button className="h-10 px-6 rounded-md bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors"> Save Changes</button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!canSave}
+            className="h-10 rounded-lg bg-sky-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 
+            disabled:hover:bg-sky-500">
+            Save changes
+          </button>
         </div>
       </div>
     </div>
