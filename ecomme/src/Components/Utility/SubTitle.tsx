@@ -2,7 +2,11 @@
 import { Link } from "react-router-dom";
 import { MoveRight } from "lucide-react";
 
-const SubTitle = ({ title, btnTitle, pathText,}: {
+const SubTitle = ({
+  title,
+  btnTitle,
+  pathText,
+}: {
   title: string;
   btnTitle?: string;
   pathText?: string;
@@ -29,7 +33,7 @@ const SubTitle = ({ title, btnTitle, pathText,}: {
               className="flex items-center font-bold hover:bg-gray-50 cursor-pointer text-sky-400
               hover:-translate-y-0.5 transition-all duration-200 p-4">
               <button
-                className="text-sky px-2 sm:px-5 py-1.5 rounded-lg
+                className="text-sky px-2 sm:px-3 py-1.5 rounded-lg
                 font-medium text-sm sm:text-base transition-colors duration-300
                 whitespace-nowrap">
                 {btnTitle}

@@ -1,0 +1,27 @@
+/** @format */
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import userRoute from "./routes/userRoute.js";
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+app.use(express.json());
+app.use("/user", userRoute);
+
+async function start() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI as string);
+    console.log("Mongo connected!");
+    app.listen(PORT, () =>
+      console.log(`server is running at : http://localhost:${PORT}`),
+    );
+  } catch (err) {
+    console.error("Failed to connect!", err);
+    process.exit(1);
+  }
+}
+
+start();
