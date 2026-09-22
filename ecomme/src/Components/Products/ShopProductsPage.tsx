@@ -9,10 +9,14 @@ const ShopProductsPage = () => {
   return (
     <div>
       <CategoryHeader />
-      <SearchCountResult title=" Search results " />
-      <div className="flex">
-        <SideFilter />
-        <CardProductsContainer />
+      <SearchCountResult title="Search results" />
+      <div className="flex flex-col gap-4 px-4 md:flex-row">
+        <aside className="w-full shrink-0 md:w-64">
+          <SideFilter />
+        </aside>
+        <main className="min-w-0 flex-1">
+          <CardProductsContainer />
+        </main>
       </div>
       <CustomIcons />
     </div>

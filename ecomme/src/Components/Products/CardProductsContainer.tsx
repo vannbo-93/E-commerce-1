@@ -5,7 +5,6 @@ import fitness from "../../../src/images/allProducts/tracker.png";
 import drone from "../../../src/images/allProducts/drone.png";
 import headphones from "../../../src/images/allProducts/wirelessheadphones.png";
 import earbuds from "../../../src/images/allProducts/wirelessearbuds.png";
-
 interface ProductCardContainerProps {
   title?: string;
   btntitle?: string;
@@ -57,7 +56,7 @@ const CardProductsContainer = ({
   pathText,
 }: ProductCardContainerProps) => {
   return (
-    <div className="container">
+    <div className="w-full">
       {title ? (
         <SubTitle title={title} btnTitle={btntitle} pathText={pathText} />
       ) : null}

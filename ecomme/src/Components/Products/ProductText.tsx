@@ -1,73 +1,89 @@
 /** @format */
+import { useState } from "react";
+import { IconShoppingCart, IconStar } from "@tabler/icons-react";
 
-const ProductsText = () => {
+// بيانات تجريبية: استبدلها ببيانات المنتج القادمة من الـ API
+const product = {
+  category: "Electronics",
+  title: "Smart phone",
+  rating: 4.5,
+  brand: "Samsung",
+  colors: ["#E52C2C", "#FFFFFF", "#000000"],
+  description:
+    "It features dual SIM support with one physical SIM and one eSIM. You can easily unlock your iPhone and sign in to apps, accounts, and more. Face ID is the fastest and most secure authentication method using facial recognition. It features the A12 Bionic chip, one of the smartest and most powerful smartphone chips. Its innovative sensor, ISP, and Neural Engine usher in a new era of photography, enabling you to capture unprecedented images. The single-lens camera keeps subjects in the foreground sharply in focus while creating a soft background blur.",
+  price: 3400,
+};
+
+interface ProductsTextProps {
+  onAddToCart?: () => void;
+}
+
+const ProductsText = ({ onAddToCart }: ProductsTextProps) => {
+  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+
   return (
-    <div>
-      <div className="mt-2">
-        <div className="cat-text font-bold">Electronics:</div>
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-semibold text-gray-500">
+        {" "}
+        {product.category}
+      </span>
+
+      <h1 className="text-xl font-bold leading-snug text-gray-900">
+        {" "}
+        {product.title}
+      </h1>
+
+      <div className="flex items-center gap-1">
+        <IconStar size={16} className="fill-amber-400 text-amber-400" />
+        <span className="text-sm font-semibold text-gray-700">
+          {product.rating.toFixed(1)}
+        </span>
       </div>
 
-      <div className="mt-2 flex flex-wrap">
-        <div className="w-full md:w-8/12">
-          <div className="cat-title inline">
-            iPhone XR with 128GB of storage, supporting 4G LTE and FaceTime
-            (Product) Red
-            <span className="cat-rate inline mx-3">4.5</span>
-          </div>
+      <div className="flex items-center gap-2 text-sm">
+        <span className="text-gray-500">Brand:</span>
+        <span className="font-semibold text-gray-900">{product.brand}</span>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="text-sm text-gray-500">Color</span>
+        <div className="flex items-center gap-2">
+          {product.colors.map((color) => (
+            <button
+              key={color}
+              type="button"
+              onClick={() => setSelectedColor(color)}
+              aria-label={`Select color ${color}`}
+              aria-pressed={selectedColor === color}
+              className={`h-8 w-8 rounded-full border-2 transition-shadow ${
+                selectedColor === color
+                  ? "border-sky-500 ring-2 ring-sky-200"
+                  : "border-gray-200"
+              }`}
+              style={{ backgroundColor: color }}
+            />
+          ))}
         </div>
       </div>
 
-      <div className="flex flex-wrap">
-        <div className="w-full md:w-8/12 mt-4">
-          <div className="cat-text inline">Brand:</div>
-          <div className="barnd-text inline mx-1 font-bold"> Samsung</div>
-        </div>
+      <div className="border-t border-gray-100 pt-4">
+        <h2 className="mb-2 font-bold text-gray-900">Specifications</h2>
+        <p className="break-words text-left leading-relaxed text-gray-600">
+          {product.description}
+        </p>
       </div>
 
-      <div className="flex flex-wrap">
-        <div className="w-full md:w-8/12 mt-1 flex gap-2">
-          <div
-            className="w-6 h-6 rounded-full border cursor-pointer"
-            style={{ backgroundColor: "#E52C2C" }}></div>
-          <div
-            className="w-6 h-6 rounded-full border cursor-pointer"
-            style={{ backgroundColor: "white" }}></div>
-          <div
-            className="w-6 h-6 rounded-full border cursor-pointer"
-            style={{ backgroundColor: "black" }}></div>
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <div className="cat-text py-4 font-bold">Specifications:</div>
-      </div>
-
-      <div>
-        <div className="w-full md:w-10/10">
-          <div className="product-description block break-words leading-relaxed text-left">
-            It features dual SIM support with one physical SIM and one eSIM. You
-            can easily unlock your iPhone and sign in to apps, accounts, and
-            more. Face ID is the fastest and most secure authentication method
-            using facial recognition. It features the A12 Bionic chip, one of
-            the smartest and most powerful smartphone chips. Its innovative
-            sensor, ISP, and Neural Engine usher in a new era of photography,
-            enabling you to capture unprecedented images. The single-lens camera
-            keeps subjects in the foreground sharply in focus while creating a
-            soft background blur. Overview
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap py-2">
-        <div className="w-full">
-          <div className="product-price inline px-3 py-3 border rounded-md transition-colors font-bold">
-            34,000 MAD
-          </div>
-          <div className="product-cart-add bg-blue-800 hover:bg-blue-900 text-white px-3 py-3
-           inline mx-3 cursor-pointer rounded-md transition-colors font-bold">
-            Add to cart
-          </div>
-        </div>
+      <div className="mt-2 flex flex-wrap items-center gap-3 border-t border-gray-100 pt-4">
+        <span className="rounded-lg border border-gray-200 px-4 py-2.5 text-lg font-bold text-gray-900">
+          ${product.price.toLocaleString("en-US")}
+        </span>
+        <button
+          type="button"
+          onClick={onAddToCart}
+          className="flex items-center gap-2 rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-sky-600">
+          <IconShoppingCart size={17} />
+          Add to cart
+        </button>
       </div>
     </div>
   );

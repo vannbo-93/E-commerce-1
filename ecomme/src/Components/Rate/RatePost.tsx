@@ -1,6 +1,7 @@
 /** @format */
 
 import ReactStarsRaw from "react-rating-stars-component";
+import { IconStar, IconStarHalfFilled } from "@tabler/icons-react";
 
 const ReactStars =
   (ReactStarsRaw as unknown as { default: typeof ReactStarsRaw }).default ??
@@ -29,10 +30,17 @@ const RatePost = ({
       onChange={ratingChanged}
       size={24}
       isHalf={true}
-      emptyIcon={<i className="far fa-star"></i>}
-      halfIcon={<i className="fa fa-star-half-alt"></i>}
-      filledIcon={<i className="fa fa-star"></i>}
-      activeColor="#ffd700"
+      emptyIcon={<IconStar size={24} className="text-gray-300" />}
+      halfIcon={
+        <IconStarHalfFilled
+          size={24}
+          className="fill-amber-400 text-amber-400"
+        />
+      }
+      filledIcon={
+        <IconStar size={24} className="fill-amber-400 text-amber-400" />
+      }
+      activeColor="#fbbf24"
     />
   );
 };

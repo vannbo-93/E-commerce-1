@@ -10,4 +10,5 @@ const AllCategoryPage = () => {
     </div>
   );
 };
+
 export default AllCategoryPage;

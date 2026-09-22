@@ -1,8 +1,6 @@
 /** @format */
-
-import next from "../../images/next.png";
-
 import type { SlideEvent } from "react-image-gallery";
+import { IconChevronLeft } from "@tabler/icons-react";
 
 interface LeftButtonProps {
   onClick: (event?: SlideEvent) => void;
@@ -10,24 +8,17 @@ interface LeftButtonProps {
 }
 
 const LeftButton = ({ onClick, disabled = false }: LeftButtonProps) => {
-  console.log("Left button loaded!");
-  const handleClick = (event?: React.MouseEvent<HTMLImageElement>) => {
-    if (!disabled) {
-      onClick(event);
-    }
-  };
-
   return (
-    <img
-      src={next}
-      alt="Previous"
-      width={35}
-      height={35}
-      onClick={handleClick}
-      className={`float-left mt-[220px] cursor-pointer ${
-        disabled ? "opacity-40 pointer-events-none" : ""
-      }`}
-    />
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label="Previous image"
+      className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center 
+      justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-colors 
+      hover:bg-white hover:text-sky-600 disabled:pointer-events-none disabled:opacity-40">
+      <IconChevronLeft size={20} />
+    </button>
   );
 };
 

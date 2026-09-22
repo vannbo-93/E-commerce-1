@@ -1,88 +1,101 @@
 /** @format */
-
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import StarIcon from "@mui/icons-material/Star";
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import { IconHeart, IconShoppingCart, IconStar } from "@tabler/icons-react";
 
 interface ProductCardProps {
-  id: string | number;
+  id: string;
+  title: string;
   image: string;
-  title?: string;
   ratingValue: number;
   ratingCount?: number;
   price: number;
   oldPrice?: number;
-  onAddToCart?: (id: string | number) => void;
+  onAddToCart?: (id: string) => void;
 }
 
-export default function ProductCard({
+const ProductCard = ({
   id,
-  image,
   title,
+  image,
   ratingValue,
   ratingCount,
   price,
   oldPrice,
   onAddToCart,
-}: ProductCardProps) {
+}: ProductCardProps) => {
+  const [isFavorite, setIsFavorite] = useState(false);
+
   return (
-    <div className="flex p-2">
-      <div className="my-2 w-full overflow-hidden rounded-2xl bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.12)]">
-        {/* منطقة الصورة*/}
-        <div className="relative bg-gray-50">
-          <Link to={`/products/${id}`}>
+    <div className="flex h-full flex-col rounded-2xl bg-white p-2 shadow-[0_2px_16px_rgba(0,0,0,0.08)] 
+    transition-shadow duration-300 hover:shadow-[0_6px_24px_rgba(0,0,0,0.12)]">
+      <div className="relative">
+        <Link to={`/products/${id}`} className="block no-underline">
+          <div className="flex h-48 items-center justify-center overflow-hidden rounded-2xl bg-slate-50">
             <img
               src={image}
-              alt={title || "product"}
-              className="w-full aspect-square object-contain p-2 rounded-2xl "
+              alt={title}
+              className="max-h-[90%] max-w-[100%] object-contain rounded-2xl"
             />
-          </Link>
-          {/* زر المفضلة */}
-          <button
-            type="button"
-            aria-label="favorite toggle"
-            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md duration-500 
-            hover:-translate-y-0.5 hover:text-red-500">
-            <FavoriteBorderIcon className="!h-5 !w-5" />
-          </button>
+          </div>
+        </Link>
+
+        <button
+          type="button"
+          onClick={() => setIsFavorite((f) => !f)}
+          aria-label={isFavorite ? "Remove from wishlist" : "Add to wishlist"}
+          aria-pressed={isFavorite}
+          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full 
+          bg-white/90 text-gray-500 shadow-sm transition-colors hover:text-red-500">
+          <IconHeart
+            size={17}
+            className={isFavorite ? "fill-red-500 text-red-500" : ""}
+          />
+        </button>
+      </div>
+
+      {/* flex-1 يدفع السعر والزر إلى أسفل البطاقة دائمًا، حتى لو التف العنوان على سطرين */}
+      <div className="flex flex-1 flex-col px-1 pt-3">
+        <Link to={`/products/${id}`} className="no-underline">
+          <h3 className="line-clamp-2 min-h-10 text-sm font-medium text-gray-900">
+            {title}
+          </h3>
+        </Link>
+
+        <div className="mt-1 flex items-center gap-1">
+          <IconStar size={14} className="fill-amber-400 text-amber-400" />
+          <span className="text-xs font-semibold text-gray-700">
+            {ratingValue.toFixed(1)}
+          </span>
+          {typeof ratingCount === "number" && (
+            <span className="text-xs text-gray-400">({ratingCount})</span>
+          )}
         </div>
 
-        {/* المحتوى */}
-        <div className="p-4">
-          <Link to={`/products/${id}`} className="no-underline text-gray-900">
-            <div className="text-base font-medium">{title || "product"}</div>
-          </Link>
-
-          <div className="mt-2 flex items-center gap-1 text-sm">
-            <StarIcon className="!h-4 !w-4 text-yellow-500" />
-            <span className="font-bold">{ratingValue}</span>
-            {ratingCount !== undefined && (
-              <span className="text-gray-400">({ratingCount})</span>
-            )}
-          </div>
-
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-xl font-bold text-gray-900">
+        <div className="mt-2 flex flex-1 items-end justify-between gap-2">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+            <span className="text-lg font-bold text-gray-900">
               ${price.toFixed(2)}
             </span>
-            {oldPrice !== undefined && (
-              <span className="text-sm text-gray-400 line-through">
+            {typeof oldPrice === "number" && oldPrice > price && (
+              <span className="text-xs text-gray-400 line-through">
                 ${oldPrice.toFixed(2)}
               </span>
             )}
           </div>
-
-          <button
-            type="button"
-            onClick={() => onAddToCart?.(id)}
-            className="mt-4 flex w-full items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white 
-            font-medium px-5 py-3 rounded-lg transition-colors cursor-pointer whitespace-nowrap px-2 text-sm md:text-base">
-            <ShoppingCartOutlinedIcon className="!h-5 !w-5" />
-            Add to Cart
-          </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => onAddToCart?.(id)}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-sky-500 px-3 py-2.5 text-sm 
+          font-semibold text-white transition-colors hover:bg-sky-600">
+          <IconShoppingCart size={16} className="shrink-0" />
+          <span className="truncate">Add to Cart</span>
+        </button>
       </div>
     </div>
   );
-}
+};
+
+export default ProductCard;
