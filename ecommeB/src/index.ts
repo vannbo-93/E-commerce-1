@@ -2,12 +2,16 @@
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 import userRoute from "./routes/userRoute.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cookieParser()); // ← جديد
 app.use(express.json());
 app.use("/user", userRoute);
 
