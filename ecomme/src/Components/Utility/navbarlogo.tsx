@@ -5,6 +5,7 @@ import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import shop from "../../../src/images/Logo/shop.png";
 import AccountMenu from "./AccountMenu";
 import { Heart } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -15,12 +16,12 @@ const navItems = [
 
 interface NavBarLogoProps {
   cartCount?: number; // اربطه بحالة السلة الفعلية
-  accountPath?: string; // صفحة الحساب أو تسجيل الدخول
   favoritesCount?: number;
 }
 
 function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -35,6 +36,11 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
     closeMenu();
   };
 
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
+
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `text-sm font-medium transition-colors duration-200 hover:text-sky-500 ${
       isActive ? "text-sky-500" : "text-gray-700"
@@ -44,7 +50,8 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
     <form onSubmit={handleSearch} role="search" className={className}>
       <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
       <input type="search" value={query} onChange={(e) => setQuery(e.target.value)}  placeholder="Search"
-        aria-label="Search products" className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none 
+        aria-label="Search products" className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm 
+        text-gray-900 outline-none 
         transition-colors placeholder:text-gray-400 focus:border-sky-400"/>
     </form>
   );
@@ -78,10 +85,12 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
           <Link
             to="/user/favorite"
             aria-label={`Wishlist, ${favoritesCount} items`}
-            className="relative hidden h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 hover:text-sky-500 sm:flex">
+            className="relative hidden h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors 
+            hover:bg-gray-100 hover:text-sky-500 sm:flex">
             <Heart size={22} />
             {favoritesCount > 0 ? (
-              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 px-1 text-xs font-semibold text-white">
+              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 
+              px-1 text-xs font-semibold text-white">
                 {favoritesCount > 99 ? "99+" : favoritesCount}
               </span>
             ) : null}
@@ -90,15 +99,22 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
           <Link
             to="/cart"
             aria-label={`Cart, ${cartCount} items`}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 hover:text-sky-500">
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors 
+            hover:bg-gray-100 hover:text-sky-500">
             <ShoppingCart size={22} />
             {cartCount > 0 ? (
-              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 px-1 text-xs font-semibold text-white">
+              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 
+              px-1 text-xs font-semibold text-white">
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             ) : null}
           </Link>
-          <AccountMenu user={null} />
+
+          <AccountMenu
+            user={user ? { name: user.username, email: user.email } : null}
+            isAdmin={user?.role === "admin"}
+            onLogout={handleLogout}
+          />
 
           {/* زر القائمة: على الموبايل فقط */}
           <button
@@ -106,7 +122,8 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 md:hidden">
+            className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors 
+            hover:bg-gray-100 md:hidden">
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>

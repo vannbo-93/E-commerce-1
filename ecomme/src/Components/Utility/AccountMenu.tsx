@@ -1,16 +1,7 @@
 /** @format */
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  CircleUser,
-  Heart,
-  LayoutDashboard,
-  LogIn,
-  LogOut,
-  MapPin,
-  Package,
-  User,
-  UserPlus,
+import { CircleUser, Heart, LayoutDashboard, LogIn, LogOut, MapPin, Package, User, UserPlus,
 } from "lucide-react";
 
 interface AccountMenuProps {
@@ -67,7 +58,8 @@ const AccountMenu = ({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 hover:text-sky-500">
+        className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 
+        hover:text-sky-500">
         <CircleUser size={24} />
       </button>
 
@@ -134,7 +126,6 @@ const AccountMenu = ({
                 role="menuitem"
                 onClick={close}
                 className={itemClass}>
-                {" "}
                 <LogIn size={18} /> Sign in
               </Link>
               <Link
@@ -142,7 +133,6 @@ const AccountMenu = ({
                 role="menuitem"
                 onClick={close}
                 className={itemClass}>
-                {" "}
                 <UserPlus size={18} /> Create account
               </Link>
             </div>

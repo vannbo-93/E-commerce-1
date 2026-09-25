@@ -1,59 +1,109 @@
 /** @format */
+import { useEffect, useState } from "react";
 import CategoryCard from "./CategoryCard";
-import camer from "../../images/allProducts/camera.png";
-import controller from "../../images/allProducts/controller.png";
-import drone from "../../images/allProducts/drone.png";
-import headset from "../../images/allProducts/headset.png";
-import homespeaker from "../../images/allProducts/homespeaker.png";
-import keyboard from "../../images/allProducts/keyboard.png";
-import microphone from "../../images/allProducts/microphone.png";
-import powerbank from "../../images/allProducts/powerbank.png";
-import projector from "../../images/allProducts/projector.png";
-import smartphone from "../../images/allProducts/smartphone.png";
-import smartphone1 from "../../images/allProducts/smartphone1.png";
-import smartring from "../../images/allProducts/smartring.png";
-import smartwatch from "../../images/allProducts/smartwatch.png";
-import speaker from "../../images/allProducts/speaker.png";
-import tracker from "../../images/allProducts/tracker.png";
-import vacuum from "../../images/allProducts/vacuum.png";
-import wificamera from "../../images/allProducts/wificamera.png";
-import wirelesscharger from "../../images/allProducts/wirelesscharger.png";
-import wirelessearbuds from "../../images/allProducts/wirelessearbuds.png";
-import wirelessheadphones from "../../images/allProducts/wirelessheadphones.png";
+import api from "../../Api/baseURL";
+import { useAuth } from "../../context/AuthContext";
+import { Toast } from "../../Components/Utility/AppAlerts";
+
+interface Category {
+  _id: string;
+  name: string;
+  image: string;
+}
 
 const CategoryContainer = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [toastOpen, setToastOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    api
+      .get("/category")
+      .then((res) => {
+        if (!cancelled) setCategories(res.data.categories);
+      })
+      .catch(() => {
+        if (!cancelled) setError("Failed to load categories.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    // تحديث فوري في الواجهة قبل انتظار رد الخادم، لشعور أسرع
+    const previous = categories;
+    setCategories((prev) => prev.filter((cat) => cat._id !== id));
+
+    try {
+      await api.delete(`/category/${id}`);
+      setToastOpen(true);
+    } catch {
+      // فشل الحذف فعليًا في الخادم: نُعيد العنصر إلى القائمة بدل ترك واجهة كاذبة
+      setCategories(previous);
+      setError("Failed to delete the category. Please try again.");
+    }
+  };
+
   return (
     <div className="my-3 min-h-screen" dir="ltr">
       <div>
         <div className="flex items-center justify-center gap-4 py-3">
-          <span className="h-px flex-1 max-w-24 bg-sky-500" />
+          <span className="h-px max-w-24 flex-1 bg-sky-500" />
           <h2 className="text-lg font-semibold text-gray-900">All Category</h2>
-          <span className="h-px flex-1 max-w-24 bg-sky-500" />
+          <span className="h-px max-w-24 flex-1 bg-sky-500" />
         </div>
-        <div className="grid grid-cols-4 gap-4 my-2 mx-12">
-          <CategoryCard title="camer" img={camer} />
-          <CategoryCard title="controller" img={controller} />
-          <CategoryCard title="drone" img={drone} />
-          <CategoryCard title="headset" img={headset} />
-          <CategoryCard title="homespeaker" img={homespeaker} />
-          <CategoryCard title="keyboard" img={keyboard} />
-          <CategoryCard title="microphone" img={microphone} />
-          <CategoryCard title="powerbank" img={powerbank} />
-          <CategoryCard title="smartphone" img={smartphone} />
-          <CategoryCard title="projector" img={projector} />
-          <CategoryCard title="smartphone1" img={smartphone1} />
-          <CategoryCard title="smartwatch" img={smartwatch} />
-          <CategoryCard title="speaker" img={speaker} />
-          <CategoryCard title="tracker" img={tracker} />
-          <CategoryCard title="vacuum" img={vacuum} />
-          <CategoryCard title="wificamera" img={wificamera} />
-          <CategoryCard title="wirelesscharger" img={wirelesscharger} />
-          <CategoryCard title="wirelessearbuds" img={wirelessearbuds} />
-          <CategoryCard title="wirelessheadphones" img={wirelessheadphones} />
-          <CategoryCard title="smartring" img={smartring} />
-        </div>
+
+        {loading && (
+          <p className="py-10 text-center text-sm text-gray-500">
+            Loading categories...
+          </p>
+        )}
+
+        {!loading && error && (
+          <p className="py-10 text-center text-sm text-red-600">{error}</p>
+        )}
+
+        {!loading && !error && categories.length === 0 && (
+          <p className="py-10 text-center text-sm text-gray-500">
+            No categories yet.
+          </p>
+        )}
+
+        {!loading && !error && categories.length > 0 && (
+          <div className="mx-4 my-2 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {categories.map((cat) => (
+              <CategoryCard
+                key={cat._id}
+                id={cat._id}
+                title={cat.name}
+                img={cat.image}
+                isAdmin={isAdmin}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
+      <Toast
+        open={toastOpen}
+        message="Category deleted successfully"
+        severity="success"
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 };
+
 export default CategoryContainer;
