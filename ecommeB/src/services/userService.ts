@@ -65,3 +65,12 @@ export const loginUser = async (
 
   return { user: toSafeUser(user), token };
 };
+
+// يُستخدم من مسار /me: التوكن يحمل فقط id وrole، فنجلب باقي البيانات من قاعدة البيانات
+export const getCurrentUser = async (id: string): Promise<SafeUser> => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+  return toSafeUser(user);
+};

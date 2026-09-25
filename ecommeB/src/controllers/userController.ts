@@ -1,6 +1,10 @@
 /** @format */
 import type { Request, Response } from "express";
-import { registerUser, loginUser } from "../services/userService.js";
+import {
+  registerUser,
+  loginUser,
+  getCurrentUser,
+} from "../services/userService.js";
 import { AppError } from "../utils/AppError.js";
 
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 أيام، بالمللي ثانية
@@ -64,4 +68,19 @@ export const login = async (req: Request, res: Response) => {
 export const logout = (_req: Request, res: Response) => {
   res.clearCookie("token");
   res.status(200).json({ message: "Logged out successfully" });
+};
+
+// req.user يأتي من protect middleware، ويحمل فقط id وrole (المحتوى التوكن)؛
+// نجلب هنا باقي بيانات المستخدم (username, email) من قاعدة البيانات
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const user = await getCurrentUser(req.user!.id);
+    res.status(200).json({ user });
+  } catch (err) {
+    if (err instanceof AppError) {
+      return res.status(err.statusCode).json({ message: err.message });
+    }
+    console.error("GetMe error:", err);
+    res.status(500).json({ message: "Something went wrong" });
+  }
 };
