@@ -38,11 +38,15 @@ export const getCategory = async (req: Request, res: Response) => {
 
 export const addCategory = async (req: Request, res: Response) => {
   try {
-    const { name, image } = req.body;
+    const { name } = req.body;
+    const file = req.file;
 
-    if (!name || !image) {
+    if (!name || !file) {
       return res.status(400).json({ message: "Name and image are required" });
     }
+
+    // رابط عام يصل عبر express.static المُعرَّف في index.ts
+    const image = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
 
     const category = await createCategory({ name, image });
     res

@@ -9,6 +9,7 @@ import {
 } from "../controllers/categoryController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import { requireAdmin } from "../middlewares/requireAdmin.js";
+import { upload, handleUploadError } from "../middlewares/uploadMiddleware.js";
 
 const router = Router();
 
@@ -17,7 +18,9 @@ router.get("/", getCategories);
 router.get("/:id", getCategory);
 
 // الكتابة محمية: أدمن فقط، مطابقة لـ AdminAddCategory
-router.post("/", protect, requireAdmin, addCategory);
+// upload.single("image") يقرأ الملف من multipart/form-data قبل وصول addCategory
+router.post( "/", protect, requireAdmin, upload.single("image"), handleUploadError, addCategory,
+);
 router.put("/:id", protect, requireAdmin, editCategory);
 router.delete("/:id", protect, requireAdmin, removeCategory);
 
