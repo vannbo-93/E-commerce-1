@@ -28,6 +28,7 @@ import UserAllAddressPage from "../src/Page/User/UserAllAddressPage";
 import UserAddAddressPage from "../src/Page/User/UserAddAddressPage";
 import UserEditAddressPage from "../src/Page/User/UserEditAddressPage";
 import UserProfilePage from "../src/Page/User/UserProfilePage";
+import AllSubCategoryPage from "../src/Page/Category/AllSubCategoryPage";
 
 function App() {
   return (
@@ -82,6 +83,10 @@ function App() {
                 <Route
                   path="/admin/addproducts"
                   element={<AdminAddProductsPage />}
+                />
+                <Route
+                  path="/admin/allsubcategories"
+                  element={<AllSubCategoryPage />}
                 />
               </Route>
 

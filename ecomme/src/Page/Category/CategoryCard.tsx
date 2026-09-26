@@ -58,7 +58,7 @@ const CategoryCard = ({
       <ConfirmDialog
         open={confirmOpen}
         title="Delete category"
-        message={`"${title}" will be permanently deleted, including its image. This can't be undone.`}
+        message={`"${title}" and all its subcategories will be permanently deleted, including images. This can't be undone.`}
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleConfirm}
       />
