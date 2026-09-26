@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import userRoute from "./routes/userRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
 import brandRoute from "./routes/brandRoute.js";
+import subCategoryRoute from "./routes/subCategoryRoute.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/user", userRoute);
 app.use("/category", categoryRoute);
 app.use("/brand", brandRoute);
+app.use("/subcategory", subCategoryRoute);
 
 async function start() {
   try {

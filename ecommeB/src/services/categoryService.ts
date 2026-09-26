@@ -1,5 +1,6 @@
 /** @format */
 import Category, { type ICategory } from "../models/categoryModel.js";
+import SubCategory from "../models/subCategoryModel.js";
 import { AppError } from "../utils/AppError.js";
 import fs from "fs";
 import path from "path";
@@ -51,6 +52,7 @@ export const updateCategory = async (
     new: true, // يُعيد المستند بعد التحديث، لا قبله
     runValidators: true, // يُطبّق قواعد الـ schema (minlength وغيرها) حتى عند التحديث
   });
+
   if (!category) {
     throw new AppError("Category not found", 404);
   }
@@ -62,6 +64,11 @@ export const deleteCategory = async (id: string): Promise<void> => {
   if (!category) {
     throw new AppError("Category not found", 404);
   }
+
+  // حذف متسلسل: يزيل كل التصنيفات الفرعية المرتبطة بهذا التصنيف الأب،
+  // لمنع بقاء مراجع معطوبة تشير إلى تصنيف لم يعد موجودًا
+  await SubCategory.deleteMany({ category: id });
+
   // يحذف الملف الفعلي أيضًا، لا فقط سجل قاعدة البيانات، لمنع بقايا صور يتيمة
   try {
     const filename = path.basename(category.image);
