@@ -1,31 +1,16 @@
 /** @format */
+import { useEffect, useState } from "react";
 import BrandCard from "./BrandCard.js";
 import SubTitle from "../../Components/Utility/SubTitle.js";
+import api from "../../Api/baseURL";
+import { useAuth } from "../../context/AuthContext";
+import { Toast } from "../../Components/Utility/AppAlerts";
 
-import voltex from "../../images/brands/01-voltex.png";
-import nuvora from "../../images/brands/02-nuvora.png";
-import kiro from "../../images/brands/03-kiro.png";
-import aerolux from "../../images/brands/04-aerolux.png";
-import zentro from "../../images/brands/05-zentro.png";
-import lumiq from "../../images/brands/06-lumiq.png";
-import orbyt from "../../images/brands/07-orbyt.png";
-import vantra from "../../images/brands/08-vantra.png";
-import novexa from "../../images/brands/09-novexa.png";
-import ekko from "../../images/brands/10-ekko.png";
-
-// اسم كل علامة تجارية مرتبط بصورتها، ليُستخدم كـ alt وكرابط لصفحة العلامة
-const brands = [
-  { name: "Voltex", img: voltex },
-  { name: "Nuvora", img: nuvora },
-  { name: "Kiro", img: kiro },
-  { name: "Erolu", img: aerolux },
-  { name: "Zentro", img: zentro },
-  { name: "Lumiq", img: lumiq },
-  { name: "Orbyt", img: orbyt },
-  { name: "Vantra", img: vantra },
-  { name: "Novexa", img: novexa },
-  { name: "Ekko", img: ekko },
-];
+interface Brand {
+  _id: string;
+  name: string;
+  image: string;
+}
 
 const AllBrandPage = ({
   title,
@@ -34,15 +19,88 @@ const AllBrandPage = ({
   title: string;
   pathText: string;
 }) => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [toastOpen, setToastOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    api
+      .get("/brand")
+      .then((res) => {
+        if (!cancelled) setBrands(res.data.brands);
+      })
+      .catch(() => {
+        if (!cancelled) setError("Failed to load brands.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    const previous = brands;
+    setBrands((prev) => prev.filter((b) => b._id !== id));
+
+    try {
+      await api.delete(`/brand/${id}`);
+      setToastOpen(true);
+    } catch {
+      setBrands(previous);
+      setError("Failed to delete the brand. Please try again.");
+    }
+  };
+
   return (
     <div className="w-full">
       <SubTitle title={title} pathText={pathText} />
-      <div className="my-2 grid grid-cols-2 gap-4 px-4 
-       sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 cursor-pointer">
-        {brands.map((brand) => (
-          <BrandCard key={brand.name} img={brand.img} />
-        ))}
-      </div>
+
+      {loading && (
+        <p className="py-10 text-center text-sm text-gray-500">
+          Loading brands...
+        </p>
+      )}
+
+      {!loading && error && (
+        <p className="py-10 text-center text-sm text-red-600">{error}</p>
+      )}
+
+      {!loading && !error && brands.length === 0 && (
+        <p className="py-10 text-center text-sm text-gray-500">
+          No brands yet.
+        </p>
+      )}
+
+      {!loading && !error && brands.length > 0 && (
+        <div className="my-2 grid grid-cols-2 gap-4 px-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {brands.map((brand) => (
+            <BrandCard
+              key={brand._id}
+              id={brand._id}
+              name={brand.name}
+              img={brand.image}
+              isAdmin={isAdmin}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
+
+      <Toast
+        open={toastOpen}
+        message="Brand deleted successfully"
+        severity="success"
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 };
