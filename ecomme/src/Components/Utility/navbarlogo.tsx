@@ -1,27 +1,34 @@
 /** @format */
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, Search, ShoppingCart, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingCart, X } from "lucide-react";
 import shop from "../../../src/images/Logo/shop.png";
 import AccountMenu from "./AccountMenu";
-import { Heart } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+
+// مسار واحد لصفحة المنتجات، يُستخدم في الروابط والبحث معًا
+// عدّله إن كان المسار الفعلي في الـ Router مختلفًا
+const PRODUCTS_PATH = "/products";
 
 const navItems = [
   { label: "Home", path: "/" },
-  { label: "Shop", path: "/shop" },
+  { label: "Shop", path: PRODUCTS_PATH },
   { label: "Brands", path: "/brands" },
   { label: "Support", path: "/support" },
 ];
 
 interface NavBarLogoProps {
-  cartCount?: number; // اربطه بحالة السلة الفعلية
-  favoritesCount?: number;
+  favoritesCount?: number; // لا يوجد نظام مفضلة في الباك إند بعد
 }
 
-function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
+function NavBarLogo({ favoritesCount = 0 }: NavBarLogoProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  // العداد من CartContext: يتحدّث فورًا عند الإضافة من أي صفحة
+  const { cart } = useCart();
+  const cartCount = cart.totalQuantity;
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -31,14 +38,17 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    // عدّل المسار حسب صفحة نتائج البحث عندك
-    navigate(`/products?search=${encodeURIComponent(q)}`);
+    navigate(`${PRODUCTS_PATH}?search=${encodeURIComponent(q)}`);
     closeMenu();
   };
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/");
+    try {
+      await logout();
+    } finally {
+      // حتى لو فشل طلب الخروج، لا نترك المستخدم عالقًا في صفحة محمية
+      navigate("/");
+    }
   };
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -48,11 +58,20 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
 
   const searchForm = (className: string) => (
     <form onSubmit={handleSearch} role="search" className={className}>
-      <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
-      <input type="search" value={query} onChange={(e) => setQuery(e.target.value)}  placeholder="Search"
-        aria-label="Search products" className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm 
-        text-gray-900 outline-none 
-        transition-colors placeholder:text-gray-400 focus:border-sky-400"/>
+      <Search
+        size={16}
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+      />
+      <input
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search"
+        aria-label="Search products"
+        className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm
+        text-gray-900 outline-none
+        transition-colors placeholder:text-gray-400 focus:border-sky-400"
+      />
     </form>
   );
 
@@ -72,7 +91,6 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
               to={item.path}
               end={item.path === "/"}
               className={linkClass}>
-              {" "}
               {item.label}
             </NavLink>
           ))}
@@ -85,11 +103,12 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
           <Link
             to="/user/favorite"
             aria-label={`Wishlist, ${favoritesCount} items`}
-            className="relative hidden h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors 
+            className="relative hidden h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors
             hover:bg-gray-100 hover:text-sky-500 sm:flex">
             <Heart size={22} />
             {favoritesCount > 0 ? (
-              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 
+              <span
+                className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500
               px-1 text-xs font-semibold text-white">
                 {favoritesCount > 99 ? "99+" : favoritesCount}
               </span>
@@ -98,12 +117,14 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
 
           <Link
             to="/cart"
+            onClick={closeMenu}
             aria-label={`Cart, ${cartCount} items`}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors 
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors
             hover:bg-gray-100 hover:text-sky-500">
             <ShoppingCart size={22} />
             {cartCount > 0 ? (
-              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 
+              <span
+                className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500
               px-1 text-xs font-semibold text-white">
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
@@ -122,7 +143,7 @@ function NavBarLogo({ cartCount = 0, favoritesCount = 0 }: NavBarLogoProps) {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors 
+            className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors
             hover:bg-gray-100 md:hidden">
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>

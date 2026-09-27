@@ -1,91 +1,122 @@
 /** @format */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 import CartItem from "../../Components/Cart/CartItem";
 import CartCheckout from "../../Components/Cart/CartCheckout";
-import smartphone from "../../../src/images/allProducts/smartphone.png";
-import watch from "../../../src/images/allProducts/smartwatch.png";
+import { useAuth } from "../../context/AuthContext";
+import { getCartErrorMessage, useCart } from "../../context/CartContext";
 
-interface CartItemData {
-  id: number;
-  image: string;
-  category: string;
-  title: string;
-  rate: number;
-  brand: string;
-  color: string;
-  quantity: number;
-  price: number;
-}
-
-const initialItems: CartItemData[] = [
-  {
-    id: 1,
-    image: watch,
-    category: "electronics",
-    title: "Smart watch",
-    rate: 4.6,
-    brand: "LG",
-    color: "#2C2CE5",
-    quantity: 1,
-    price: 78,
-  },
-  {
-    id: 2,
-    image: smartphone,
-    category: "electronics",
-    title: "Samsung Galaxy",
-    rate: 4.2,
-    brand: "Samsung",
-    color: "#f40000",
-    quantity: 1,
-    price: 560,
-  },
-];
+// عدّلهما إن كانت المسارات مختلفة في الـ Router
+const SHOP_PATH = "/products";
+const LOGIN_PATH = "/login";
 
 const CartPage = () => {
-  const [items, setItems] = useState<CartItemData[]>(initialItems);
+  const { user, loading: authLoading } = useAuth();
+  const {
+    cart,
+    loading,
+    error: loadError,
+    updateQuantity,
+    removeItem,
+    refresh,
+  } = useCart();
 
-  const handleQuantityChange = (id: number, newQuantity: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item,
-      ),
+  const [actionError, setActionError] = useState("");
+  // الأسطر التي تنتظر رد السيرفر: state للعرض، و ref للحماية المتزامنة
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const pendingRef = useRef<Set<string>>(new Set());
+
+  const setPending = (itemId: string, pending: boolean) => {
+    if (pending) pendingRef.current.add(itemId);
+    else pendingRef.current.delete(itemId);
+    setPendingIds(new Set(pendingRef.current));
+  };
+
+  const runItemAction = async (itemId: string, action: () => Promise<void>) => {
+    if (pendingRef.current.has(itemId)) return;
+    setPending(itemId, true);
+    setActionError("");
+    try {
+      await action();
+    } catch (err) {
+      setActionError(getCartErrorMessage(err));
+    } finally {
+      setPending(itemId, false);
+    }
+  };
+
+  const handleQuantityChange = (itemId: string, quantity: number) =>
+    runItemAction(itemId, () => updateQuantity(itemId, quantity));
+
+  const handleDelete = (itemId: string) =>
+    runItemAction(itemId, () => removeItem(itemId));
+
+  const wrapper = "container mx-auto min-h-[680px] px-4 pb-10";
+
+  if (authLoading || (loading && cart.items.length === 0)) {
+    return (
+      <div className={`${wrapper} py-10 text-center text-sm text-gray-500`}>
+        Loading your cart...
+      </div>
     );
-  };
+  }
 
-  const handleDelete = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
+  if (!user) {
+    return (
+      <div
+        className={`${wrapper} flex flex-col items-center gap-3 py-14 text-center`}>
+        <p className="text-base font-semibold text-gray-900">
+          Log in to see your cart
+        </p>
+        <Link
+          to={LOGIN_PATH}
+          state={{ from: "/cart" }}
+          className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-medium text-white no-underline transition-colors hover:bg-sky-600">
+          Log in
+        </Link>
+      </div>
+    );
+  }
 
-  const total = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
+  if (loadError) {
+    return (
+      <div
+        className={`${wrapper} flex flex-col items-center gap-3 py-14 text-center`}>
+        <p className="text-sm text-red-600">{loadError}</p>
+        <button
+          type="button"
+          onClick={() => void refresh()}
+          className="rounded-lg border border-gray-200 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          Try again
+        </button>
+      </div>
+    );
+  }
 
-  const itemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
-
-  const handleApplyCoupon = (code: string) => {
-    console.log("Applying coupon:", code);
-  };
+  const { items, totalQuantity, totalPrice } = cart;
 
   return (
-    <div className="container mx-auto min-h-[680px] px-4 pb-10">
+    <div className={wrapper}>
       {/* حجم العنوان بـ style لأن CSS عامًا على h1 قد يتغلب على فئات Tailwind */}
       <div className="mb-5 mt-6 flex items-center gap-3">
-        <h1
-          className="font-bold text-gray-900 "
-          style={{ fontSize: "1.75rem" }}>
-          {" "}
+        <h1 className="font-bold text-gray-900" style={{ fontSize: "1.75rem" }}>
           Shopping Cart
         </h1>
         {items.length > 0 ? (
           <span className="rounded-full bg-sky-50 px-3 py-1 text-sm font-medium text-sky-600">
-            {itemsCount} {itemsCount === 1 ? "item" : "items"}
+            {totalQuantity} {totalQuantity === 1 ? "item" : "items"}
           </span>
         ) : null}
       </div>
+
+      {actionError && (
+        <div
+          role="alert"
+          className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+          {actionError}
+        </div>
+      )}
 
       <div className="flex flex-col items-start gap-6 md:flex-row">
         <div className="w-full rounded-2xl bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.1)] md:w-2/3">
@@ -95,15 +126,13 @@ const CartPage = () => {
                 <ShoppingCart size={28} />
               </div>
               <p className="text-base font-semibold text-gray-900">
-                {" "}
                 Your cart is empty
               </p>
               <p className="text-sm text-gray-500">
-                {" "}
                 Looks like you haven't added anything yet.
               </p>
               <Link
-                to="/shop"
+                to={SHOP_PATH}
                 className="mt-2 rounded-lg bg-sky-500 px-6 py-3 text-sm font-medium text-white no-underline
                  transition-colors hover:bg-sky-600">
                 Continue Shopping
@@ -113,17 +142,20 @@ const CartPage = () => {
             <div className="divide-y divide-gray-100 px-4">
               {items.map((item) => (
                 <CartItem
-                  key={item.id}
-                  image={item.image}
-                  category={item.category}
-                  title={item.title}
-                  rate={item.rate}
-                  brand={item.brand}
+                  key={item._id}
+                  image={item.product.image}
+                  category={item.product.category}
+                  title={item.product.name}
+                  brand={item.product.brand}
                   color={item.color}
                   quantity={item.quantity}
-                  price={item.price}
-                  onQuantityChange={(q) => handleQuantityChange(item.id, q)}
-                  onDelete={() => handleDelete(item.id)}
+                  price={item.product.price}
+                  lineTotal={item.lineTotal}
+                  disabled={pendingIds.has(item._id)}
+                  onQuantityChange={(q) =>
+                    void handleQuantityChange(item._id, q)
+                  }
+                  onDelete={() => void handleDelete(item._id)}
                 />
               ))}
             </div>
@@ -131,10 +163,15 @@ const CartPage = () => {
         </div>
 
         <div className="w-full md:sticky md:top-24 md:w-1/3">
-          <CartCheckout total={total} onApplyCoupon={handleApplyCoupon} />
+          <CartCheckout
+            total={totalPrice}
+            itemsCount={totalQuantity}
+            busy={pendingIds.size > 0}
+          />
         </div>
       </div>
     </div>
   );
 };
+
 export default CartPage;

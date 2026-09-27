@@ -7,7 +7,7 @@ import {
   updateSubCategory,
   deleteSubCategory,
 } from "../services/subCategoryService.js";
-import { AppError } from "../utils/AppError.js";
+import { AppError } from "../utils/appError.js";
 
 const handleError = (err: unknown, res: Response) => {
   if (err instanceof AppError) {

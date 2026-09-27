@@ -1,81 +1,152 @@
 /** @format */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { AlertColor } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import AdminAllProductsCard from "./AdminAllProductsCard";
 import { ConfirmDialog, Toast } from "./AppAlerts";
-import camera from "../../images/allProducts/camera.png";
-import controller from "../../images/allProducts/controller.png";
-import smartphone from "../../images/allProducts/smartphone.png";
-import watch from "../../images/allProducts/smartwatch.png";
-import microphone from "../../images/allProducts/microphone.png";
-import tracker from "../../images/allProducts/tracker.png";
+import api from "../../Api/baseURL";
 
-interface Product { id: string | number; image: string; title: string; rate: number; price: number;
+interface RawProduct {
+  _id: string;
+  name: string;
+  images: string[];
+  price: number;
+  rating: { value: number; count: number };
 }
-const mockProducts: Product[] = [
-  { id: 1, image: camera, title: "action camera", rate: 4.5, price: 128 },
-  { id: 2, image: controller, title: "gaming controller", rate: 4.2, price: 45,},
-  { id: 3, image: smartphone, title: "smart phone", rate: 4.7, price: 220 },
-  { id: 4, image: watch, title: "smart watch", rate: 4.3, price: 65 },
-  { id: 5, image: tracker, title: "fitness tracker band", rate: 4.0, price: 122,},
-  { id: 6, image: microphone, title: "usb microphone", rate: 4.6, price: 320 },
-];
 
-interface ToastState { open: boolean; message: string; severity: AlertColor;
+interface Product {
+  id: string;
+  image: string;
+  title: string;
+  rate: number;
+  price: number;
+}
+
+interface ToastState {
+  open: boolean;
+  message: string;
+  severity: AlertColor;
 }
 
 const AdminAllProducts = () => {
-  const [deleteId, setDeleteId] = useState<Product["id"] | null>(null);
+  const navigate = useNavigate();
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState>({
     open: false,
     message: "",
     severity: "success",
   });
 
-  const productToDelete = mockProducts.find((p) => p.id === deleteId);
+  useEffect(() => {
+    let cancelled = false;
 
-  const handleDelete = (id: Product["id"]) => setDeleteId(id);
+    api
+      .get("/product")
+      .then((res) => {
+        if (cancelled) return;
+        const mapped: Product[] = res.data.products.map((p: RawProduct) => ({
+          id: p._id,
+          image: p.images?.[0] ?? "",
+          title: p.name,
+          rate: p.rating?.value ?? 0,
+          price: p.price,
+        }));
+        setProducts(mapped);
+      })
+      .catch(() => {
+        if (!cancelled) setError("Failed to load products.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-  const confirmDelete = () => {
-    // TODO: Call the delete API, then show success or error based on the result.
-    console.log("Delete product:", deleteId);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const productToDelete = products.find((p) => p.id === deleteId);
+
+  const handleDelete = (id: string) => setDeleteId(id);
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    const idToDelete = deleteId;
+    const previous = products;
+
     setDeleteId(null);
-    setToast({
-      open: true,
-      message: "Product deleted successfully",
-      severity: "success",
-    });
+    setProducts((prev) => prev.filter((p) => p.id !== idToDelete));
+
+    try {
+      await api.delete(`/product/${idToDelete}`);
+      setToast({
+        open: true,
+        message: "Product deleted successfully",
+        severity: "success",
+      });
+    } catch {
+      // فشل الحذف فعليًا في الخادم: نُعيد المنتج للقائمة بدل واجهة كاذبة
+      setProducts(previous);
+      setToast({
+        open: true,
+        message: "Failed to delete the product. Please try again.",
+        severity: "error",
+      });
+    }
   };
 
-  const handleEdit = (id: Product["id"]) => {
-    console.log("Edit product:", id);
+  const handleEdit = (id: string) => {
+    navigate(`/admin/editproduct/${id}`);
   };
 
   return (
     <div>
-      <h2 className="admin-content-text text-lg font-semibold !mb-8 pt-4">
-        {" "}
+      <h2 className="mb-8! pt-4 text-lg font-semibold text-gray-900">
         Manage all products
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 ">
-        {mockProducts.map((product) => (
-          <AdminAllProductsCard
-            key={product.id}
-            id={product.id}
-            image={product.image}
-            title={product.title}
-            rate={product.rate}
-            price={product.price}
-            onDelete={() => handleDelete(product.id)}
-            onEdit={() => handleEdit(product.id)}
-          />
-        ))}
-      </div>
+
+      {loading && (
+        <p className="py-10 text-center text-sm text-gray-500">
+          Loading products...
+        </p>
+      )}
+
+      {!loading && error && (
+        <p className="py-10 text-center text-sm text-red-600">{error}</p>
+      )}
+
+      {!loading && !error && products.length === 0 && (
+        <p className="py-10 text-center text-sm text-gray-500">
+          No products yet.
+        </p>
+      )}
+
+      {!loading && !error && products.length > 0 && (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((product) => (
+            <AdminAllProductsCard
+              key={product.id}
+              id={product.id}
+              image={product.image}
+              title={product.title}
+              rate={product.rate}
+              price={product.price}
+              onDelete={() => handleDelete(product.id)}
+              onEdit={() => handleEdit(product.id)}
+            />
+          ))}
+        </div>
+      )}
 
       <ConfirmDialog
         open={deleteId !== null}
         title="Delete product"
-        message={`"${productToDelete?.title ?? ""}" will be permanently deleted. This can't be undone.`}
+        message={`"${productToDelete?.title ?? ""}" will be permanently deleted, including its image. This can't be undone.`}
         onClose={() => setDeleteId(null)}
         onConfirm={confirmDelete}
       />

@@ -1,8 +1,13 @@
 /** @format */
 import type { Request, Response } from "express";
-import { getAllBrands, getBrandById, createBrand, updateBrand, deleteBrand,
+import {
+  getAllBrands,
+  getBrandById,
+  createBrand,
+  updateBrand,
+  deleteBrand,
 } from "../services/brandService.js";
-import { AppError } from "../utils/AppError.js";
+import { AppError } from "../utils/appError.js";
 
 const handleError = (err: unknown, res: Response) => {
   if (err instanceof AppError) {

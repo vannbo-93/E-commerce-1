@@ -29,88 +29,105 @@ import UserAddAddressPage from "../src/Page/User/UserAddAddressPage";
 import UserEditAddressPage from "../src/Page/User/UserEditAddressPage";
 import UserProfilePage from "../src/Page/User/UserProfilePage";
 import AllSubCategoryPage from "../src/Page/Category/AllSubCategoryPage";
+import EditProduct from "../src/Page/Admin/EditProduct";
+import { CartProvider } from "./context/CartContext";
 
 function App() {
   return (
     <div className="min-h-screen flex flex-col" dir="ltr">
       <BrowserRouter>
         <AuthProvider>
-          <NavBarLogo />
-          <main className="flex-1">
-            <Routes>
-              {/* مسارات عامة، بلا أي حراسة */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/allcategory" element={<AllCategoryPage />} />
-              <Route
-                path="/allbrand"
-                element={
-                  <AllBrandPage title="All Brands" pathText="/allbrand" />
-                }
-              />
-              <Route path="/products" element={<ShopProductsPage />} />
-              <Route path="/products/:id" element={<ProductDetailsPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route
-                path="/order/paymethoud"
-                element={<ChoosePayMethoudPage />}
-              />
+          <CartProvider>
+            <NavBarLogo />
+            <main className="flex-1">
+              <Routes>
+                {/* مسارات عامة، بلا أي حراسة */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/allcategory" element={<AllCategoryPage />} />
+                <Route
+                  path="/allbrand"
+                  element={
+                    <AllBrandPage title="All Brands" pathText="/allbrand" />
+                  }
+                />
+                <Route path="/products" element={<ShopProductsPage />} />
+                <Route path="/products/:id" element={<ProductDetailsPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route
+                  path="/order/paymethoud"
+                  element={<ChoosePayMethoudPage />}
+                />
 
-              {/* مسارات الأدمن: محمية بـ RequireAdmin — تتحقق من /user/me ومن role */}
-              <Route element={<RequireAdmin />}>
-                <Route
-                  path="/admin/allproducts"
-                  element={<AdminAllProductsPage />}
-                />
-                <Route
-                  path="/admin/allorders"
-                  element={<AdminAllOrdersPage />}
-                />
-                <Route
-                  path="/admin/orders/:id"
-                  element={<AdminOrderDetalisPage />}
-                />
-                <Route path="/admin/addbrand" element={<AdminAddbrandPage />} />
-                <Route
-                  path="/admin/addcategory"
-                  element={<AdminAddCategoryPage />}
-                />
-                <Route
-                  path="/admin/addsubcategory"
-                  element={<AdminAddSubCategoryPage />}
-                />
-                <Route
-                  path="/admin/addproducts"
-                  element={<AdminAddProductsPage />}
-                />
-                <Route
-                  path="/admin/allsubcategories"
-                  element={<AllSubCategoryPage />}
-                />
-              </Route>
+                {/* مسارات الأدمن: محمية بـ RequireAdmin — تتحقق من /user/me ومن role */}
+                <Route element={<RequireAdmin />}>
+                  <Route
+                    path="/admin/allproducts"
+                    element={<AdminAllProductsPage />}
+                  />
+                  <Route
+                    path="/admin/allorders"
+                    element={<AdminAllOrdersPage />}
+                  />
+                  <Route
+                    path="/admin/orders/:id"
+                    element={<AdminOrderDetalisPage />}
+                  />
+                  <Route
+                    path="/admin/addbrand"
+                    element={<AdminAddbrandPage />}
+                  />
+                  <Route
+                    path="/admin/addcategory"
+                    element={<AdminAddCategoryPage />}
+                  />
+                  <Route
+                    path="/admin/addsubcategory"
+                    element={<AdminAddSubCategoryPage />}
+                  />
+                  <Route
+                    path="/admin/addproducts"
+                    element={<AdminAddProductsPage />}
+                  />
+                  <Route
+                    path="/admin/allsubcategories"
+                    element={<AllSubCategoryPage />}
+                  />
+                  <Route
+                    path="/admin/editproduct/:id"
+                    element={<EditProduct />}
+                  />
+                </Route>
 
-              {/* مسارات المستخدم: محمية بـ RequireAuth — تكفي هوية مسجّلة، بلا شرط role */}
-              <Route element={<RequireAuth />}>
-                <Route path="/user/allorders" element={<UserAllOrdersPage />} />
-                <Route
-                  path="/user/favoriteproducts"
-                  element={<UserFavoriteProductsPage />}
-                />
-                <Route path="/user/address" element={<UserAllAddressPage />} />
-                <Route
-                  path="/user/add-address"
-                  element={<UserAddAddressPage />}
-                />
-                <Route
-                  path="/user/edit-address"
-                  element={<UserEditAddressPage />}
-                />
-                <Route path="/user/profile" element={<UserProfilePage />} />
-              </Route>
-            </Routes>
-          </main>
-          <Footer />
+                {/* مسارات المستخدم: محمية بـ RequireAuth — تكفي هوية مسجّلة، بلا شرط role */}
+                <Route element={<RequireAuth />}>
+                  <Route
+                    path="/user/allorders"
+                    element={<UserAllOrdersPage />}
+                  />
+                  <Route
+                    path="/user/favoriteproducts"
+                    element={<UserFavoriteProductsPage />}
+                  />
+                  <Route
+                    path="/user/address"
+                    element={<UserAllAddressPage />}
+                  />
+                  <Route
+                    path="/user/add-address"
+                    element={<UserAddAddressPage />}
+                  />
+                  <Route
+                    path="/user/edit-address"
+                    element={<UserEditAddressPage />}
+                  />
+                  <Route path="/user/profile" element={<UserProfilePage />} />
+                </Route>
+              </Routes>
+            </main>
+            <Footer />
+          </CartProvider>
         </AuthProvider>
       </BrowserRouter>
     </div>

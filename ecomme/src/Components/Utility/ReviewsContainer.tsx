@@ -1,26 +1,41 @@
 /** @format */
-
+import { useEffect, useState } from "react";
 import ReviewCard from "./CustomerReviews";
-import SubTitle from "../../Components/Utility/SubTitle";
-import mohamed from "../../images/PhotoPerson/mohamed.jpg";
-import ahmed from "../../images/PhotoPerson/ahmed.jpg";
-import moha from "../../images/PhotoPerson/moha.jpg";
+import SubTitle from "./SubTitle";
+import api from "../../Api/baseURL";
 
-interface ReviewsContainerProps { title?: string; btntitle?: string; pathText?: string;}
-// بيانات تجريبية: استبدلها بأسماء وآراء عملائك الحقيقيين
-const reviews = [
-  { id: "1", name: "Mohamed", avatar: moha, rating: 5, review:
-      "Great quality products and fast delivery. The website is easy to use and has amazing collections!",
-  },
-  { id: "2", name: "isawi", avatar: mohamed, rating: 5, review:
-      "Excellent products with quick delivery. The website is simple to navigate and offers a fantastic selection!",
-  },
-  { id: "3", name: "mark", avatar: ahmed, rating: 5, review:
-      "Amazing product quality and speedy shipping. The website looks great and makes finding products really easy!",
-  },
-];
+interface ReviewsContainerProps {
+  title?: string;
+  btntitle?: string;
+  pathText?: string;
+}
 
-const ReviewsContainer = ({ title, btntitle, pathText,}: ReviewsContainerProps) => {
+interface RawReview {
+  _id: string;
+  rating: number;
+  comment: string;
+  user: { _id: string; username: string } | null;
+}
+
+const ReviewsContainer = ({
+  title,
+  btntitle,
+  pathText,
+}: ReviewsContainerProps) => {
+  const [reviews, setReviews] = useState<RawReview[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api
+      .get("/review/featured")
+      .then((res) => setReviews(res.data.reviews))
+      .catch(() => setReviews([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // لا يوجد نظام تحقق من الشراء الفعلي بعد، فلا نعرض شارة "Verified Buyer" كاذبة
+  if (loading || reviews.length === 0) return null;
+
   return (
     <div className="my-4 w-full">
       {title ? (
@@ -30,11 +45,11 @@ const ReviewsContainer = ({ title, btntitle, pathText,}: ReviewsContainerProps) 
       <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-3">
         {reviews.map((item) => (
           <ReviewCard
-            key={item.id}
-            name={item.name}
-            avatar={item.avatar}
+            key={item._id}
+            name={item.user?.username ?? "Anonymous"}
             rating={item.rating}
-            review={item.review}
+            review={item.comment}
+            verified={false}
           />
         ))}
       </div>

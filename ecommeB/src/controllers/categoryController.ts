@@ -7,7 +7,7 @@ import {
   updateCategory,
   deleteCategory,
 } from "../services/categoryService.js";
-import { AppError } from "../utils/AppError.js";
+import { AppError } from "../utils/appError.js";
 
 // يوحّد معالجة الأخطاء بدل تكرار نفس try/catch في كل دالة
 const handleError = (err: unknown, res: Response) => {

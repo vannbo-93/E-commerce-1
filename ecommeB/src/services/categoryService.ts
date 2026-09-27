@@ -1,7 +1,8 @@
 /** @format */
 import Category, { type ICategory } from "../models/categoryModel.js";
 import SubCategory from "../models/subCategoryModel.js";
-import { AppError } from "../utils/AppError.js";
+import Product from "../models/productModel.js";
+import { AppError } from "../utils/appError.js";
 import fs from "fs";
 import path from "path";
 
@@ -60,6 +61,15 @@ export const updateCategory = async (
 };
 
 export const deleteCategory = async (id: string): Promise<void> => {
+  // يمنع حذف تصنيف له منتجات مرتبطة، بدل حذفها معه تلقائيًا أو تركها بمرجع معطوب
+  const productCount = await Product.countDocuments({ category: id });
+  if (productCount > 0) {
+    throw new AppError(
+      "Cannot delete a category that still has products. Reassign or delete those products first.",
+      409,
+    );
+  }
+
   const category = await Category.findByIdAndDelete(id);
   if (!category) {
     throw new AppError("Category not found", 404);

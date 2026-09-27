@@ -42,7 +42,9 @@ const AdminAllProductsCard: React.FC<AdminAllProductsCardProps> = ({
 
           <div className="mt-1 flex items-center gap-1">
             <Star size={14} className="fill-amber-400 text-amber-400" />
-            <span className="text-xs font-semibold text-gray-600">{rate}</span>
+            <span className="text-xs font-semibold text-gray-600">
+              {rate.toFixed(1)}
+            </span>
           </div>
 
           <p className="mt-2 text-lg font-bold text-gray-900">
@@ -55,7 +57,8 @@ const AdminAllProductsCard: React.FC<AdminAllProductsCardProps> = ({
         <button
           type="button"
           onClick={onEdit}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-sky-500 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-600 ">
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-sky-500 py-2 text-sm font-semibold 
+          text-white transition-colors hover:bg-sky-600 ">
           <Pencil size={15} />
           Edit
         </button>
@@ -63,7 +66,8 @@ const AdminAllProductsCard: React.FC<AdminAllProductsCardProps> = ({
           type="button"
           onClick={onDelete}
           aria-label="Remove product"
-          className="flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-semibold text-red-500 transition-colors 
+          className="flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-sm 
+          font-semibold text-red-500 transition-colors 
           hover:bg-red-500 hover:text-white ">
           <Trash2 size={15} />
           Delete

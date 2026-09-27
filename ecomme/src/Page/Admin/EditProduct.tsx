@@ -6,7 +6,7 @@ import {
   type ChangeEvent,
   type ReactNode,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import type { StylesConfig } from "react-select";
 import { IconPlus, IconX } from "@tabler/icons-react";
@@ -15,7 +15,6 @@ import api from "../../Api/baseURL";
 import { isAxiosError } from "axios";
 
 type ProductOption = { name: string; id: string };
-
 const MAX_IMAGES = 6;
 
 const baseField =
@@ -84,15 +83,16 @@ const selectStyles: StylesConfig<ProductOption, true> = {
   singleValue: (base) => ({ ...base, color: "#111827" }),
 };
 
-interface ImageEntry {
-  file: File;
-  preview: string;
-}
+// صورة قديمة (رابط موجود فعليًا)، أو صورة جديدة (ملف لم يُرفع بعد)
+type ImageSlot =
+  | { kind: "existing"; url: string }
+  | { kind: "new"; file: File; preview: string };
 
-const AdminAddProducts = () => {
+const EditProduct = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const colorInputRef = useRef<HTMLInputElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const colorInputRef = useRef<HTMLInputElement | null>(null);
 
   const [categories, setCategories] = useState<ProductOption[]>([]);
   const [brands, setBrands] = useState<ProductOption[]>([]);
@@ -100,27 +100,29 @@ const AdminAddProducts = () => {
     [],
   );
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [loadingProduct, setLoadingProduct] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-  // مصفوفة صور بدل صورة واحدة: كل عنصر يحمل الملف الحقيقي ومعاينته
-  const [images, setImages] = useState<ImageEntry[]>([]);
-
+  const [images, setImages] = useState<ImageSlot[]>([]);
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [priceBeforeDiscount, setPriceBeforeDiscount] = useState("");
   const [price, setPrice] = useState("");
   const [mainCategory, setMainCategory] = useState("");
   const [brand, setBrand] = useState("");
-  const [colors, setColors] = useState(["#E52C2C", "#FFFFFF", "#000000"]);
+  const [colors, setColors] = useState<string[]>([]);
   const [selectedSubCategories, setSelectedSubCategories] = useState<
     ProductOption[]
   >([]);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // يحرر كل معاينات الصور من الذاكرة عند مغادرة الصفحة
+  // يحرر معاينات الصور الجديدة فقط (الروابط القديمة ليست Object URLs، لا تحتاج تحريرًا)
   useEffect(() => {
     return () => {
-      images.forEach((img) => URL.revokeObjectURL(img.preview));
+      images.forEach((img) => {
+        if (img.kind === "new") URL.revokeObjectURL(img.preview);
+      });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -157,6 +159,36 @@ const AdminAddProducts = () => {
       .finally(() => setLoadingOptions(false));
   }, []);
 
+  // يجلب المنتج الحالي ويُعبّئ كل الحقول بقيمه الفعلية
+  useEffect(() => {
+    if (!id) return;
+    api
+      .get(`/product/${id}`)
+      .then((res) => {
+        const p = res.data.product;
+        setProductName(p.name);
+        setDescription(p.description);
+        setPrice(String(p.price));
+        setPriceBeforeDiscount(
+          p.priceBeforeDiscount ? String(p.priceBeforeDiscount) : "",
+        );
+        setMainCategory(p.category?._id ?? "");
+        setBrand(p.brand?._id ?? "");
+        setColors(p.colors ?? []);
+        setSelectedSubCategories(
+          (p.subCategories ?? []).map((s: { _id: string; name: string }) => ({
+            id: s._id,
+            name: s.name,
+          })),
+        );
+        setImages(
+          (p.images ?? []).map((url: string) => ({ kind: "existing", url })),
+        );
+      })
+      .catch(() => setLoadError("Failed to load this product."))
+      .finally(() => setLoadingProduct(false));
+  }, [id]);
+
   const canSave =
     productName.trim() !== "" &&
     description.trim() !== "" &&
@@ -167,56 +199,56 @@ const AdminAddProducts = () => {
     !submitting;
 
   const handleAddColor = () => colorInputRef.current?.click();
-
-  const handleColorChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedColor = event.target.value.toUpperCase();
-    setColors((prev) =>
-      prev.includes(selectedColor) ? prev : [...prev, selectedColor],
-    );
+  const handleColorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const c = e.target.value.toUpperCase();
+    setColors((prev) => (prev.includes(c) ? prev : [...prev, c]));
   };
-
-  const handleRemoveColor = (color: string) => {
-    setColors((prev) => prev.filter((c) => c !== color));
-  };
+  const handleRemoveColor = (c: string) =>
+    setColors((prev) => prev.filter((x) => x !== c));
 
   const handleImagesClick = () => imageInputRef.current?.click();
 
-  const handleImagesChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(event.target.files ?? []);
+  const handleImagesChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files ?? []);
     if (selected.length === 0) return;
 
     setImages((prev) => {
-      const combined = [
+      const combined: ImageSlot[] = [
         ...prev,
         ...selected.map((file) => ({
+          kind: "new" as const,
           file,
           preview: URL.createObjectURL(file),
         })),
       ];
-      // يمنع تجاوز الحد الأقصى، ويحرر ذاكرة أي صورة زائدة تم قصها
       if (combined.length > MAX_IMAGES) {
-        combined
-          .slice(MAX_IMAGES)
-          .forEach((img) => URL.revokeObjectURL(img.preview));
+        combined.slice(MAX_IMAGES).forEach((img) => {
+          if (img.kind === "new") URL.revokeObjectURL(img.preview);
+        });
         return combined.slice(0, MAX_IMAGES);
       }
       return combined;
     });
-
-    event.target.value = ""; // يسمح باختيار نفس الملف مجددًا لاحقًا إن أُزيل
+    e.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
     setImages((prev) => {
-      URL.revokeObjectURL(prev[index].preview);
+      const img = prev[index];
+      if (img.kind === "new") URL.revokeObjectURL(img.preview);
       return prev.filter((_, i) => i !== index);
     });
   };
 
   const handleSave = async () => {
-    if (!canSave) return;
+    if (!canSave || !id) return;
     setSubmitting(true);
     setError("");
+
+    const existingImages = images
+      .filter((i) => i.kind === "existing")
+      .map((i) => i.url);
+    const newFiles = images.filter((i) => i.kind === "new").map((i) => i.file);
 
     const formData = new FormData();
     formData.append("name", productName.trim());
@@ -231,11 +263,11 @@ const AdminAddProducts = () => {
       JSON.stringify(selectedSubCategories.map((s) => s.id)),
     );
     formData.append("colors", JSON.stringify(colors));
-    // كل صورة تُضاف بنفس الحقل "images"؛ multer.array("images") يجمعها في req.files
-    images.forEach((img) => formData.append("images", img.file));
+    formData.append("existingImages", JSON.stringify(existingImages));
+    newFiles.forEach((file) => formData.append("images", file));
 
     try {
-      await api.post("/product", formData, {
+      await api.put(`/product/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       navigate("/admin/allproducts");
@@ -248,6 +280,19 @@ const AdminAddProducts = () => {
       setSubmitting(false);
     }
   };
+
+  if (loadingProduct) {
+    return (
+      <div className="py-10 text-center text-sm text-gray-500">
+        Loading product...
+      </div>
+    );
+  }
+  if (loadError) {
+    return (
+      <div className="py-10 text-center text-sm text-red-600">{loadError}</div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -266,8 +311,8 @@ const AdminAddProducts = () => {
         className="hidden"
       />
 
-      <h2 className="mb-4! pt-3 text-lg! font-bold! text-gray-900">
-        Add New Product
+      <h2 className="mb-4! pt-3 text-lg! font-bold! text-gray-900 p-4">
+        Edit Product
       </h2>
 
       <div className="flex w-full flex-col gap-5 rounded-2xl bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
@@ -283,12 +328,12 @@ const AdminAddProducts = () => {
           <div className="flex flex-wrap items-center gap-3">
             {images.map((img, index) => (
               <div
-                key={img.preview}
+                key={img.kind === "existing" ? img.url : img.preview}
                 className="group relative h-[100px] w-[100px]">
                 <img
-                  src={img.preview}
-                  alt={`Product preview ${index + 1}`}
-                  className="h-full w-full rounded-xl border border-gray-200 object-contain bg-slate-50 p-1"
+                  src={img.kind === "existing" ? img.url : img.preview}
+                  alt={`Product ${index + 1}`}
+                  className="h-full w-full rounded-xl border border-gray-200 bg-slate-50 object-contain p-1"
                 />
                 <button
                   type="button"
@@ -311,17 +356,13 @@ const AdminAddProducts = () => {
                 type="button"
                 onClick={handleImagesClick}
                 aria-label="Add product images"
-                className="flex h-[100px] w-[100px] flex-col items-center justify-center gap-1 rounded-xl border border-dashed 
-                border-gray-300 bg-slate-50 text-gray-400 transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
+                className="flex h-[100px] w-[100px] flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300 
+                bg-slate-50 text-gray-400 transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
                 <ImageIcon sx={{ fontSize: 24 }} />
                 <span className="text-xs">Add image</span>
               </button>
             )}
           </div>
-          <p className="text-xs text-gray-400">
-            The first image is used as the main thumbnail. Drag order isn't
-            supported yet — remove and re-add to reorder.
-          </p>
         </Field>
 
         <Field label="Product name" htmlFor="product-name">
@@ -330,7 +371,6 @@ const AdminAddProducts = () => {
             type="text"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
-            placeholder="Enter product name"
             className={inputClass}
           />
         </Field>
@@ -341,7 +381,6 @@ const AdminAddProducts = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
-            placeholder="Enter product description"
             className={`resize-none py-2 ${baseField}`}
           />
         </Field>
@@ -354,7 +393,6 @@ const AdminAddProducts = () => {
               min="0"
               value={priceBeforeDiscount}
               onChange={(e) => setPriceBeforeDiscount(e.target.value)}
-              placeholder="0.00"
               className={inputClass}
             />
           </Field>
@@ -365,7 +403,6 @@ const AdminAddProducts = () => {
               min="0"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="0.00"
               className={inputClass}
             />
           </Field>
@@ -399,9 +436,8 @@ const AdminAddProducts = () => {
             onChange={(selected) =>
               setSelectedSubCategories(selected as ProductOption[])
             }
-            getOptionLabel={(option) => option.name}
-            getOptionValue={(option) => option.id}
-            placeholder="Select subcategories"
+            getOptionLabel={(o) => o.name}
+            getOptionValue={(o) => o.id}
             styles={selectStyles}
           />
         </Field>
@@ -425,21 +461,16 @@ const AdminAddProducts = () => {
         </Field>
 
         <Field label="Available product colors">
-          <p className="text-xs text-gray-400">
-            Click a color to remove it, or add a new one with the + button.
-          </p>
           <div className="flex flex-wrap items-center gap-3">
             {colors.map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => handleRemoveColor(c)}
-                aria-label={`Remove color ${c}`}
                 title="Click to remove"
                 className="group relative h-8 w-8 rounded-full border border-gray-200 transition-transform hover:scale-110"
                 style={{ backgroundColor: c }}>
-                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity 
-                group-hover:opacity-100">
+                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                   <IconX size={16} className="text-white" />
                 </span>
               </button>
@@ -447,9 +478,8 @@ const AdminAddProducts = () => {
             <button
               type="button"
               onClick={handleAddColor}
-              aria-label="Add color"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-gray-300 text-gray-500 
-              transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-gray-300 text-gray-500 transition-colors 
+              hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
               <IconPlus size={16} />
             </button>
           </div>
@@ -460,8 +490,8 @@ const AdminAddProducts = () => {
             type="button"
             onClick={handleSave}
             disabled={!canSave}
-            className="h-10 rounded-lg bg-sky-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-sky-600 
-            disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500">
+            className="h-10 rounded-lg bg-sky-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed 
+            disabled:opacity-50 disabled:hover:bg-sky-500">
             {submitting ? "Saving..." : "Save changes"}
           </button>
         </div>
@@ -470,4 +500,4 @@ const AdminAddProducts = () => {
   );
 };
 
-export default AdminAddProducts;
+export default EditProduct;

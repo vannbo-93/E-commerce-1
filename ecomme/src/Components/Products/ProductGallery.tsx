@@ -1,16 +1,25 @@
 /** @format */
 
 import { useCallback } from "react";
-import smartphone from "../../images/allProducts/smartphone.png";
 import "react-image-gallery/styles/image-gallery.css";
-import ImageGallery, { type GalleryItem, type SlideEvent,} from "react-image-gallery";
+import ImageGallery, {
+  type GalleryItem,
+  type SlideEvent,
+} from "react-image-gallery";
 import LeftButton from "./LeftButton";
 import RightButton from "./RightButton";
 
-const GALLERY_IMAGES: GalleryItem[] = [ { original: smartphone }, { original: smartphone },
-  { original: smartphone }, { original: smartphone },];
+interface ProductGalleryProps {
+  images: string[];
+  title: string;
+}
 
-const ProductGallery = () => {
+const ProductGallery = ({ images, title }: ProductGalleryProps) => {
+  const galleryImages: GalleryItem[] = images.map((src) => ({
+    original: src,
+    originalAlt: title,
+  }));
+
   const renderRightNav = useCallback(
     (onClick: (event?: SlideEvent) => void, disabled?: boolean) => (
       <RightButton onClick={onClick} disabled={disabled} />
@@ -26,7 +35,6 @@ const ProductGallery = () => {
 
   return (
     <div className="product-gallery w-full pt-2">
-      {/* يكبّر صورة المعرض؛ react-image-gallery لا يوفر prop مباشرة لحجم الصورة */}
       <style>{`
         .product-gallery .image-gallery-slide .image-gallery-image {
           height: 500px;
@@ -41,8 +49,14 @@ const ProductGallery = () => {
           }
         }
       `}</style>
-      <ImageGallery items={GALLERY_IMAGES} showThumbnails={false} showPlayButton={false}
-        renderRightNav={renderRightNav} renderLeftNav={renderLeftNav} showFullscreenButton={false}
+      <ImageGallery
+        items={galleryImages}
+        showThumbnails={galleryImages.length > 1}
+        showPlayButton={false}
+        showNav={galleryImages.length > 1}
+        renderRightNav={renderRightNav}
+        renderLeftNav={renderLeftNav}
+        showFullscreenButton={false}
       />
     </div>
   );

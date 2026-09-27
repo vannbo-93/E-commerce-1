@@ -1,7 +1,7 @@
 /** @format */
 import User, { type IUser } from "../models/userModel.js";
 import { generateToken } from "../utils/generateToken.js";
-import { AppError } from "../utils/AppError.js";
+import { AppError } from "../utils/appError.js";
 
 export interface RegisterInput {
   username: string;

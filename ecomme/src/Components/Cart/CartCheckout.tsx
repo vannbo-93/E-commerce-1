@@ -1,10 +1,12 @@
 /** @format */
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 interface CartCheckoutProps {
   total: number;
-  onApplyCoupon?: (code: string) => void;
+  itemsCount: number;
+  // true أثناء أي تعديل على السلة: يمنع الانتقال للدفع بإجمالي لم يُحدَّث بعد
+  busy?: boolean;
 }
 
 const formatPrice = (value: number) =>
@@ -12,23 +14,18 @@ const formatPrice = (value: number) =>
     value,
   );
 
-// المسار كما كان في ملفك، وفيه على الأرجح خطأ إملائي (paymethoud)
+// المسار كما هو في الـ Router حاليًا (فيه خطأ إملائي، يُصلَح مع صفحة الدفع)
 const CHECKOUT_PATH = "/order/paymethoud";
 
+// لا حقل كوبون: لا يوجد نظام كوبونات في الباك إند بعد، فلا نعرض حقلًا لا يعمل.
+// ولا نمرر total عبر state: صفحة الدفع يجب ألا تثق بأي رقم من المتصفح،
+// الباك إند يحسب الإجمالي بنفسه عند إنشاء الطلب.
 const CartCheckout: React.FC<CartCheckoutProps> = ({
   total,
-  onApplyCoupon,
+  itemsCount,
+  busy = false,
 }) => {
-  const [couponCode, setCouponCode] = useState("");
-  const canApply = couponCode.trim().length > 0;
-  const canCheckout = total > 0;
-
-  const handleApply = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (canApply && onApplyCoupon) {
-      onApplyCoupon(couponCode.trim());
-    }
-  };
+  const canCheckout = itemsCount > 0 && !busy;
 
   return (
     <div className="rounded-2xl bg-white p-5 shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
@@ -36,37 +33,23 @@ const CartCheckout: React.FC<CartCheckoutProps> = ({
         Order Summary
       </h3>
 
-      {/* الكوبون: min-w-0 يسمح للحقل بالانكماش فلا يُقص الزر */}
-      <form onSubmit={handleApply} className="flex gap-2">
-        <input
-          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none transition-colors
-           placeholder:text-gray-400 focus:border-sky-400"
-          placeholder="Coupon code"
-          aria-label="Coupon code"
-          value={couponCode}
-          onChange={(e) => setCouponCode(e.target.value)}
-        />
-        <button
-          type="submit"
-          disabled={!canApply}
-          className="shrink-0 rounded-lg bg-sky-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-600 
-          disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500">
-          Apply
-        </button>
-      </form>
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-gray-500">Items ({itemsCount})</span>
+        <span className="font-medium text-gray-900">{formatPrice(total)}</span>
+      </div>
 
-      <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
+      <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
         <span className="text-sm font-medium text-gray-500">Total</span>
         <span className="text-xl font-bold text-gray-900">
           {formatPrice(total)}
         </span>
       </div>
-      
+
       {canCheckout ? (
         <Link
           to={CHECKOUT_PATH}
-          state={{ total }}
-          className="mt-4 block w-full rounded-lg bg-sky-500 py-3 text-center font-semibold text-white no-underline transition-colors hover:bg-sky-600">
+          className="mt-4 block w-full rounded-lg bg-sky-500 py-3 text-center font-semibold text-white no-underline transition-colors 
+          hover:bg-sky-600">
           Checkout
         </Link>
       ) : (

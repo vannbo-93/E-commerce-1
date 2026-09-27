@@ -8,6 +8,9 @@ import userRoute from "./routes/userRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
 import brandRoute from "./routes/brandRoute.js";
 import subCategoryRoute from "./routes/subCategoryRoute.js";
+import productRoute from "./routes/productRoute.js";
+import reviewRoute from "./routes/reviewRoute.js";
+import cartRoute from "./routes/cartRoute.js";
 
 dotenv.config();
 
@@ -25,6 +28,9 @@ app.use("/user", userRoute);
 app.use("/category", categoryRoute);
 app.use("/brand", brandRoute);
 app.use("/subcategory", subCategoryRoute);
+app.use("/product", productRoute);
+app.use("/review", reviewRoute);
+app.use("/cart", cartRoute);
 
 async function start() {
   try {

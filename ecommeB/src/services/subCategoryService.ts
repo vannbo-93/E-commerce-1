@@ -1,7 +1,8 @@
 /** @format */
 import SubCategory, { type ISubCategory } from "../models/subCategoryModel.js";
 import Category from "../models/categoryModel.js";
-import { AppError } from "../utils/AppError.js";
+import Product from "../models/productModel.js";
+import { AppError } from "../utils/appError.js";
 
 export interface CreateSubCategoryInput {
   name: string;
@@ -75,6 +76,15 @@ export const updateSubCategory = async (
 };
 
 export const deleteSubCategory = async (id: string): Promise<void> => {
+  // يمنع حذف تصنيف فرعي ما دام مرتبطًا بمنتج، بدل ترك مرجع معطوب داخل مصفوفة المنتج
+  const productCount = await Product.countDocuments({ subCategories: id });
+  if (productCount > 0) {
+    throw new AppError(
+      "Cannot delete a subcategory that still has products. Reassign or delete those products first.",
+      409,
+    );
+  }
+
   const subCategory = await SubCategory.findByIdAndDelete(id);
   if (!subCategory) {
     throw new AppError("Subcategory not found", 404);

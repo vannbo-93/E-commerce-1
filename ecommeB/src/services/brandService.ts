@@ -1,6 +1,7 @@
 /** @format */
 import Brand, { type IBrand } from "../models/brandModel.js";
-import { AppError } from "../utils/AppError.js";
+import Product from "../models/productModel.js";
+import { AppError } from "../utils/appError.js";
 import fs from "fs";
 import path from "path";
 
@@ -54,6 +55,14 @@ export const updateBrand = async (
 };
 
 export const deleteBrand = async (id: string): Promise<void> => {
+  const productCount = await Product.countDocuments({ brand: id });
+  if (productCount > 0) {
+    throw new AppError(
+      "Cannot delete a brand that still has products. Reassign or delete those products first.",
+      409,
+    );
+  }
+
   const brand = await Brand.findByIdAndDelete(id);
   if (!brand) {
     throw new AppError("Brand not found", 404);
