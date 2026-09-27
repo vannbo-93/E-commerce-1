@@ -11,6 +11,7 @@ import subCategoryRoute from "./routes/subCategoryRoute.js";
 import productRoute from "./routes/productRoute.js";
 import reviewRoute from "./routes/reviewRoute.js";
 import cartRoute from "./routes/cartRoute.js";
+import wishlistRoute from "./routes/wishlistRoute.js";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use("/subcategory", subCategoryRoute);
 app.use("/product", productRoute);
 app.use("/review", reviewRoute);
 app.use("/cart", cartRoute);
+app.use("/wishlist", wishlistRoute);
 
 async function start() {
   try {
