@@ -1,12 +1,16 @@
 /** @format */
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IconHeart,
   IconPhoto,
   IconShoppingCart,
   IconStar,
 } from "@tabler/icons-react";
+import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
+
+// عدّله إن كان مسار صفحة الدخول مختلفًا في الـ Router
+const LOGIN_PATH = "/login";
 
 export type CardCartStatus = "idle" | "adding" | "added" | "error";
 
@@ -38,8 +42,22 @@ const ProductCard = ({
   cartStatus = "idle",
   cartError,
 }: ProductCardProps) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, loading: authLoading } = useAuth();
+  // القلب يعمل من داخل البطاقة، فلا يحتاج أي قسم لتمرير المفضلة
+  const { isInWishlist, toggle } = useWishlist();
+  const isFavorite = isInWishlist(id);
   const productPath = `/products/${id}`;
+
+  const handleToggleFavorite = () => {
+    if (authLoading) return;
+    if (!user) {
+      navigate(LOGIN_PATH, { state: { from: location.pathname } });
+      return;
+    }
+    toggle(id).catch((err) => console.error("toggle failed", err));
+  };
 
   const buttonClass =
     "mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-sky-500 px-3 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500";
@@ -74,10 +92,9 @@ const ProductCard = ({
           </div>
         </Link>
 
-        {/* المفضلة: حالة محلية فقط، لا تُحفظ في أي مكان بعد */}
         <button
           type="button"
-          onClick={() => setIsFavorite((f) => !f)}
+          onClick={handleToggleFavorite}
           aria-label={isFavorite ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={isFavorite}
           className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full

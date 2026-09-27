@@ -42,6 +42,6 @@
 
     // Recommended Options
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../ecomme/src/hooks"],
   "exclude": ["node_modules"]
 }

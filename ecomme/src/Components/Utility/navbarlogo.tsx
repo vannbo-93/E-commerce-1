@@ -6,6 +6,7 @@ import shop from "../../../src/images/Logo/shop.png";
 import AccountMenu from "./AccountMenu";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 // مسار واحد لصفحة المنتجات، يُستخدم في الروابط والبحث معًا
 // عدّله إن كان المسار الفعلي في الـ Router مختلفًا
@@ -18,16 +19,14 @@ const navItems = [
   { label: "Support", path: "/support" },
 ];
 
-interface NavBarLogoProps {
-  favoritesCount?: number; // لا يوجد نظام مفضلة في الباك إند بعد
-}
-
-function NavBarLogo({ favoritesCount = 0 }: NavBarLogoProps) {
+function NavBarLogo() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   // العداد من CartContext: يتحدّث فورًا عند الإضافة من أي صفحة
   const { cart } = useCart();
   const cartCount = cart.totalQuantity;
+  const { ids: wishlistIds } = useWishlist();
+  const favoritesCount = wishlistIds.size;
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -101,7 +100,7 @@ function NavBarLogo({ favoritesCount = 0 }: NavBarLogoProps) {
           {searchForm("relative hidden w-40 md:block lg:w-64")}
 
           <Link
-            to="/user/favorite"
+            to="/user/favoriteproducts"
             aria-label={`Wishlist, ${favoritesCount} items`}
             className="relative hidden h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors
             hover:bg-gray-100 hover:text-sky-500 sm:flex">
