@@ -50,6 +50,7 @@ export interface MailInput {
   subject: string;
   html: string;
   text: string; // نسخة نصية: بعض برامج البريد لا تعرض HTML، وغيابها يرفع احتمال السبام
+  replyTo?: string; // "رد" في برنامج البريد يذهب لهذا العنوان بدل المرسل
   headers?: Record<string, string>;
 }
 

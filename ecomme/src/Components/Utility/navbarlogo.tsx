@@ -15,7 +15,7 @@ const PRODUCTS_PATH = "/products";
 const navItems = [
   { label: "Home", path: "/" },
   { label: "Shop", path: PRODUCTS_PATH },
-  { label: "Brands", path: "/brands" },
+  { label: "Brands", path: "/allbrand" },
   { label: "Support", path: "/support" },
 ];
 

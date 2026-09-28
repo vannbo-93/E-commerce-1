@@ -31,6 +31,9 @@ import AllSubCategoryPage from "../src/Page/Category/AllSubCategoryPage";
 import EditProduct from "../src/Page/Admin/EditProduct";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
+import SupportPage from "./Page/Support/SupportPage";
+import InfoPage from "./Page/Info/InfoPage";
+import { aboutContent, privacyContent } from "./Page/Info/infoContent";
 
 function App() {
   return (
@@ -62,6 +65,15 @@ function App() {
                   <Route
                     path="/order/paymethoud"
                     element={<ChoosePayMethoudPage />}
+                  />
+                  <Route path="/support" element={<SupportPage />} />
+                  <Route
+                    path="/about"
+                    element={<InfoPage content={aboutContent} />}
+                  />
+                  <Route
+                    path="/privacy"
+                    element={<InfoPage content={privacyContent} />}
                   />
 
                   {/* مسارات الأدمن: محمية بـ RequireAdmin — تتحقق من /user/me ومن role */}
@@ -142,8 +154,7 @@ function App() {
                         </p>
                         <Link
                           to="/"
-                          className="mt-2 rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-medium text-white no-underline 
-                          hover:bg-sky-600">
+                          className="mt-2 rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-medium text-white no-underline hover:bg-sky-600">
                           Back to home
                         </Link>
                       </div>
