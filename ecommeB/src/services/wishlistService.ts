@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import Wishlist from "../models/wishlistModel.js";
 import Product from "../models/productModel.js";
-import { AppError } from "../utils/appError.js";
+import { AppError } from "../utils/AppError.js";
 
 // نفس ما تحتاجه ProductCard في الفرونت إند
 export interface WishlistProductResponse {

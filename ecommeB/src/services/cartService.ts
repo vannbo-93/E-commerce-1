@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import Cart, { type ICart } from "../models/cartModel.js";
 import Product from "../models/productModel.js";
-import { AppError } from "../utils/appError.js";
+import { AppError } from "../utils/AppError.js";
 
 const MAX_QUANTITY = 99;
 

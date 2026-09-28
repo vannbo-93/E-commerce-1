@@ -6,7 +6,7 @@ import {
   createReview,
   deleteReview,
 } from "../services/reviewService.js";
-import { AppError } from "../utils/appError.js";
+import { AppError } from "../utils/AppError.js";
 
 const handleError = (err: unknown, res: Response) => {
   if (err instanceof AppError) {

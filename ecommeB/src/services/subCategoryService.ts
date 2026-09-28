@@ -2,7 +2,7 @@
 import SubCategory, { type ISubCategory } from "../models/subCategoryModel.js";
 import Category from "../models/categoryModel.js";
 import Product from "../models/productModel.js";
-import { AppError } from "../utils/appError.js";
+import { AppError } from "../utils/AppError.js";
 
 export interface CreateSubCategoryInput {
   name: string;

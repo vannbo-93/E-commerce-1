@@ -1,7 +1,7 @@
 /** @format */
 import Brand, { type IBrand } from "../models/brandModel.js";
 import Product from "../models/productModel.js";
-import { AppError } from "../utils/appError.js";
+import { AppError } from "../utils/AppError.js";
 import fs from "fs";
 import path from "path";
 

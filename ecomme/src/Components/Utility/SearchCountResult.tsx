@@ -1,11 +1,12 @@
 /** @format */
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   IconArrowsSort,
   IconCheck,
   IconChevronDown,
-  IconFlame,
+  IconClock,
   IconStar,
   IconSortAscending,
   IconSortDescending,
@@ -17,8 +18,10 @@ interface SortOption {
   icon: React.ReactNode;
 }
 
+// المعرّفات تطابق حرفيًا ما يقبله GET /product?sort= في الباك إند
+// لا "Best sellers": لا يوجد نظام طلبات بعد، فلا توجد بيانات مبيعات حقيقية
 const SORT_OPTIONS: SortOption[] = [
-  { id: "bestseller", label: "Best sellers", icon: <IconFlame size={16} /> },
+  { id: "newest", label: "Newest", icon: <IconClock size={16} /> },
   { id: "rating", label: "Top rated", icon: <IconStar size={16} /> },
   {
     id: "price_asc",
@@ -32,15 +35,24 @@ const SORT_OPTIONS: SortOption[] = [
   },
 ];
 
+// الترتيب الذي يطبّقه الباك إند عند غياب ?sort=
+const DEFAULT_SORT = "newest";
+
 interface SearchCountResultProps {
-  title: string;
-  onSortChange?: (sortId: string) => void;
+  // null أثناء التحميل: لا نعرض رقمًا قديمًا أو صفرًا مضللًا
+  total: number | null;
 }
 
-const SearchCountResult = ({ title, onSortChange }: SearchCountResultProps) => {
+const SearchCountResult = ({ total }: SearchCountResultProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const search = searchParams.get("search")?.trim() ?? "";
+  const selected = searchParams.get("sort") ?? DEFAULT_SORT;
+  const selectedOption =
+    SORT_OPTIONS.find((o) => o.id === selected) ?? SORT_OPTIONS[0];
+  const isCustomSort = selected !== DEFAULT_SORT;
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -64,17 +76,30 @@ const SearchCountResult = ({ title, onSortChange }: SearchCountResultProps) => {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
+  // الترتيب الافتراضي لا يُكتب في الرابط، وتغيير الترتيب يعيد للصفحة الأولى
   const handleSelect = (optionId: string) => {
-    setSelected(optionId);
     setIsOpen(false);
-    onSortChange?.(optionId);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (optionId === DEFAULT_SORT) next.delete("sort");
+      else next.set("sort", optionId);
+      next.delete("page");
+      return next;
+    });
   };
 
-  const selectedOption = SORT_OPTIONS.find((o) => o.id === selected);
+  const title =
+    total === null
+      ? "Loading products..."
+      : search
+        ? `${total} ${total === 1 ? "result" : "results"} for "${search}"`
+        : `${total} ${total === 1 ? "product" : "products"}`;
 
   return (
-    <div className="flex items-center justify-between px-2 pt-3 pb-5">
-      <span className="font-medium text-gray-800">{title}</span>
+    <div className="flex flex-wrap items-center justify-between gap-3 px-2 pb-5 pt-3">
+      <span className="font-medium text-gray-800" aria-live="polite">
+        {title}
+      </span>
 
       <div ref={wrapperRef} className="relative">
         <button
@@ -83,17 +108,17 @@ const SearchCountResult = ({ title, onSortChange }: SearchCountResultProps) => {
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition-all duration-200 ${
-            isOpen || selectedOption
+            isOpen || isCustomSort
               ? "border-sky-300 bg-sky-50 text-sky-700"
               : "border-gray-200 bg-white text-gray-700 hover:border-sky-200 hover:bg-sky-50/60 hover:text-sky-600"
           }`}>
           <IconArrowsSort
             size={16}
             className={
-              isOpen || selectedOption ? "text-sky-500" : "text-gray-400"
+              isOpen || isCustomSort ? "text-sky-500" : "text-gray-400"
             }
           />
-          <span>{selectedOption ? selectedOption.label : "Sort by"}</span>
+          <span>Sort: {selectedOption?.label}</span>
           <IconChevronDown
             size={14}
             className={`text-gray-400 transition-transform duration-200 ${
@@ -102,15 +127,16 @@ const SearchCountResult = ({ title, onSortChange }: SearchCountResultProps) => {
           />
         </button>
 
+        {/* invisible عند الإغلاق: يُخرج الأزرار من التنقل بمفتاح Tab، لا شفافية فقط */}
         <ul
           role="listbox"
           aria-label="Sort by"
-          className={`absolute right-0 top-full z-20 mt-2 min-w-[240px] origin-top-right overflow-hidden rounded-2xl border border-gray-100 bg-white py-1.5 
+          className={`absolute right-0 top-full z-20 mt-2 min-w-[240px] origin-top-right overflow-hidden rounded-2xl border border-gray-100 bg-white py-1.5
             shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-150 ${
-            isOpen
-              ? "pointer-events-auto scale-100 opacity-100"
-              : "pointer-events-none scale-95 opacity-0"
-          }`}>
+              isOpen
+                ? "visible pointer-events-auto scale-100 opacity-100"
+                : "invisible pointer-events-none scale-95 opacity-0"
+            }`}>
           {SORT_OPTIONS.map((option) => {
             const isSelected = selected === option.id;
             return (

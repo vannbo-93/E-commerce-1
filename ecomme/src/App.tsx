@@ -1,9 +1,8 @@
 /** @format */
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Link, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import RequireAuth from "./routes/RequireAuth";
 import RequireAdmin from "./routes/RequireAdmin";
-
 import HomePage from "../src/Page/Home/HomePage";
 import NavBarLogo from "./Components/Utility/NavBarLogo";
 import Footer from "./Components/Utility/Footer";
@@ -129,6 +128,26 @@ function App() {
                     />
                     <Route path="/user/profile" element={<UserProfilePage />} />
                   </Route>
+
+                  {/* أي رابط غير معرّف: رسالة واضحة بدل صفحة فارغة بين الـ NavBar والـ Footer */}
+                  <Route
+                    path="*"
+                    element={
+                      <div className="flex flex-col items-center gap-3 py-24 text-center">
+                        <p className="text-2xl font-bold text-gray-900">
+                          Page not found
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          The page you're looking for doesn't exist.
+                        </p>
+                        <Link
+                          to="/"
+                          className="mt-2 rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-medium text-white no-underline hover:bg-sky-600">
+                          Back to home
+                        </Link>
+                      </div>
+                    }
+                  />
                 </Routes>
               </main>
               <Footer />

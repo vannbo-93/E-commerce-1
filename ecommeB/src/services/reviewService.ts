@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import Review, { type IReview } from "../models/reviewModel.js";
 import Product from "../models/productModel.js";
-import { AppError } from "../utils/appError.js";
+import { AppError } from "../utils/AppError.js";
 
 export interface CreateReviewInput {
   product: string;

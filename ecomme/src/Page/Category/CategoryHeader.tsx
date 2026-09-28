@@ -1,36 +1,82 @@
 /** @format */
-import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import api from "../../Api/baseURL";
 
-// فئات مناسبة لمتجر إلكترونيات فقط
-const categories = [
-  { label: "All", to: "/shop" },
-  { label: "Phones & Tablets", to: "/shop?category=phones" },
-  { label: "Laptops & Computers", to: "/shop?category=laptops" },
-  { label: "Audio", to: "/shop?category=audio" },
-  { label: "Smart Wearables", to: "/shop?category=wearables" },
-  { label: "Accessories", to: "/shop?category=accessories" },
-  { label: "Discounts", to: "/shop?category=discounts" },
-];
+interface CategoryOption {
+  _id: string;
+  name: string;
+}
 
+// شريط تصنيفات سريع أعلى صفحة المتجر: يختار تصنيفًا واحدًا.
+// يعدّل معامل category فقط في الرابط، فيبقى البحث والترتيب والماركة كما هي.
+// الاختيار المتعدد متاح في SideFilter، ويكتب في نفس المعامل.
 const CategoryHeader = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
+
+  const selected = searchParams.get("category") ?? "";
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .get("/category")
+      .then((res) => {
+        if (!cancelled) setCategories(res.data.categories ?? []);
+      })
+      .catch(() => {
+        // فشل الجلب يخفي الشريط فقط، ولا يمنع عرض المنتجات
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selectCategory = (categoryId: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (categoryId === "") next.delete("category");
+      else next.set("category", categoryId);
+      next.delete("page");
+      return next;
+    });
+  };
+
+  if (categories.length === 0) return null;
+
+  const chipClass = (active: boolean) =>
+    `shrink-0 rounded-full px-3 py-1.5 text-sm font-medium capitalize transition-colors ${
+      active
+        ? "bg-sky-500 text-white"
+        : "text-gray-600 hover:bg-sky-50 hover:text-sky-600"
+    }`;
+
   return (
     <nav
       aria-label="Product categories"
       className="flex flex-nowrap gap-3 overflow-x-auto whitespace-nowrap border-b border-gray-100 px-2 py-3">
-      {categories.map((cat) => (
-        <NavLink
-          key={cat.to}
-          to={cat.to}
-          className={({ isActive }) =>
-            `shrink-0 rounded-full px-3 py-1.5 text-sm font-medium no-underline transition-colors ${
-              isActive
-                ? "bg-sky-500 text-white"
-                : "text-gray-600 hover:bg-sky-50 hover:text-sky-600"
-            }`
-          }>
-          {cat.label}
-        </NavLink>
-      ))}
+      <button
+        type="button"
+        onClick={() => selectCategory("")}
+        aria-pressed={selected === ""}
+        className={chipClass(selected === "")}>
+        All
+      </button>
+      {categories.map((cat) => {
+        // مفعّل فقط إن كان التصنيف الوحيد المختار؛ عند اختيار عدة تصنيفات
+        // من SideFilter لا يُفعَّل أي زر هنا، لأن الشريط لا يعبّر عن اختيار متعدد
+        const active = selected === cat._id;
+        return (
+          <button
+            key={cat._id}
+            type="button"
+            onClick={() => selectCategory(cat._id)}
+            aria-pressed={active}
+            className={chipClass(active)}>
+            {cat.name}
+          </button>
+        );
+      })}
     </nav>
   );
 };

@@ -2,7 +2,7 @@
 import Category, { type ICategory } from "../models/categoryModel.js";
 import SubCategory from "../models/subCategoryModel.js";
 import Product from "../models/productModel.js";
-import { AppError } from "../utils/appError.js";
+import { AppError } from "../utils/AppError.js";
 import fs from "fs";
 import path from "path";
 
