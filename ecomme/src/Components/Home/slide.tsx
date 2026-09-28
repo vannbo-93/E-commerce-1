@@ -1,6 +1,7 @@
 /** @format */
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const defaultSlides = [
   { id: 1, image: "src/images/slide/slide-1-audio-mobile.webp", alt: "show 1" },
@@ -60,16 +61,20 @@ function Slide({ slides = defaultSlides }) {
       <div
         className="flex flex-wrap"
         style={{ gap: "0.8em", marginTop: "0.8em" }}>
-        <button
-          className="flex items-center gap-2 rounded-lg bg-sky-500 font-medium text-white transition-colors hover:bg-sky-600"
+        <Link
+          to="/products"
+          className="inline-flex items-center gap-2 rounded-lg bg-sky-500 font-medium text-white no-underline transition-colors 
+          hover:bg-sky-600"
           style={{ padding: "0.7em 1.3em" }}>
           Shop Now <ChevronRight size="1.2em" />
-        </button>
-        <button
-          className="rounded-lg border border-black/30 font-medium text-black transition-colors hover:border-sky-400 hover:text-sky-400"
+        </Link>
+        <Link
+          to="/products?onSale=true"
+          className="inline-flex items-center rounded-lg border border-black/30 font-medium text-black no-underline transition-colors
+           hover:border-sky-400 hover:text-sky-400"
           style={{ padding: "0.7em 1.3em" }}>
           Explore Deals
-        </button>
+        </Link>
       </div>
     </>
   );

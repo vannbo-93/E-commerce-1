@@ -17,7 +17,7 @@ const HomePage = () => {
       <CardProductsContainer
         title="Featured Products"
         btntitle="View All"
-        pathText="/products"
+        pathText="/products?sort=rating"
       />
       <DiscountSection />
       <FeaturesBar />

@@ -142,7 +142,8 @@ function App() {
                         </p>
                         <Link
                           to="/"
-                          className="mt-2 rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-medium text-white no-underline hover:bg-sky-600">
+                          className="mt-2 rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-medium text-white no-underline 
+                          hover:bg-sky-600">
                           Back to home
                         </Link>
                       </div>

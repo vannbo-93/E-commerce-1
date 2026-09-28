@@ -1,5 +1,6 @@
 /** @format */
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Link } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowForward";
 import saleblue from "../../../src/images/Slide/sale-bag-blue-tag.webp";
 
 const DiscountBanner = () => {
@@ -9,7 +10,10 @@ const DiscountBanner = () => {
       className="relative flex min-h-[220px] w-full items-center justify-end overflow-hidden md:aspect-[3.1/1]"
       style={{ containerType: "inline-size" }}>
       <img
-        className="absolute inset-0 h-full w-full object-cover object-left md:object-center" src={saleblue} alt=""/>
+        className="absolute inset-0 h-full w-full object-cover object-left md:object-center"
+        src={saleblue}
+        alt=""
+      />
 
       {/* كل الأحجام بوحدة em، فيتناسب كل شيء مع عرض اللافتة */}
       <div
@@ -25,18 +29,29 @@ const DiscountBanner = () => {
           style={{ fontSize: "3.4em", lineHeight: 0.95, margin: "0.1em 0" }}>
           Up to 50% Off
         </h2>
-        <p className="hidden text-gray-900 md:block" style={{ fontSize: "1em", marginTop: "0.6em" }}>
+        <p
+          className="hidden text-gray-900 md:block"
+          style={{ fontSize: "1em", marginTop: "0.6em" }}>
           Limited time offer on selected items.
           <br />
           Hurry up and grab the best deals!
         </p>
-        <div
-          className="flex cursor-pointer items-center justify-center rounded-lg bg-sky-500 font-medium text-white transition-colors hover:bg-sky-600"
-          style={{ marginTop: "1em", width: "13em", padding: "0.8em 0", gap: "0.5em", fontSize: "1.05em",
+        <Link
+          to="/products?onSale=true"
+          className="flex items-center justify-center rounded-lg bg-sky-500 font-medium text-white no-underline transition-colors 
+          hover:bg-sky-600"
+          style={{
+            marginTop: "1em",
+            width: "13em",
+            padding: "0.8em 0",
+            gap: "0.5em",
+            fontSize: "1.05em",
           }}>
-          <ArrowBackIcon style={{ width: "1.2em", height: "1.2em" }} />
+          <ArrowBackIcon
+            style={{ width: "1.2em", height: "1.2em", transform: "scaleX(-1)" }}
+          />
           Shop the Sale
-        </div>
+        </Link>
       </div>
     </div>
   );
