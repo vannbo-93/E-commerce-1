@@ -80,6 +80,7 @@ export interface ProductListQuery {
   brands?: string[];
   minPrice?: number;
   maxPrice?: number;
+  onSale?: boolean; // المنتجات التي سعرها قبل الخصم أعلى من سعرها الحالي
   sort?: ProductSort;
   page?: number;
   limit?: number; // غيابه = كل المنتجات (توافق مع صفحات الأدمن الحالية)
@@ -159,6 +160,8 @@ export const parseProductListQuery = (
     throw new AppError("minPrice cannot be greater than maxPrice", 400);
   }
 
+  if (query.onSale === "true") result.onSale = true;
+
   if (typeof query.sort === "string" && query.sort !== "") {
     if (!(PRODUCT_SORTS as readonly string[]).includes(query.sort)) {
       throw new AppError(
@@ -194,6 +197,11 @@ export const listProducts = async (
       ...(q.minPrice !== undefined ? { $gte: q.minPrice } : {}),
       ...(q.maxPrice !== undefined ? { $lte: q.maxPrice } : {}),
     };
+  }
+
+  // منتج بلا priceBeforeDiscount: المقارنة null > رقم = false، فلا يظهر
+  if (q.onSale) {
+    filter.$expr = { $gt: ["$priceBeforeDiscount", "$price"] };
   }
 
   const sort = SORT_MAP[q.sort ?? "newest"];
