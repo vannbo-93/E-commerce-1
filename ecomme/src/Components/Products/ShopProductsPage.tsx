@@ -19,6 +19,7 @@ const FORWARDED_PARAMS = [
   "brand",
   "minPrice",
   "maxPrice",
+  "onSale",
   "sort",
   "page",
 ] as const;

@@ -10,6 +10,7 @@ const PARAM = {
   brand: "brand",
   minPrice: "minPrice",
   maxPrice: "maxPrice",
+  onSale: "onSale",
   page: "page",
 } as const;
 
@@ -193,6 +194,7 @@ const SideFilter = () => {
   const selectedBrands = readList(searchParams.get(PARAM.brand));
   const minPrice = searchParams.get(PARAM.minPrice) ?? "";
   const maxPrice = searchParams.get(PARAM.maxPrice) ?? "";
+  const onSale = searchParams.get(PARAM.onSale) === "true";
 
   useEffect(() => {
     let cancelled = false;
@@ -239,7 +241,8 @@ const SideFilter = () => {
     selectedCategories.length +
     selectedBrands.length +
     (minPrice !== "" ? 1 : 0) +
-    (maxPrice !== "" ? 1 : 0);
+    (maxPrice !== "" ? 1 : 0) +
+    (onSale ? 1 : 0);
 
   const clearFilters = () =>
     updateParams({
@@ -247,6 +250,7 @@ const SideFilter = () => {
       [PARAM.brand]: "",
       [PARAM.minPrice]: "",
       [PARAM.maxPrice]: "",
+      [PARAM.onSale]: "",
     });
 
   return (
@@ -255,7 +259,8 @@ const SideFilter = () => {
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-gray-900">Filters</h2>
           {activeCount > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 px-1.5 text-xs font-semibold text-white">
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 px-1.5 text-xs 
+            font-semibold text-white">
               {activeCount}
             </span>
           )}
@@ -270,6 +275,22 @@ const SideFilter = () => {
           </button>
         )}
       </div>
+
+      {/* عروض: منتجات سعرها قبل الخصم أعلى من سعرها الحالي */}
+      <label
+        className={`flex cursor-pointer items-center gap-2.5 rounded-lg border-t border-gray-100 px-2 pt-5 text-sm font-medium ${
+          onSale ? "text-sky-700" : "text-gray-700"
+        }`}>
+        <input
+          type="checkbox"
+          checked={onSale}
+          onChange={() =>
+            updateParams({ [PARAM.onSale]: onSale ? "" : "true" })
+          }
+          className={checkboxClass}
+        />
+        On sale only
+      </label>
 
       <div className="border-t border-gray-100 pt-5">
         <CheckboxGroup

@@ -11,8 +11,8 @@ export interface ProductCardContainerProps {
   title?: string;
   btntitle?: string;
   pathText?: string;
-  // "newest": الأحدث أولًا (لقسم New Arrivals)، "default": بترتيب الباك إند
-  sort?: "default" | "newest";
+  // "rating": الأعلى تقييمًا (Featured Products)، "newest": الأحدث (New Arrivals)
+  sort?: "rating" | "newest";
 }
 
 interface RawProduct {
@@ -29,7 +29,7 @@ const CardProductsContainer = ({
   title,
   btntitle,
   pathText,
-  sort = "default",
+  sort = "rating",
 }: ProductCardContainerProps) => {
   const { getCardCartProps } = useCardCartActions();
 
@@ -40,19 +40,11 @@ const CardProductsContainer = ({
   useEffect(() => {
     let cancelled = false;
 
+    // الباك إند يرتّب ويقص: 4 منتجات فقط تُنقل عبر الشبكة، لا كل المتجر
     api
-      .get("/product")
+      .get(`/product?limit=${MAX_PRODUCTS}&sort=${sort}`)
       .then((res) => {
-        if (!cancelled) {
-          // الباك إند يعيد كل المنتجات حاليًا؛ نرتّب محليًا ونعرض أول 4 فقط
-          const all: RawProduct[] = res.data.products ?? [];
-          const ordered =
-            sort === "newest"
-              ? // ObjectId يبدأ بوقت الإنشاء بطول ثابت، فمقارنته كنص = مقارنة بالزمن
-                [...all].sort((a, b) => b._id.localeCompare(a._id))
-              : all;
-          setProducts(ordered.slice(0, MAX_PRODUCTS));
-        }
+        if (!cancelled) setProducts(res.data.products ?? []);
       })
       .catch(() => {
         if (!cancelled) setLoadError("Failed to load products.");

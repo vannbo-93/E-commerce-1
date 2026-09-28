@@ -49,6 +49,7 @@ const SearchCountResult = ({ total }: SearchCountResultProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const search = searchParams.get("search")?.trim() ?? "";
+  const onSale = searchParams.get("onSale") === "true";
   const selected = searchParams.get("sort") ?? DEFAULT_SORT;
   const selectedOption =
     SORT_OPTIONS.find((o) => o.id === selected) ?? SORT_OPTIONS[0];
@@ -93,7 +94,7 @@ const SearchCountResult = ({ total }: SearchCountResultProps) => {
       ? "Loading products..."
       : search
         ? `${total} ${total === 1 ? "result" : "results"} for "${search}"`
-        : `${total} ${total === 1 ? "product" : "products"}`;
+        : `${total} ${total === 1 ? "product" : "products"}${onSale ? " on sale" : ""}`;
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-2 pb-5 pt-3">
@@ -107,7 +108,8 @@ const SearchCountResult = ({ total }: SearchCountResultProps) => {
           onClick={() => setIsOpen((prev) => !prev)}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
-          className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition-all duration-200 ${
+          className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition-all 
+            duration-200 ${
             isOpen || isCustomSort
               ? "border-sky-300 bg-sky-50 text-sky-700"
               : "border-gray-200 bg-white text-gray-700 hover:border-sky-200 hover:bg-sky-50/60 hover:text-sky-600"
@@ -131,7 +133,8 @@ const SearchCountResult = ({ total }: SearchCountResultProps) => {
         <ul
           role="listbox"
           aria-label="Sort by"
-          className={`absolute right-0 top-full z-20 mt-2 min-w-[240px] origin-top-right overflow-hidden rounded-2xl border border-gray-100 bg-white py-1.5
+          className={`absolute right-0 top-full z-20 mt-2 min-w-[240px] origin-top-right overflow-hidden rounded-2xl border 
+            border-gray-100 bg-white py-1.5
             shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-150 ${
               isOpen
                 ? "visible pointer-events-auto scale-100 opacity-100"
