@@ -12,6 +12,7 @@ import productRoute from "./routes/productRoute.js";
 import reviewRoute from "./routes/reviewRoute.js";
 import cartRoute from "./routes/cartRoute.js";
 import wishlistRoute from "./routes/wishlistRoute.js";
+import newsletterRoute from "./routes/newsletterRoute.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/product", productRoute);
 app.use("/review", reviewRoute);
 app.use("/cart", cartRoute);
 app.use("/wishlist", wishlistRoute);
+app.use("/newsletter", newsletterRoute);
 
 async function start() {
   try {
