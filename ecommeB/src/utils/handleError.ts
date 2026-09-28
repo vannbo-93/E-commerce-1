@@ -1,7 +1,7 @@
 /** @format */
 import type { Response } from "express";
 import mongoose from "mongoose";
-import { AppError } from "./appError.js";
+import { AppError } from "./AppError.js";
 
 // معالج أخطاء موحّد للكنترولرات: أخطاء المستخدم تعود 400 لا 500
 export const handleError = (err: unknown, res: Response) => {

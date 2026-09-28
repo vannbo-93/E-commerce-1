@@ -3,38 +3,50 @@ import type { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import {
-  getAllProducts,
+  listProducts,
+  parseProductListQuery,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
+  type UpdateProductInput,
 } from "../services/productService.js";
-import { AppError } from "../utils/appError.js";
-
-const handleError = (err: unknown, res: Response) => {
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({ message: err.message });
-  }
-  console.error(err);
-  res.status(500).json({ message: "Something went wrong" });
-};
+import { handleError } from "../utils/handleError.js";
 
 // subCategories وcolors تصلان كنص JSON عبر multipart/form-data (لا يدعم مصفوفات متداخلة مباشرة)
 const parseJsonArray = (value: unknown): string[] => {
   if (!value) return [];
-  if (Array.isArray(value)) return value as string[];
+  if (Array.isArray(value)) return value.map(String);
   try {
     const parsed = JSON.parse(value as string);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map(String) : [];
   } catch {
     return [];
   }
 };
 
-export const getProducts = async (_req: Request, res: Response) => {
+const toImageUrl = (req: Request, file: Express.Multer.File) =>
+  `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
+
+// يحذف ملفات صور من القرص؛ الفشل يُسجَّل ولا يوقف الطلب
+const deleteImageFiles = (imageUrls: string[], context: string) => {
+  for (const imageUrl of imageUrls) {
+    try {
+      const filePath = path.join("uploads", path.basename(imageUrl));
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch (err) {
+      console.error(`Failed to delete ${context}:`, imageUrl, err);
+    }
+  }
+};
+
+// GET /product?search=&category=&brand=&minPrice=&maxPrice=&sort=&page=&limit=
+// بدون limit يعيد كل المنتجات، كما كان سابقًا (لوحة الأدمن تعتمد على ذلك)
+export const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await getAllProducts();
-    res.status(200).json({ products });
+    const query = parseProductListQuery(req.query as Record<string, unknown>);
+    const result = await listProducts(query);
+    res.status(200).json(result);
   } catch (err) {
     handleError(err, res);
   }
@@ -50,10 +62,10 @@ export const getProduct = async (req: Request, res: Response) => {
 };
 
 export const addProduct = async (req: Request, res: Response) => {
+  const files = (req.files as Express.Multer.File[] | undefined) ?? [];
   try {
     const { name, description, price, priceBeforeDiscount, category, brand } =
       req.body;
-    const files = req.files as Express.Multer.File[] | undefined;
 
     if (
       !name ||
@@ -61,17 +73,17 @@ export const addProduct = async (req: Request, res: Response) => {
       !price ||
       !category ||
       !brand ||
-      !files?.length
+      files.length === 0
     ) {
+      deleteImageFiles(
+        files.map((f) => toImageUrl(req, f)),
+        "uploaded image",
+      );
       return res.status(400).json({
         message:
           "Name, description, price, category, brand and at least one image are required",
       });
     }
-
-    const images = files.map(
-      (file) => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`,
-    );
 
     const product = await createProduct({
       name: String(name),
@@ -81,7 +93,7 @@ export const addProduct = async (req: Request, res: Response) => {
       brand: String(brand),
       subCategories: parseJsonArray(req.body.subCategories),
       colors: parseJsonArray(req.body.colors),
-      images,
+      images: files.map((f) => toImageUrl(req, f)),
       ...(priceBeforeDiscount
         ? { priceBeforeDiscount: Number(priceBeforeDiscount) }
         : {}),
@@ -89,54 +101,62 @@ export const addProduct = async (req: Request, res: Response) => {
 
     res.status(201).json({ message: "Product created successfully", product });
   } catch (err) {
+    // فشل الإنشاء: الملفات التي رفعها multer لم تعد مرتبطة بأي منتج
+    deleteImageFiles(
+      files.map((f) => toImageUrl(req, f)),
+      "uploaded image",
+    );
     handleError(err, res);
   }
 };
 
 export const editProduct = async (req: Request, res: Response) => {
+  const files = (req.files as Express.Multer.File[] | undefined) ?? [];
+  const newImages = files.map((f) => toImageUrl(req, f));
+
   try {
     const existingProduct = await getProductById(req.params.id as string);
-    const files = req.files as Express.Multer.File[] | undefined;
 
-    // existingImages: قائمة روابط الصور القديمة التي يريد الأدمن الإبقاء عليها (JSON string)
-    const keptImages = parseJsonArray(req.body.existingImages);
-    const newImages = (files ?? []).map(
-      (file) => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`,
+    // نقبل فقط روابط من صور المنتج الحالية، لا أي رابط يرسله الطلب
+    const keptImages = parseJsonArray(req.body.existingImages).filter((img) =>
+      existingProduct.images.includes(img),
     );
     const finalImages = [...keptImages, ...newImages];
 
     if (finalImages.length === 0) {
+      deleteImageFiles(newImages, "uploaded image");
       return res
         .status(400)
         .json({ message: "At least one product image is required" });
     }
 
-    // يحذف من القرص أي صورة قديمة لم تعد ضمن القائمة المحتفَظ بها
+    // قائمة بيضاء: الحقول المسموح بتعديلها فقط، فلا يمكن تمرير rating أو غيره
+    const body = req.body as Record<string, unknown>;
+    const update: UpdateProductInput = { images: finalImages };
+    if (body.name) update.name = String(body.name);
+    if (body.description) update.description = String(body.description);
+    if (body.price) update.price = Number(body.price);
+    if (body.priceBeforeDiscount)
+      update.priceBeforeDiscount = Number(body.priceBeforeDiscount);
+    if (body.category) update.category = String(body.category);
+    if (body.brand) update.brand = String(body.brand);
+    if (body.subCategories)
+      update.subCategories = parseJsonArray(body.subCategories);
+    if (body.colors) update.colors = parseJsonArray(body.colors);
+
+    const product = await updateProduct(req.params.id as string, update);
+
+    // الحذف من القرص بعد نجاح التحديث فقط، لا قبله:
+    // لو فشل التحديث لبقيت قاعدة البيانات تشير إلى صور محذوفة
     const removedImages = existingProduct.images.filter(
       (img) => !keptImages.includes(img),
     );
-    for (const imageUrl of removedImages) {
-      try {
-        const filename = path.basename(imageUrl);
-        const filePath = path.join("uploads", filename);
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      } catch (err) {
-        console.error("Failed to delete removed product image:", imageUrl, err);
-      }
-    }
+    deleteImageFiles(removedImages, "removed product image");
 
-    const body: Record<string, unknown> = { ...req.body, images: finalImages };
-    delete body.existingImages;
-    if (body.subCategories)
-      body.subCategories = parseJsonArray(body.subCategories as string);
-    if (body.colors) body.colors = parseJsonArray(body.colors as string);
-    if (body.price) body.price = Number(body.price);
-    if (body.priceBeforeDiscount)
-      body.priceBeforeDiscount = Number(body.priceBeforeDiscount);
-
-    const product = await updateProduct(req.params.id as string, body);
     res.status(200).json({ message: "Product updated successfully", product });
   } catch (err) {
+    // فشل التحديث: الصور الجديدة لم تُربط بالمنتج، والقديمة لم تُمسّ
+    deleteImageFiles(newImages, "uploaded image");
     handleError(err, res);
   }
 };
