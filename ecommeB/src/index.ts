@@ -14,6 +14,7 @@ import cartRoute from "./routes/cartRoute.js";
 import wishlistRoute from "./routes/wishlistRoute.js";
 import newsletterRoute from "./routes/newsletterRoute.js";
 import contactRoute from "./routes/contactRoute.js";
+import addressRoute from "./routes/addressRoute.js";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/cart", cartRoute);
 app.use("/wishlist", wishlistRoute);
 app.use("/newsletter", newsletterRoute);
 app.use("/contact", contactRoute);
+app.use("/address", addressRoute);
 
 async function start() {
   try {
