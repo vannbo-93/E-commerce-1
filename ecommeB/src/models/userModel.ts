@@ -8,6 +8,8 @@ export interface IUser extends Document {
   email: string;
   password: string; // يخزّن الهاش، لا كلمة المرور الصريحة أبدًا
   role: "user" | "admin";
+  // آخر تغيير لكلمة المرور: أي توكن صدر قبله يُرفض في protect
+  passwordChangedAt?: Date | undefined;
   comparePassword: (candidate: string) => Promise<boolean>;
 }
 
@@ -17,8 +19,8 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: [true, "Username is required"],
       trim: true,
-      minlength: 3,
-      maxlength: 30,
+      minlength: [3, "Username must be at least 3 characters"],
+      maxlength: [30, "Username cannot exceed 30 characters"],
     },
     email: {
       type: String,
@@ -31,7 +33,7 @@ const userSchema = new Schema<IUser>(
     password: {
       type: String,
       required: [true, "Password is required"],
-      minlength: 6,
+      minlength: [6, "Password must be at least 6 characters"],
       select: false, // لا يُرجَع تلقائيًا في أي استعلام إلا إذا طُلب صراحة
     },
     role: {
@@ -39,11 +41,16 @@ const userSchema = new Schema<IUser>(
       enum: ["user", "admin"],
       default: "user",
     },
+    passwordChangedAt: {
+      type: Date,
+    },
   },
   { timestamps: true },
 );
 
-// يُشفّر كلمة المرور تلقائيًا قبل الحفظ، فقط إن تغيّرت فعليًا
+// يُشفّر كلمة المرور تلقائيًا قبل الحفظ، فقط إن تغيّرت فعليًا.
+// تنبيه: يعمل مع save() و create() فقط، لا مع findByIdAndUpdate أو updateOne.
+// أي تغيير لكلمة المرور يجب أن يمر عبر save()، وإلا حُفظت كنص صريح.
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);

@@ -1,5 +1,4 @@
 /** @format */
-/** @format */
 
 import UserProfile from "../../Components/User/UserProfile";
 import UserSideBar from "../../Components/User/UserSideBar";
