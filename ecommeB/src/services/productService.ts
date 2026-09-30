@@ -18,6 +18,7 @@ export interface CreateProductInput {
   brand: string;
   colors?: string[];
   images: string[];
+  stock?: number;
 }
 
 export type UpdateProductInput = Partial<CreateProductInput>;

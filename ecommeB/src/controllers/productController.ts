@@ -12,6 +12,7 @@ import {
   type UpdateProductInput,
 } from "../services/productService.js";
 import { handleError } from "../utils/handleError.js";
+import { AppError } from "../utils/AppError.js";
 
 // subCategories وcolors تصلان كنص JSON عبر multipart/form-data (لا يدعم مصفوفات متداخلة مباشرة)
 const parseJsonArray = (value: unknown): string[] => {
@@ -23,6 +24,16 @@ const parseJsonArray = (value: unknown): string[] => {
   } catch {
     return [];
   }
+};
+
+// المخزون: عدد صحيح غير سالب. غيابه في الإضافة = 0، وفي التعديل = بلا تغيير
+const parseStock = (value: unknown): number | undefined => {
+  if (value === undefined || value === null || value === "") return undefined;
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 0) {
+    throw new AppError("Stock must be a whole number of 0 or more", 400);
+  }
+  return n;
 };
 
 const toImageUrl = (req: Request, file: Express.Multer.File) =>
@@ -85,7 +96,10 @@ export const addProduct = async (req: Request, res: Response) => {
       });
     }
 
+    const stock = parseStock(req.body.stock);
+
     const product = await createProduct({
+      ...(stock !== undefined ? { stock } : {}),
       name: String(name),
       description: String(description),
       price: Number(price),
@@ -143,6 +157,8 @@ export const editProduct = async (req: Request, res: Response) => {
     if (body.subCategories)
       update.subCategories = parseJsonArray(body.subCategories);
     if (body.colors) update.colors = parseJsonArray(body.colors);
+    const stock = parseStock(body.stock);
+    if (stock !== undefined) update.stock = stock;
 
     const product = await updateProduct(req.params.id as string, update);
 

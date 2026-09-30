@@ -12,6 +12,8 @@ export interface IProduct extends Document {
   colors: string[];
   images: string[];
   rating: { value: number; count: number };
+  // الكمية المتوفرة: تُخصم عند إنشاء الطلب، وتُعاد عند إلغائه
+  stock: number;
 }
 
 const productSchema = new Schema<IProduct>(
@@ -67,6 +69,15 @@ const productSchema = new Schema<IProduct>(
     rating: {
       value: { type: Number, default: 0, min: 0, max: 5 },
       count: { type: Number, default: 0, min: 0 },
+    },
+    stock: {
+      type: Number,
+      default: 0,
+      min: [0, "Stock cannot be negative"],
+      validate: {
+        validator: Number.isInteger,
+        message: "Stock must be a whole number",
+      },
     },
   },
   { timestamps: true },

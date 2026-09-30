@@ -19,6 +19,7 @@ export interface CartItemResponse {
     image: string | null;
     brand: string | null;
     category: string | null;
+    stock: number;
   };
 }
 
@@ -56,7 +57,7 @@ const toCartResponse = async (cart: ICart | null): Promise<CartResponse> => {
   const products = await Product.find({
     _id: { $in: cart.items.map((i) => i.product) },
   })
-    .select("name price priceBeforeDiscount images brand category")
+    .select("name price priceBeforeDiscount images brand category stock")
     .populate<{ brand: { name: string } | null }>("brand", "name")
     .populate<{ category: { name: string } | null }>("category", "name")
     .lean();
@@ -89,6 +90,7 @@ const toCartResponse = async (cart: ICart | null): Promise<CartResponse> => {
         image: p.images[0] ?? null,
         brand: p.brand?.name ?? null,
         category: p.category?.name ?? null,
+        stock: p.stock ?? 0,
       },
     });
   }
@@ -118,9 +120,14 @@ export const addToCart = async (
   assertValidId(input.productId, "product id");
   assertValidQuantity(input.quantity);
 
-  const product = await Product.findById(input.productId).select("colors");
+  const product = await Product.findById(input.productId).select(
+    "colors stock",
+  );
   if (!product) {
     throw new AppError("Product not found", 404);
+  }
+  if (product.stock <= 0) {
+    throw new AppError("This product is out of stock", 409);
   }
 
   // اللون إلزامي فقط إن كان للمنتج ألوان، ويجب أن يكون أحدها
@@ -148,6 +155,20 @@ export const addToCart = async (
       i.product.toString() === input.productId &&
       (i.color ?? null) === (color ?? null),
   );
+
+  // المخزون لكل منتج لا لكل لون: نجمع كل أسطر هذا المنتج في السلة
+  const alreadyInCart = cart.items
+    .filter((i) => i.product.toString() === input.productId)
+    .reduce((sum, i) => sum + i.quantity, 0);
+  if (alreadyInCart + input.quantity > product.stock) {
+    const canAdd = Math.max(0, product.stock - alreadyInCart);
+    throw new AppError(
+      canAdd > 0
+        ? `Only ${product.stock} in stock. You can add ${canAdd} more.`
+        : `Only ${product.stock} in stock, and they're already in your cart.`,
+      409,
+    );
+  }
 
   if (existing) {
     existing.quantity = Math.min(
@@ -178,6 +199,23 @@ export const updateCartItemQuantity = async (
   const item = cart?.items.id(itemId);
   if (!cart || !item) {
     throw new AppError("Item not found in your cart", 404);
+  }
+
+  // المخزون يشمل أسطر نفس المنتج الأخرى (بألوان مختلفة)
+  const product = await Product.findById(item.product).select("stock");
+  const otherLines = cart.items
+    .filter(
+      (i) =>
+        i.product.toString() === item.product.toString() &&
+        i._id.toString() !== itemId,
+    )
+    .reduce((sum, i) => sum + i.quantity, 0);
+  const stock = product?.stock ?? 0;
+  if (otherLines + quantity > stock) {
+    throw new AppError(
+      `Only ${stock} in stock${otherLines > 0 ? " (including other colors in your cart)" : ""}`,
+      409,
+    );
   }
 
   item.quantity = quantity;
