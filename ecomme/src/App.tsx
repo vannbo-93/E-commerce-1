@@ -22,6 +22,7 @@ import AdminAddCategoryPage from "../src/Page/Admin/AdminAddCategoryPage";
 import AdminAddSubCategoryPage from "../src/Page/Admin/AdminAddSubCategoryPage";
 import AdminAddProductsPage from "./Page/Admin/AdminAddProductsPage";
 import UserAllOrdersPage from "./Page/User/UserAllOrdersPage";
+import UserOrderDetailsPage from "../src/Components/User/UserOrderDetailsPage";
 import UserFavoriteProductsPage from "../src/Page/User/UserFavoriteProductsPage";
 import UserAllAddressPage from "../src/Page/User/UserAllAddressPage";
 import UserAddAddressPage from "../src/Page/User/UserAddAddressPage";
@@ -62,10 +63,6 @@ function App() {
                     element={<ProductDetailsPage />}
                   />
                   <Route path="/cart" element={<CartPage />} />
-                  <Route
-                    path="/order/paymethoud"
-                    element={<ChoosePayMethoudPage />}
-                  />
                   <Route path="/support" element={<SupportPage />} />
                   <Route
                     path="/about"
@@ -121,6 +118,15 @@ function App() {
                     <Route
                       path="/user/allorders"
                       element={<UserAllOrdersPage />}
+                    />
+                    <Route
+                      path="/user/orders/:id"
+                      element={<UserOrderDetailsPage />}
+                    />
+                    {/* الدفع يحتاج حسابًا: الطلب يُنشأ من سلة المستخدم وعناوينه */}
+                    <Route
+                      path="/order/paymethoud"
+                      element={<ChoosePayMethoudPage />}
                     />
                     <Route
                       path="/user/favoriteproducts"

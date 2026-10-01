@@ -201,21 +201,27 @@ export const updateCartItemQuantity = async (
     throw new AppError("Item not found in your cart", 404);
   }
 
-  // المخزون يشمل أسطر نفس المنتج الأخرى (بألوان مختلفة)
-  const product = await Product.findById(item.product).select("stock");
-  const otherLines = cart.items
-    .filter(
-      (i) =>
-        i.product.toString() === item.product.toString() &&
-        i._id.toString() !== itemId,
-    )
-    .reduce((sum, i) => sum + i.quantity, 0);
-  const stock = product?.stock ?? 0;
-  if (otherLines + quantity > stock) {
-    throw new AppError(
-      `Only ${stock} in stock${otherLines > 0 ? " (including other colors in your cart)" : ""}`,
-      409,
-    );
+  // التقليل مسموح دائمًا: هو ما يصحّح سلة تجاوزت المخزون.
+  // التحقق من المخزون عند الزيادة فقط
+  if (quantity > item.quantity) {
+    // المخزون يشمل أسطر نفس المنتج الأخرى (بألوان مختلفة)
+    const product = await Product.findById(item.product).select("stock");
+    const otherLines = cart.items
+      .filter(
+        (i) =>
+          i.product.toString() === item.product.toString() &&
+          i._id.toString() !== itemId,
+      )
+      .reduce((sum, i) => sum + i.quantity, 0);
+    const stock = product?.stock ?? 0;
+    if (otherLines + quantity > stock) {
+      throw new AppError(
+        stock <= 0
+          ? "This product is out of stock"
+          : `Only ${stock} in stock${otherLines > 0 ? " (including other colors in your cart)" : ""}`,
+        409,
+      );
+    }
   }
 
   item.quantity = quantity;
