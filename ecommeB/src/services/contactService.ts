@@ -1,4 +1,5 @@
 /** @format */
+import mongoose from "mongoose";
 import ContactMessage from "../models/contactMessageModel.js";
 import { AppError } from "../utils/AppError.js";
 import { sendMail } from "../utils/mailer.js";
@@ -93,4 +94,114 @@ export const createContactMessage = async (
   const clean = validate(input);
   await ContactMessage.create(clean);
   await notifySupport(clean);
+};
+
+// ===================== الأدمن =====================
+
+export const CONTACT_STATUSES = ["new", "read", "archived"] as const;
+type ContactStatus = (typeof CONTACT_STATUSES)[number];
+
+const ADMIN_MAX_LIMIT = 50;
+
+export interface AdminContactMessage {
+  _id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: ContactStatus;
+  createdAt: Date;
+}
+
+const toAdminMessage = (m: {
+  _id: { toString(): string };
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: ContactStatus;
+  createdAt: Date;
+}): AdminContactMessage => ({
+  _id: m._id.toString(),
+  name: m.name,
+  email: m.email,
+  subject: m.subject,
+  message: m.message,
+  status: m.status,
+  createdAt: m.createdAt,
+});
+
+export const listContactMessages = async (q: {
+  status?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  const filter: Record<string, unknown> = {};
+  if (q.status) {
+    if (!(CONTACT_STATUSES as readonly string[]).includes(q.status)) {
+      throw new AppError(
+        `status must be one of: ${CONTACT_STATUSES.join(", ")}`,
+        400,
+      );
+    }
+    filter.status = q.status;
+  }
+
+  const limit = Math.min(
+    Math.max(1, q.limit && Number.isInteger(q.limit) ? q.limit : 20),
+    ADMIN_MAX_LIMIT,
+  );
+  const page = q.page && Number.isInteger(q.page) && q.page > 0 ? q.page : 1;
+
+  const [messages, total, statusCounts] = await Promise.all([
+    ContactMessage.find(filter)
+      .sort({ _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    ContactMessage.countDocuments(filter),
+    ContactMessage.aggregate<{ _id: ContactStatus; count: number }>([
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]),
+  ]);
+
+  const counts = Object.fromEntries(
+    CONTACT_STATUSES.map((s) => [s, 0]),
+  ) as Record<ContactStatus, number>;
+  for (const c of statusCounts) counts[c._id] = c.count;
+
+  return {
+    messages: messages.map(toAdminMessage),
+    total,
+    page,
+    pages: Math.max(1, Math.ceil(total / limit)),
+    counts,
+  };
+};
+
+// لشارة القائمة الجانبية: استعلام خفيف بدل جلب القائمة كاملة
+export const countUnreadMessages = () =>
+  ContactMessage.countDocuments({ status: "new" });
+
+export const updateContactMessageStatus = async (
+  id: string,
+  status: string,
+): Promise<AdminContactMessage> => {
+  if (!mongoose.isValidObjectId(id)) {
+    throw new AppError("Message not found", 404);
+  }
+  if (!(CONTACT_STATUSES as readonly string[]).includes(status)) {
+    throw new AppError(
+      `status must be one of: ${CONTACT_STATUSES.join(", ")}`,
+      400,
+    );
+  }
+
+  const updated = await ContactMessage.findByIdAndUpdate(
+    id,
+    { $set: { status } },
+    { new: true },
+  ).lean();
+  if (!updated) throw new AppError("Message not found", 404);
+  return toAdminMessage(updated);
 };
