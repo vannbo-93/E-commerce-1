@@ -13,6 +13,7 @@ export interface WishlistProductResponse {
   image: string | null;
   hasOptions: boolean;
   rating: { value: number; count: number };
+  stock: number;
 }
 
 const assertValidProductId = (productId: string) => {
@@ -35,7 +36,7 @@ export const getWishlist = async (
   if (!wishlist || wishlist.products.length === 0) return [];
 
   const products = await Product.find({ _id: { $in: wishlist.products } })
-    .select("name price priceBeforeDiscount images colors rating")
+    .select("name price priceBeforeDiscount images colors rating stock")
     .lean();
 
   const byId = new Map(products.map((p) => [p._id.toString(), p]));
@@ -65,6 +66,7 @@ export const getWishlist = async (
         value: p.rating?.value ?? 0,
         count: p.rating?.count ?? 0,
       },
+      stock: p.stock ?? 0,
     });
   }
   return result;
