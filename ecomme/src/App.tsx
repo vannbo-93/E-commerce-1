@@ -35,6 +35,7 @@ import { WishlistProvider } from "./context/WishlistContext";
 import SupportPage from "./Page/Support/SupportPage";
 import InfoPage from "./Page/Info/InfoPage";
 import { aboutContent, privacyContent } from "./Page/Info/infoContent";
+import AdminMessagesPage from "./Page/Admin/AdminMessagesPage";
 
 function App() {
   return (
@@ -110,6 +111,10 @@ function App() {
                     <Route
                       path="/admin/editproduct/:id"
                       element={<EditProduct />}
+                    />
+                    <Route
+                      path="/admin/messages"
+                      element={<AdminMessagesPage />}
                     />
                   </Route>
 

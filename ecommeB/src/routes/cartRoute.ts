@@ -1,23 +1,27 @@
 /** @format */
 import { Router } from "express";
 import {
-  getMyCart,
-  addItem,
-  updateItem,
-  removeItem,
-  clearMyCart,
-} from "../controllers/CartController.js";
+  submitContactMessage,
+  getContactMessages,
+  getUnreadCount,
+  changeContactMessageStatus,
+} from "../controllers/contactController.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { requireAdmin } from "../middlewares/requireAdmin.js";
 
 const router = Router();
 
-// السلة خاصة بكل مستخدم: كل المسارات تحتاج تسجيل دخول
-router.use(protect);
+// عام: الزائر يستطيع التواصل دون حساب
+router.post("/", submitContactMessage);
 
-router.get("/", getMyCart);
-router.post("/", addItem);
-router.delete("/", clearMyCart);
-router.patch("/items/:itemId", updateItem);
-router.delete("/items/:itemId", removeItem);
+// الأدمن: قراءة الرسائل وإدارتها
+router.get("/admin", protect, requireAdmin, getContactMessages);
+router.get("/admin/unread-count", protect, requireAdmin, getUnreadCount);
+router.patch(
+  "/admin/:id/status",
+  protect,
+  requireAdmin,
+  changeContactMessageStatus,
+);
 
 export default router;
