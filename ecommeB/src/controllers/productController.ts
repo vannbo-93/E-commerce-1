@@ -150,8 +150,13 @@ export const editProduct = async (req: Request, res: Response) => {
     if (body.name) update.name = String(body.name);
     if (body.description) update.description = String(body.description);
     if (body.price) update.price = Number(body.price);
-    if (body.priceBeforeDiscount)
+    // الحقل يُرسَل دائمًا من صفحة التعديل: فارغ = أزل الخصم، رقم = خصم جديد.
+    // غيابه تمامًا (طلب من مصدر آخر) = لا تغيير
+    if (body.priceBeforeDiscount === "") {
+      update.clearPriceBeforeDiscount = true;
+    } else if (body.priceBeforeDiscount !== undefined) {
       update.priceBeforeDiscount = Number(body.priceBeforeDiscount);
+    }
     if (body.category) update.category = String(body.category);
     if (body.brand) update.brand = String(body.brand);
     if (body.subCategories)

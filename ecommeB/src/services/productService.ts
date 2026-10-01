@@ -21,7 +21,10 @@ export interface CreateProductInput {
   stock?: number;
 }
 
-export type UpdateProductInput = Partial<CreateProductInput>;
+export type UpdateProductInput = Partial<CreateProductInput> & {
+  // true: إزالة الخصم (حذف priceBeforeDiscount من المنتج)
+  clearPriceBeforeDiscount?: boolean;
+};
 
 // يتحقق أن التصنيف والعلامة والتصنيفات الفرعية موجودة فعليًا، بدل مراجع معطوبة
 const validateReferences = async (data: {
@@ -266,12 +269,40 @@ export const updateProduct = async (
   id: string,
   data: UpdateProductInput,
 ): Promise<IProduct> => {
-  await validateReferences(data);
+  const { clearPriceBeforeDiscount, ...fields } = data;
+  await validateReferences(fields);
 
-  const product = await Product.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  }).populate(populateOptions);
+  const existing = await Product.findById(id).select(
+    "price priceBeforeDiscount",
+  );
+  if (!existing) {
+    throw new AppError("Product not found", 404);
+  }
+
+  // نفس قاعدة الإنشاء: "السعر قبل الخصم" لا يقل عن السعر الحالي،
+  // محسوبًا على القيم النهائية بعد التعديل لا على المُرسَل فقط
+  const finalPrice = fields.price ?? existing.price;
+  const finalBefore = clearPriceBeforeDiscount
+    ? undefined
+    : (fields.priceBeforeDiscount ?? existing.priceBeforeDiscount);
+  if (finalBefore != null && finalBefore < finalPrice) {
+    throw new AppError(
+      "Price before discount cannot be lower than the current price",
+      400,
+    );
+  }
+
+  const product = await Product.findByIdAndUpdate(
+    id,
+    {
+      $set: fields,
+      // $unset يحذف الحقل فعليًا: المنتج يخرج من "On sale" ولا يظهر له سعر مشطوب
+      ...(clearPriceBeforeDiscount
+        ? { $unset: { priceBeforeDiscount: 1 } }
+        : {}),
+    },
+    { new: true, runValidators: true },
+  ).populate(populateOptions);
 
   if (!product) {
     throw new AppError("Product not found", 404);
