@@ -32,6 +32,7 @@ interface RawProduct {
   images: string[];
   colors: string[];
   rating?: { value: number; count: number };
+  stock?: number;
 }
 
 interface ListState {
@@ -188,6 +189,7 @@ const ShopProductsPage = () => {
                 ? { oldPrice: product.priceBeforeDiscount }
                 : {})}
               hasOptions={product.colors.length > 0}
+              stock={product.stock ?? 0}
               {...getCardCartProps(product._id)}
             />
           </div>

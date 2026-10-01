@@ -144,14 +144,16 @@ const AdminAllOrders = () => {
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Order number, e.g. 1024"
             aria-label="Search by order number"
-            className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-9 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40"
+            className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-9 text-sm text-gray-900 
+            placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40"
           />
           {search && (
             <button
               type="button"
               onClick={clearSearch}
               aria-label="Clear search"
-              className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+              className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full 
+              text-gray-400 hover:bg-gray-100 hover:text-gray-600">
               <IconX size={14} />
             </button>
           )}
@@ -189,7 +191,8 @@ const AdminAllOrders = () => {
           Loading orders...
         </p>
       ) : data.orders.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-4 py-14 text-center shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
+        <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-4 py-14 text-center 
+        shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-500">
             <IconPackage size={26} />
           </div>
@@ -262,7 +265,8 @@ const AdminAllOrders = () => {
                       <Link
                         to={`/admin/orders/${order._id}`}
                         aria-label={`Open order #${order.orderNumber}`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-sky-50 hover:text-sky-600">
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-400 
+                        hover:bg-sky-50 hover:text-sky-600">
                         <IconChevronRight size={18} />
                       </Link>
                     </td>

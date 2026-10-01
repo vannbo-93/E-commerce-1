@@ -1,6 +1,7 @@
 /** @format */
 import { useState } from "react";
 import { IconShoppingCart, IconStar } from "@tabler/icons-react";
+import { isOutOfStock, stockLabel } from "../Utility/stock";
 
 export interface CartFeedback {
   kind: "success" | "error";
@@ -17,6 +18,7 @@ interface ProductsTextProps {
   description: string;
   price: number;
   priceBeforeDiscount?: number;
+  stock?: number;
   // يستقبل اللون المختار، فالمكوّن لا يعرف شيئًا عن الـ API أو السلة
   onAddToCart?: (color: string | null) => void;
   isAdding?: boolean;
@@ -33,6 +35,7 @@ const ProductsText = ({
   description,
   price,
   priceBeforeDiscount,
+  stock,
   onAddToCart,
   isAdding = false,
   cartFeedback = null,
@@ -41,6 +44,11 @@ const ProductsText = ({
   const [selectedColor, setSelectedColor] = useState<string | null>(
     colors[0] ?? null,
   );
+
+  // غياب stock (استخدام قديم) = لا تنبيهات ولا تعطيل
+  const outOfStock = stock !== undefined && isOutOfStock(stock);
+  const lowStockText =
+    stock !== undefined && !outOfStock ? stockLabel(stock) : null;
 
   return (
     <div className="flex flex-col gap-2">
@@ -107,13 +115,23 @@ const ProductsText = ({
         <button
           type="button"
           onClick={() => onAddToCart?.(selectedColor)}
-          disabled={isAdding || !onAddToCart}
+          disabled={isAdding || !onAddToCart || outOfStock}
           className="flex items-center gap-2 rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors
           hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500">
           <IconShoppingCart size={17} />
-          {isAdding ? "Adding..." : "Add to cart"}
+          {outOfStock ? "Out of stock" : isAdding ? "Adding..." : "Add to cart"}
         </button>
       </div>
+
+      {outOfStock ? (
+        <p className="text-sm font-medium text-red-600">
+          This product is currently out of stock.
+        </p>
+      ) : lowStockText ? (
+        <p className="text-sm font-medium text-amber-600">
+          {lowStockText}. Order soon.
+        </p>
+      ) : null}
 
       {cartFeedback && (
         <p

@@ -96,6 +96,15 @@ const CartPage = () => {
 
   const { items, totalQuantity, totalPrice } = cart;
 
+  // منتج نفد أو قلّ مخزونه بعد إضافته للسلة: لا انتقال للدفع حتى يُصحَّح
+  const stockProblems = items.filter(
+    (i) => i.quantity > i.product.stock,
+  ).length;
+  const blockedReason =
+    stockProblems > 0
+      ? `${stockProblems === 1 ? "One item exceeds" : `${stockProblems} items exceed`} the available stock. Update your cart to continue.`
+      : null;
+
   return (
     <div className={wrapper}>
       {/* حجم العنوان بـ style لأن CSS عامًا على h1 قد يتغلب على فئات Tailwind */}
@@ -151,6 +160,7 @@ const CartPage = () => {
                   quantity={item.quantity}
                   price={item.product.price}
                   lineTotal={item.lineTotal}
+                  stock={item.product.stock}
                   disabled={pendingIds.has(item._id)}
                   onQuantityChange={(q) =>
                     void handleQuantityChange(item._id, q)
@@ -167,6 +177,7 @@ const CartPage = () => {
             total={totalPrice}
             itemsCount={totalQuantity}
             busy={pendingIds.size > 0}
+            blockedReason={blockedReason}
           />
         </div>
       </div>

@@ -185,7 +185,9 @@ const AdminOrderDetalis = () => {
                 rows={2}
                 placeholder="e.g. Shipped with Amana, tracking 123456"
                 disabled={updating !== null}
-                className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 disabled:opacity-60"
+                className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 
+                placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 
+                disabled:opacity-60"
               />
             </div>
 
@@ -196,7 +198,8 @@ const AdminOrderDetalis = () => {
                   type="button"
                   onClick={() => void handleTransition(target)}
                   disabled={updating !== null}
-                  className="rounded-lg bg-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500">
+                  className="rounded-lg bg-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors 
+                  hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500">
                   {updating === target ? "Updating..." : ACTION_LABEL[target]}
                 </button>
               ))}
@@ -205,7 +208,8 @@ const AdminOrderDetalis = () => {
                   type="button"
                   onClick={() => void handleTransition("cancelled")}
                   disabled={updating !== null}
-                  className="ml-auto rounded-lg border border-red-200 px-5 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50">
+                  className="ml-auto rounded-lg border border-red-200 px-5 py-2.5 text-sm font-medium text-red-600 
+                  transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50">
                   {updating === "cancelled"
                     ? "Cancelling..."
                     : ACTION_LABEL.cancelled}

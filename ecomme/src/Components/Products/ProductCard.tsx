@@ -8,6 +8,7 @@ import {
 } from "@tabler/icons-react";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { isOutOfStock, stockLabel } from "../Utility/stock";
 
 // عدّله إن كان مسار صفحة الدخول مختلفًا في الـ Router
 const LOGIN_PATH = "/login";
@@ -24,6 +25,8 @@ interface ProductCardProps {
   oldPrice?: number;
   // منتج له ألوان لا يُضاف من البطاقة: الزر يفتح صفحته لاختيار اللون
   hasOptions?: boolean;
+  // المخزون: 0 = زر معطّل "Out of stock". غيابه = لا تنبيهات (توافق مع أي استخدام قديم)
+  stock?: number;
   onAddToCart?: (id: string) => void;
   cartStatus?: CardCartStatus;
   cartError?: string;
@@ -38,6 +41,7 @@ const ProductCard = ({
   price,
   oldPrice,
   hasOptions = false,
+  stock,
   onAddToCart,
   cartStatus = "idle",
   cartError,
@@ -49,6 +53,9 @@ const ProductCard = ({
   const { isInWishlist, toggle } = useWishlist();
   const isFavorite = isInWishlist(id);
   const productPath = `/products/${id}`;
+  const outOfStock = stock !== undefined && isOutOfStock(stock);
+  const lowStockText =
+    stock !== undefined && !outOfStock ? stockLabel(stock) : null;
 
   const handleToggleFavorite = () => {
     if (authLoading) return;
@@ -56,6 +63,7 @@ const ProductCard = ({
       navigate(LOGIN_PATH, { state: { from: location.pathname } });
       return;
     }
+    // الفشل يعيد القلب لحالته السابقة داخل الـ context؛ الخطأ يُسجَّل للمطوّر فقط
     toggle(id).catch((err) => console.error("toggle failed", err));
   };
 
@@ -75,12 +83,17 @@ const ProductCard = ({
     transition-shadow duration-300 hover:shadow-[0_6px_24px_rgba(0,0,0,0.12)]">
       <div className="relative">
         <Link to={productPath} className="block no-underline">
-          <div className="flex h-48 items-center justify-center overflow-hidden rounded-2xl bg-slate-50">
+          <div className="relative flex h-48 items-center justify-center overflow-hidden rounded-2xl bg-slate-50">
+            {outOfStock && (
+              <span className="absolute left-2 top-2 z-10 rounded-full bg-gray-900/80 px-2.5 py-1 text-xs font-medium text-white">
+                Out of stock
+              </span>
+            )}
             {image ? (
               <img
                 src={image}
                 alt={title}
-                className="max-h-[90%] max-w-[100%] rounded-2xl object-contain"
+                className={`max-h-[90%] max-w-[100%] rounded-2xl object-contain ${outOfStock ? "opacity-50 grayscale" : ""}`}
               />
             ) : (
               <IconPhoto
@@ -141,7 +154,12 @@ const ProductCard = ({
           </div>
         </div>
 
-        {hasOptions ? (
+        {outOfStock ? (
+          <button type="button" disabled className={buttonClass}>
+            <IconShoppingCart size={16} className="shrink-0" />
+            <span className="truncate">Out of stock</span>
+          </button>
+        ) : hasOptions ? (
           <Link to={productPath} className={buttonClass}>
             <IconShoppingCart size={16} className="shrink-0" />
             <span className="truncate">Choose options</span>
@@ -155,6 +173,12 @@ const ProductCard = ({
             <IconShoppingCart size={16} className="shrink-0" />
             <span className="truncate">{buttonLabel}</span>
           </button>
+        )}
+
+        {lowStockText && (
+          <p className="mt-1 text-center text-xs font-medium text-amber-600">
+            {lowStockText}
+          </p>
         )}
 
         {cartStatus === "error" && cartError && (

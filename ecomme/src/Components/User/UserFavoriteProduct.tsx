@@ -48,8 +48,7 @@ const UserFavoriteProduct = () => {
           <Link
             to={LOGIN_PATH}
             state={{ from: "/user/favorite" }}
-            className="rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-medium text-white no-underline transition-colors 
-            hover:bg-sky-600">
+            className="rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-medium text-white no-underline transition-colors hover:bg-sky-600">
             Log in
           </Link>
         </div>
@@ -78,9 +77,7 @@ const UserFavoriteProduct = () => {
     return (
       <div>
         {heading}
-        <div
-          className="flex flex-col items-center gap-3 rounded-2xl bg-white px-4 py-14 text-center 
-        shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
+        <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-4 py-14 text-center shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-400">
             <IconHeart size={28} />
           </div>
@@ -92,8 +89,7 @@ const UserFavoriteProduct = () => {
           </p>
           <Link
             to={PRODUCTS_PATH}
-            className="mt-2 rounded-lg bg-sky-500 px-6 py-3 text-sm font-medium text-white no-underline transition-colors 
-            hover:bg-sky-600">
+            className="mt-2 rounded-lg bg-sky-500 px-6 py-3 text-sm font-medium text-white no-underline transition-colors hover:bg-sky-600">
             Browse products
           </Link>
         </div>
@@ -105,7 +101,7 @@ const UserFavoriteProduct = () => {
     <div>
       {heading}
       {/* إزالة القلب هنا تُخرج المنتج من القائمة فورًا عبر WishlistContext */}
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-3 xl:grid-cols-4">
         {products.map((product) => (
           <div key={product._id} className="min-w-0">
             <ProductCard
@@ -119,6 +115,7 @@ const UserFavoriteProduct = () => {
                 ? { oldPrice: product.priceBeforeDiscount }
                 : {})}
               hasOptions={product.hasOptions}
+              stock={product.stock}
               {...getCardCartProps(product._id)}
             />
           </div>

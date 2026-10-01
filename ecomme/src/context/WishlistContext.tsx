@@ -20,6 +20,7 @@ export interface WishlistProduct {
   image: string | null;
   hasOptions: boolean;
   rating: { value: number; count: number };
+  stock: number;
 }
 
 interface WishlistContextValue {

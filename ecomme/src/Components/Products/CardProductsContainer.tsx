@@ -23,6 +23,7 @@ interface RawProduct {
   images: string[];
   colors: string[];
   rating?: { value: number; count: number };
+  stock?: number;
 }
 
 const CardProductsContainer = ({
@@ -84,6 +85,7 @@ const CardProductsContainer = ({
                   ? { oldPrice: product.priceBeforeDiscount }
                   : {})}
                 hasOptions={product.colors.length > 0}
+                stock={product.stock ?? 0}
                 {...getCardCartProps(product._id)}
               />
             </div>

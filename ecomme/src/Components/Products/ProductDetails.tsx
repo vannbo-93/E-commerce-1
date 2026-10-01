@@ -20,6 +20,7 @@ interface RawProduct {
   colors: string[];
   images: string[];
   rating: { value: number; count: number };
+  stock?: number;
   category: { _id: string; name: string } | null;
   brand: { _id: string; name: string } | null;
 }
@@ -137,6 +138,7 @@ const ProductDetails = () => {
             {...(product.priceBeforeDiscount !== undefined
               ? { priceBeforeDiscount: product.priceBeforeDiscount }
               : {})}
+            stock={product.stock ?? 0}
             onAddToCart={handleAddToCart}
             isAdding={adding || authLoading}
             cartFeedback={cartFeedback}

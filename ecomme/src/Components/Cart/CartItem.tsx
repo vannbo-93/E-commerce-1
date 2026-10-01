@@ -1,6 +1,7 @@
 /** @format */
 import React from "react";
 import { ImageOff, Minus, Plus, Trash2 } from "lucide-react";
+import { LOW_STOCK_THRESHOLD } from "../Utility/stock";
 
 interface CartItemProps {
   image: string | null;
@@ -11,6 +12,7 @@ interface CartItemProps {
   quantity: number;
   price: number;
   lineTotal: number;
+  stock: number;
   // true أثناء انتظار رد السيرفر لهذا السطر: يمنع الضغطات المتتالية المتسابقة
   disabled?: boolean;
   onQuantityChange: (newQuantity: number) => void;
@@ -37,10 +39,17 @@ const CartItem: React.FC<CartItemProps> = ({
   quantity,
   price,
   lineTotal,
+  stock,
   disabled = false,
   onQuantityChange,
   onDelete,
 }) => {
+  // الحد الأعلى للكمية: الأصغر بين الحد العام والمخزون الفعلي
+  const maxQty = Math.min(MAX_QTY, Math.max(stock, 0));
+  const outOfStock = stock <= 0;
+  const exceedsStock = !outOfStock && quantity > stock;
+  const lowStock = !outOfStock && !exceedsStock && stock <= LOW_STOCK_THRESHOLD;
+
   return (
     <div className={`flex gap-4 py-5 ${disabled ? "opacity-60" : ""}`}>
       {/* الصورة، أو أيقونة محايدة إن لم توجد صورة */}
@@ -119,7 +128,7 @@ const CartItem: React.FC<CartItemProps> = ({
             <button
               type="button"
               aria-label="Increase quantity"
-              disabled={disabled || quantity >= MAX_QTY}
+              disabled={disabled || quantity >= maxQty}
               onClick={() => onQuantityChange(quantity + 1)}
               className={stepperBtn}>
               <Plus size={14} />
@@ -138,6 +147,25 @@ const CartItem: React.FC<CartItemProps> = ({
             ) : null}
           </div>
         </div>
+
+        {/* تنبيه المخزون: المخزون قد يتغير بعد إضافة المنتج للسلة */}
+        {outOfStock ? (
+          <p className="mt-2 text-xs font-medium text-red-600">
+            Out of stock. Remove it to continue to checkout.
+          </p>
+        ) : exceedsStock ? (
+          <p className="mt-2 text-xs font-medium text-amber-600">
+            Only {stock} available. Reduce the quantity to continue to checkout.
+          </p>
+        ) : lowStock ? (
+          <p className="mt-2 text-xs font-medium text-amber-600">
+            Only {stock} left
+          </p>
+        ) : quantity >= maxQty && maxQty > 0 && maxQty < MAX_QTY ? (
+          <p className="mt-2 text-xs text-gray-500">
+            Maximum available quantity
+          </p>
+        ) : null}
       </div>
     </div>
   );

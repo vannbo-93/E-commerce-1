@@ -1,5 +1,4 @@
 /** @format */
-/*className="font-sans"*/
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 @import "tailwindcss";
@@ -9,151 +8,41 @@
 ========================= */
 
 @theme {
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* =========================
-   Global Variables
-========================= */
-
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: "Inter", sans-serif;
-  --heading: "Inter", sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font-family: "Inter", sans-serif;
-  font-size: 18px;
-  line-height: 145%;
-  letter-spacing: 0.18px;
-
-  color-scheme: light;
-  color: var(--text);
-  background: var(--bg);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* =========================
-   Global
-========================= */
-
-* {
-  box-sizing: border-box;
-  font-family: inherit;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-/* =========================
-   Root
-========================= */
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  min-height: 100svh;
-  margin: 0 auto;
-
-  border-inline: 1px solid var(--border);
-
-  display: flex;
-  flex-direction: column;
-}
-
-/* =========================
-   Headings
+   Base
+   كل القواعد داخل @layer base: أي قاعدة خارج الطبقات تتغلب على كلاسات Tailwind
+   مهما كانت، فتُلغي text-sm على الأزرار وأحجام العناوين وغيرها.
+   Tailwind يعيد ضبط العناوين والأزرار والحقول أصلًا (preflight)،
+   فلا حاجة لقواعد عامة عليها هنا.
 ========================= */
 
 @layer base {
-  h1,
-  h2 {
-    font-family: "Inter", sans-serif;
-    font-weight: 900;
-    color: var(--text-h);
-  }
-
-  h1 {
-    font-size: 56px;
-    letter-spacing: -1.68px;
-    margin: 32px 0;
-  }
-
-  h2 {
-    font-size: 24px;
-    line-height: 118%;
-    letter-spacing: -0.24px;
-    margin: 0 0 8px;
-  }
-
-  p {
-    margin: 0;
-  }
-}
-
-/* =========================
-   Code
-========================= */
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-}
-
-/* =========================
-   Responsive
-========================= */
-
-@media (max-width: 1024px) {
   :root {
-    font-size: 16px;
+    color-scheme: light;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  h1 {
-    font-size: 36px;
-    margin: 20px 0;
+  html,
+  body {
+    background: #fff;
+    color: #6b6375;
+    line-height: 1.45;
   }
 
-  h2 {
-    font-size: 20px;
+  /* عرض الموقع الأقصى، مع خطين رفيعين على الجانبين */
+  #root {
+    width: 1126px;
+    max-width: 100%;
+    min-height: 100svh;
+    margin: 0 auto;
+    border-inline: 1px solid #e5e4e7;
+    display: flex;
+    flex-direction: column;
   }
 }

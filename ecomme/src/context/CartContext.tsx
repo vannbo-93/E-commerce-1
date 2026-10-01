@@ -20,6 +20,7 @@ export interface CartProduct {
   image: string | null;
   brand: string | null;
   category: string | null;
+  stock: number; // المخزون الحالي: لتعطيل + ولتنبيهات النفاد في السلة
 }
 
 export interface CartLine {

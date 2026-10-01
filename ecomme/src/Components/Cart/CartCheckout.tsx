@@ -7,6 +7,8 @@ interface CartCheckoutProps {
   itemsCount: number;
   // true أثناء أي تعديل على السلة: يمنع الانتقال للدفع بإجمالي لم يُحدَّث بعد
   busy?: boolean;
+  // سبب يمنع الدفع (منتج نفد مثلًا): يُعرض للعميل ويعطّل الزر
+  blockedReason?: string | null;
 }
 
 const formatPrice = (value: number) =>
@@ -24,8 +26,9 @@ const CartCheckout: React.FC<CartCheckoutProps> = ({
   total,
   itemsCount,
   busy = false,
+  blockedReason = null,
 }) => {
-  const canCheckout = itemsCount > 0 && !busy;
+  const canCheckout = itemsCount > 0 && !busy && !blockedReason;
 
   return (
     <div className="rounded-2xl bg-white p-5 shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
@@ -45,11 +48,18 @@ const CartCheckout: React.FC<CartCheckoutProps> = ({
         </span>
       </div>
 
+      {blockedReason && (
+        <p
+          role="alert"
+          className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          {blockedReason}
+        </p>
+      )}
+
       {canCheckout ? (
         <Link
           to={CHECKOUT_PATH}
-          className="mt-4 block w-full rounded-lg bg-sky-500 py-3 text-center font-semibold text-white no-underline transition-colors 
-          hover:bg-sky-600">
+          className="mt-4 block w-full rounded-lg bg-sky-500 py-3 text-center font-semibold text-white no-underline transition-colors hover:bg-sky-600">
           Checkout
         </Link>
       ) : (
