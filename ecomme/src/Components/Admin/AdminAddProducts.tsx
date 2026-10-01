@@ -89,6 +89,10 @@ interface ImageEntry {
   preview: string;
 }
 
+// عدد صحيح من 0 فأكثر، كما يشترط الباك إند
+const isValidStock = (value: string) =>
+  value.trim() !== "" && Number.isInteger(Number(value)) && Number(value) >= 0;
+
 const AdminAddProducts = () => {
   const navigate = useNavigate();
   const colorInputRef = useRef<HTMLInputElement | null>(null);
@@ -103,26 +107,36 @@ const AdminAddProducts = () => {
 
   // مصفوفة صور بدل صورة واحدة: كل عنصر يحمل الملف الحقيقي ومعاينته
   const [images, setImages] = useState<ImageEntry[]>([]);
+  // نسخة دائمة التحديث من الصور: يقرؤها التنظيف عند مغادرة الصفحة
+  const imagesRef = useRef<ImageEntry[]>([]);
+  // يُحدَّث بعد كل رسم لا أثناءه: React قد يرسم دون أن يعتمد النتيجة
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
 
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [priceBeforeDiscount, setPriceBeforeDiscount] = useState("");
   const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
   const [mainCategory, setMainCategory] = useState("");
   const [brand, setBrand] = useState("");
-  const [colors, setColors] = useState(["#E52C2C", "#FFFFFF", "#000000"]);
+  // فارغة افتراضيًا: ألوان مسبقة كانت تُحفظ مع كل منتج إن لم يحذفها الأدمن،
+  // فيظهر المنتج بـ "Choose options" ويُطلب من العميل لون قد لا يكون متوفرًا
+  const [colors, setColors] = useState<string[]>([]);
   const [selectedSubCategories, setSelectedSubCategories] = useState<
     ProductOption[]
   >([]);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
-  // يحرر كل معاينات الصور من الذاكرة عند مغادرة الصفحة
+  // يحرر كل معاينات الصور من الذاكرة عند مغادرة الصفحة.
+  // يقرأ imagesRef لا images: images هنا قيمتها من لحظة فتح الصفحة (فارغة)
   useEffect(() => {
     return () => {
-      images.forEach((img) => URL.revokeObjectURL(img.preview));
+      imagesRef.current.forEach((img) => URL.revokeObjectURL(img.preview));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -157,10 +171,13 @@ const AdminAddProducts = () => {
       .finally(() => setLoadingOptions(false));
   }, []);
 
+  const stockInvalid = stock !== "" && !isValidStock(stock);
+
   const canSave =
     productName.trim() !== "" &&
     description.trim() !== "" &&
     price !== "" &&
+    isValidStock(stock) &&
     mainCategory !== "" &&
     brand !== "" &&
     images.length > 0 &&
@@ -208,13 +225,16 @@ const AdminAddProducts = () => {
 
   const handleRemoveImage = (index: number) => {
     setImages((prev) => {
-      URL.revokeObjectURL(prev[index].preview);
+      const target = prev[index];
+      if (target) URL.revokeObjectURL(target.preview);
       return prev.filter((_, i) => i !== index);
     });
   };
 
   const handleSave = async () => {
-    if (!canSave) return;
+    // ref: ضغطتان سريعتان قبل تحديث الـ state كانتا تنشئان منتجين
+    if (!canSave || submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setError("");
 
@@ -224,6 +244,7 @@ const AdminAddProducts = () => {
     formData.append("price", price);
     if (priceBeforeDiscount)
       formData.append("priceBeforeDiscount", priceBeforeDiscount);
+    formData.append("stock", String(Number(stock)));
     formData.append("category", mainCategory);
     formData.append("brand", brand);
     formData.append(
@@ -245,6 +266,7 @@ const AdminAddProducts = () => {
         : "Something went wrong";
       setError(message);
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -294,7 +316,7 @@ const AdminAddProducts = () => {
                   type="button"
                   onClick={() => handleRemoveImage(index)}
                   aria-label={`Remove image ${index + 1}`}
-                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white 
+                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white
                   opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
                   <IconX size={14} />
                 </button>
@@ -311,7 +333,7 @@ const AdminAddProducts = () => {
                 type="button"
                 onClick={handleImagesClick}
                 aria-label="Add product images"
-                className="flex h-[100px] w-[100px] flex-col items-center justify-center gap-1 rounded-xl border border-dashed 
+                className="flex h-[100px] w-[100px] flex-col items-center justify-center gap-1 rounded-xl border border-dashed
                 border-gray-300 bg-slate-50 text-gray-400 transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
                 <ImageIcon sx={{ fontSize: 24 }} />
                 <span className="text-xs">Add image</span>
@@ -346,7 +368,7 @@ const AdminAddProducts = () => {
           />
         </Field>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <Field label="Price before discount" htmlFor="price-before">
             <input
               id="price-before"
@@ -368,6 +390,24 @@ const AdminAddProducts = () => {
               placeholder="0.00"
               className={inputClass}
             />
+          </Field>
+          <Field label="Stock (units available)" htmlFor="stock">
+            <input
+              id="stock"
+              type="number"
+              min="0"
+              step="1"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              placeholder="e.g. 20"
+              aria-invalid={stockInvalid}
+              className={`${inputClass} ${stockInvalid ? "border-red-400" : ""}`}
+            />
+            {stockInvalid && (
+              <span className="text-xs text-red-600">
+                Must be a whole number of 0 or more.
+              </span>
+            )}
           </Field>
         </div>
 
@@ -424,9 +464,10 @@ const AdminAddProducts = () => {
           </select>
         </Field>
 
-        <Field label="Available product colors">
+        <Field label="Available product colors (optional)">
           <p className="text-xs text-gray-400">
-            Click a color to remove it, or add a new one with the + button.
+            Leave empty if the product comes in one color only. Customers must
+            pick a color for products that have colors.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             {colors.map((c) => (
@@ -438,7 +479,8 @@ const AdminAddProducts = () => {
                 title="Click to remove"
                 className="group relative h-8 w-8 rounded-full border border-gray-200 transition-transform hover:scale-110"
                 style={{ backgroundColor: c }}>
-                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity 
+                <span
+                  className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity
                 group-hover:opacity-100">
                   <IconX size={16} className="text-white" />
                 </span>
@@ -448,7 +490,7 @@ const AdminAddProducts = () => {
               type="button"
               onClick={handleAddColor}
               aria-label="Add color"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-gray-300 text-gray-500 
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-gray-300 text-gray-500
               transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
               <IconPlus size={16} />
             </button>
@@ -458,11 +500,11 @@ const AdminAddProducts = () => {
         <div className="flex justify-end">
           <button
             type="button"
-            onClick={handleSave}
+            onClick={() => void handleSave()}
             disabled={!canSave}
-            className="h-10 rounded-lg bg-sky-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-sky-600 
+            className="h-10 rounded-lg bg-sky-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-sky-600
             disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-sky-500">
-            {submitting ? "Saving..." : "Save changes"}
+            {submitting ? "Adding..." : "Add product"}
           </button>
         </div>
       </div>

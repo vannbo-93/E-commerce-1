@@ -1,9 +1,9 @@
 /** @format */
 
 import AdminSideBar from "../../Components/Admin/AdminSideBar";
-import PaginationCompontent from "../../Components/Utility/Pagination";
 import AdminAllOrders from "../../Components/Admin/AdminAllOrders";
 
+// الترقيم داخل AdminAllOrders: هو وحده يعرف عدد الصفحات الحقيقي من الباك إند
 const AdminAllOrdersPage = () => {
   return (
     <div className="w-full px-4">
@@ -13,7 +13,6 @@ const AdminAllOrdersPage = () => {
         </div>
         <div className="min-w-0 flex-1">
           <AdminAllOrders />
-          <PaginationCompontent />
         </div>
       </div>
     </div>

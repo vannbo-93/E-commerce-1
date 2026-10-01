@@ -88,6 +88,10 @@ type ImageSlot =
   | { kind: "existing"; url: string }
   | { kind: "new"; file: File; preview: string };
 
+// عدد صحيح من 0 فأكثر، كما يشترط الباك إند
+const isValidStock = (value: string) =>
+  value.trim() !== "" && Number.isInteger(Number(value)) && Number(value) >= 0;
+
 const EditProduct = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -104,10 +108,18 @@ const EditProduct = () => {
   const [loadError, setLoadError] = useState("");
 
   const [images, setImages] = useState<ImageSlot[]>([]);
+  // نسخة دائمة التحديث من الصور: يقرؤها التنظيف عند مغادرة الصفحة
+  const imagesRef = useRef<ImageSlot[]>([]);
+  // يُحدَّث بعد كل رسم لا أثناءه: React قد يرسم دون أن يعتمد النتيجة
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
+
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [priceBeforeDiscount, setPriceBeforeDiscount] = useState("");
   const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
   const [mainCategory, setMainCategory] = useState("");
   const [brand, setBrand] = useState("");
   const [colors, setColors] = useState<string[]>([]);
@@ -116,15 +128,16 @@ const EditProduct = () => {
   >([]);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
-  // يحرر معاينات الصور الجديدة فقط (الروابط القديمة ليست Object URLs، لا تحتاج تحريرًا)
+  // يحرر معاينات الصور الجديدة فقط عند مغادرة الصفحة.
+  // يقرأ imagesRef لا images: images هنا قيمتها من لحظة فتح الصفحة (فارغة)
   useEffect(() => {
     return () => {
-      images.forEach((img) => {
+      imagesRef.current.forEach((img) => {
         if (img.kind === "new") URL.revokeObjectURL(img.preview);
       });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -172,6 +185,8 @@ const EditProduct = () => {
         setPriceBeforeDiscount(
           p.priceBeforeDiscount ? String(p.priceBeforeDiscount) : "",
         );
+        // منتج قديم بلا حقل stock يظهر 0، فيعرف الأدمن أنه نافد
+        setStock(String(p.stock ?? 0));
         setMainCategory(p.category?._id ?? "");
         setBrand(p.brand?._id ?? "");
         setColors(p.colors ?? []);
@@ -189,10 +204,13 @@ const EditProduct = () => {
       .finally(() => setLoadingProduct(false));
   }, [id]);
 
+  const stockInvalid = stock !== "" && !isValidStock(stock);
+
   const canSave =
     productName.trim() !== "" &&
     description.trim() !== "" &&
     price !== "" &&
+    isValidStock(stock) &&
     mainCategory !== "" &&
     brand !== "" &&
     images.length > 0 &&
@@ -235,27 +253,31 @@ const EditProduct = () => {
   const handleRemoveImage = (index: number) => {
     setImages((prev) => {
       const img = prev[index];
-      if (img.kind === "new") URL.revokeObjectURL(img.preview);
+      if (img?.kind === "new") URL.revokeObjectURL(img.preview);
       return prev.filter((_, i) => i !== index);
     });
   };
 
   const handleSave = async () => {
-    if (!canSave || !id) return;
+    // ref: ضغطتان سريعتان قبل تحديث الـ state كانتا ترسلان طلبين
+    if (!canSave || !id || submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setError("");
 
-    const existingImages = images
-      .filter((i) => i.kind === "existing")
-      .map((i) => i.url);
-    const newFiles = images.filter((i) => i.kind === "new").map((i) => i.file);
+    const existingImages = images.flatMap((i) =>
+      i.kind === "existing" ? [i.url] : [],
+    );
+    const newFiles = images.flatMap((i) => (i.kind === "new" ? [i.file] : []));
 
     const formData = new FormData();
     formData.append("name", productName.trim());
     formData.append("description", description.trim());
     formData.append("price", price);
-    if (priceBeforeDiscount)
-      formData.append("priceBeforeDiscount", priceBeforeDiscount);
+    // يُرسل دائمًا، حتى فارغًا: الفارغ يعني "أزل الخصم" في الباك إند.
+    // سابقًا لم يكن يُرسل حين يُمسح، فكان الخصم القديم يبقى إلى الأبد
+    formData.append("priceBeforeDiscount", priceBeforeDiscount.trim());
+    formData.append("stock", String(Number(stock)));
     formData.append("category", mainCategory);
     formData.append("brand", brand);
     formData.append(
@@ -277,6 +299,7 @@ const EditProduct = () => {
         : "Something went wrong";
       setError(message);
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -293,6 +316,8 @@ const EditProduct = () => {
       <div className="py-10 text-center text-sm text-red-600">{loadError}</div>
     );
   }
+
+  const stockNumber = Number(stock);
 
   return (
     <div className="w-full">
@@ -339,7 +364,7 @@ const EditProduct = () => {
                   type="button"
                   onClick={() => handleRemoveImage(index)}
                   aria-label={`Remove image ${index + 1}`}
-                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white 
+                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white
                   opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
                   <IconX size={14} />
                 </button>
@@ -356,7 +381,7 @@ const EditProduct = () => {
                 type="button"
                 onClick={handleImagesClick}
                 aria-label="Add product images"
-                className="flex h-[100px] w-[100px] flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300 
+                className="flex h-[100px] w-[100px] flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300
                 bg-slate-50 text-gray-400 transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
                 <ImageIcon sx={{ fontSize: 24 }} />
                 <span className="text-xs">Add image</span>
@@ -385,7 +410,7 @@ const EditProduct = () => {
           />
         </Field>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <Field label="Price before discount" htmlFor="price-before">
             <input
               id="price-before"
@@ -393,8 +418,12 @@ const EditProduct = () => {
               min="0"
               value={priceBeforeDiscount}
               onChange={(e) => setPriceBeforeDiscount(e.target.value)}
+              placeholder="No discount"
               className={inputClass}
             />
+            <span className="text-xs text-gray-400">
+              Clear this field to end the discount.
+            </span>
           </Field>
           <Field label="Product price" htmlFor="price">
             <input
@@ -405,6 +434,27 @@ const EditProduct = () => {
               onChange={(e) => setPrice(e.target.value)}
               className={inputClass}
             />
+          </Field>
+          <Field label="Stock (units available)" htmlFor="stock">
+            <input
+              id="stock"
+              type="number"
+              min="0"
+              step="1"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              aria-invalid={stockInvalid}
+              className={`${inputClass} ${stockInvalid ? "border-red-400" : ""}`}
+            />
+            {stockInvalid ? (
+              <span className="text-xs text-red-600">
+                Must be a whole number of 0 or more.
+              </span>
+            ) : stock !== "" && stockNumber === 0 ? (
+              <span className="text-xs text-amber-600">
+                Out of stock: customers can't order this product.
+              </span>
+            ) : null}
           </Field>
         </div>
 
@@ -460,13 +510,18 @@ const EditProduct = () => {
           </select>
         </Field>
 
-        <Field label="Available product colors">
+        <Field label="Available product colors (optional)">
+          <p className="text-xs text-gray-400">
+            Leave empty if the product comes in one color only. Customers must
+            pick a color for products that have colors.
+          </p>
           <div className="flex flex-wrap items-center gap-3">
             {colors.map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => handleRemoveColor(c)}
+                aria-label={`Remove color ${c}`}
                 title="Click to remove"
                 className="group relative h-8 w-8 rounded-full border border-gray-200 transition-transform hover:scale-110"
                 style={{ backgroundColor: c }}>
@@ -478,7 +533,8 @@ const EditProduct = () => {
             <button
               type="button"
               onClick={handleAddColor}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-gray-300 text-gray-500 transition-colors 
+              aria-label="Add color"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-gray-300 text-gray-500 transition-colors
               hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
               <IconPlus size={16} />
             </button>
@@ -488,9 +544,9 @@ const EditProduct = () => {
         <div className="flex justify-end">
           <button
             type="button"
-            onClick={handleSave}
+            onClick={() => void handleSave()}
             disabled={!canSave}
-            className="h-10 rounded-lg bg-sky-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed 
+            className="h-10 rounded-lg bg-sky-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed
             disabled:opacity-50 disabled:hover:bg-sky-500">
             {submitting ? "Saving..." : "Save changes"}
           </button>
