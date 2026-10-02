@@ -5,7 +5,7 @@ import {
   addToWishlist,
   removeFromWishlist,
 } from "../services/wishlistService.js";
-import { handleError } from "../utils/HandleError.js";
+import { handleError } from "../utils/handleError.js";
 
 // كل المسارات خلف protect، فـ req.user موجود دائمًا هنا
 

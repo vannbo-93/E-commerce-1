@@ -6,8 +6,8 @@ import {
   updateCartItemQuantity,
   removeCartItem,
   clearCart,
-} from "../services/CartService.js";
-import { handleError } from "../utils/HandleError.js";
+} from "../services/cartService.js";
+import { handleError } from "../utils/handleError.js";
 
 // كل المسارات خلف protect، فـ req.user موجود دائمًا هنا
 
