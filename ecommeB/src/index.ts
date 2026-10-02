@@ -26,6 +26,7 @@ import contactRoute from "./routes/contactRoute.js";
 import addressRoute from "./routes/addressRoute.js";
 import orderRoute from "./routes/orderRoute.js";
 import { AppError } from "./utils/AppError.js";
+import { apiLimiter } from "./middlewares/rateLimiters.js";
 
 // ===================== المتغيرات الإلزامية =====================
 
@@ -92,6 +93,9 @@ app.get("/health", (_req, res) => {
   const dbReady = mongoose.connection.readyState === 1;
   res.status(dbReady ? 200 : 503).json({ status: dbReady ? "ok" : "db-down" });
 });
+
+// حد عام لكل المسارات التالية (فحص الصحة أعلاه مستثنى منه)
+app.use(apiLimiter);
 
 app.use("/user", userRoute);
 app.use("/category", categoryRoute);

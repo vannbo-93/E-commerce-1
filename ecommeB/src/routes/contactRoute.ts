@@ -8,11 +8,12 @@ import {
 } from "../controllers/contactController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import { requireAdmin } from "../middlewares/requireAdmin.js";
+import { contactLimiter } from "../middlewares/rateLimiters.js";
 
 const router = Router();
 
 // عام: الزائر يستطيع التواصل دون حساب
-router.post("/", submitContactMessage);
+router.post("/", contactLimiter, submitContactMessage);
 
 // الأدمن: قراءة الرسائل وإدارتها
 router.get("/admin", protect, requireAdmin, getContactMessages);

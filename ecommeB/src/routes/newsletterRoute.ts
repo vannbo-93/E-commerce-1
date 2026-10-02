@@ -7,13 +7,14 @@ import {
   showUnsubscribePage,
   unsubscribeNewsletter,
 } from "../controllers/newsletterController.js";
+import { newsletterLimiter } from "../middlewares/rateLimiters.js";
 
 const router = Router();
 
 // كل المسارات عامة: صاحب البريد لا يحتاج حسابًا في المتجر
 
 // الاشتراك من نموذج الصفحة الرئيسية
-router.post("/", subscribeToNewsletter);
+router.post("/", newsletterLimiter, subscribeToNewsletter);
 
 // رابط التأكيد في البريد: GET يعرض زرًا، POST ينفّذ
 router.get("/confirm", showConfirmPage);
