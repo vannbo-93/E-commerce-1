@@ -11,12 +11,18 @@ import { handleError } from "../utils/handleError.js";
 
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 أيام، بالمللي ثانية
 
-// نفس الخيارات للضبط والمسح: بعض المتصفحات تتجاهل المسح إن اختلفت
-const cookieOptions = (): CookieOptions => ({
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // false محليًا (http)، true عند النشر (https)
-  sameSite: "lax",
-});
+// نفس الخيارات للضبط والمسح: بعض المتصفحات تتجاهل المسح إن اختلفت.
+// في الإنتاج: الفرونت إند والباك إند على نطاقين مختلفين (Vercel و Render مثلًا)،
+// والمتصفح لا يرسل كوكي "lax" عبر نطاقين، فلا يعمل تسجيل الدخول أبدًا.
+// "none" يسمح بذلك، ويشترط secure (HTTPS). محليًا يبقى "lax" لأن جهازك على HTTP
+const cookieOptions = (): CookieOptions => {
+  const isProduction = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  };
+};
 
 const setAuthCookie = (res: Response, token: string) => {
   res.cookie("token", token, { ...cookieOptions(), maxAge: COOKIE_MAX_AGE });

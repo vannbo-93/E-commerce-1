@@ -67,10 +67,17 @@ const addressSchema = new Schema<IAddress>(
 );
 
 // عنوان افتراضي واحد فقط لكل مستخدم، مضمون على مستوى قاعدة البيانات نفسها:
-// الفهرس الفريد يُطبَّق فقط على المستندات التي isDefault فيها true
+// الفهرس الفريد يُطبَّق فقط على المستندات التي isDefault فيها true.
+// المفتاح { user, isDefault } لا { user } وحده: الحقل user عليه فهرس عادي أصلًا
+// (index: true)، وفهرسان بنفس المفتاح يأخذان نفس الاسم، فيُرفض الثاني بصمت.
+// والاسم صريح لنفس السبب
 addressSchema.index(
-  { user: 1 },
-  { unique: true, partialFilterExpression: { isDefault: true } },
+  { user: 1, isDefault: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { isDefault: true },
+    name: "one_default_address_per_user",
+  },
 );
 
 const Address: Model<IAddress> = model<IAddress>("Address", addressSchema);
