@@ -6,7 +6,10 @@ import {
   getCurrentUser,
   updateProfile,
   changePassword,
+  setAvatar,
+  removeAvatar,
 } from "../services/userService.js";
+import { saveImage, deleteImage } from "../utils/imageStorage.js";
 import { handleError } from "../utils/handleError.js";
 
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 أيام، بالمللي ثانية
@@ -113,6 +116,33 @@ export const changeMyPassword = async (req: Request, res: Response) => {
     // الكوكي القديم أصبح مرفوضًا: نستبدله بالتوكن الجديد فيبقى المستخدم مسجّلًا هنا
     setAuthCookie(res, token);
     res.status(200).json({ message: "Password changed successfully", user });
+  } catch (err) {
+    handleError(err, res);
+  }
+};
+
+// PATCH /user/me/avatar — رفع صورة شخصية (حقل "avatar" في multipart/form-data)
+export const uploadMyAvatar = async (req: Request, res: Response) => {
+  let saved = "";
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Please choose an image" });
+    }
+    saved = await saveImage(req.file);
+    const user = await setAvatar(req.user!.id, saved);
+    res.status(200).json({ message: "Photo updated", user });
+  } catch (err) {
+    // فشل الحفظ بعد رفع الصورة: لم تعد مرتبطة بأي حساب
+    if (saved) await deleteImage(saved);
+    handleError(err, res);
+  }
+};
+
+// DELETE /user/me/avatar — العودة للحروف الأولى
+export const deleteMyAvatar = async (req: Request, res: Response) => {
+  try {
+    const user = await removeAvatar(req.user!.id);
+    res.status(200).json({ message: "Photo removed", user });
   } catch (err) {
     handleError(err, res);
   }

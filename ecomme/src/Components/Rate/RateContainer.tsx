@@ -1,9 +1,8 @@
 /** @format */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import RateItem from "./RateItem";
 import RatePost from "./RatePost";
 import RatingBadge from "./RatingBadge";
-import PaginationComponent from "../Utility/Pagination";
 import api from "../../Api/baseURL";
 import { useAuth } from "../../context/AuthContext";
 import { isAxiosError } from "axios";
@@ -12,7 +11,8 @@ interface RawReview {
   _id: string;
   rating: number;
   comment: string;
-  user: { _id: string; username: string } | null;
+  user: { _id: string; username: string; avatar?: string } | null;
+  verified?: boolean;
 }
 
 interface RateContainerProps {
@@ -31,8 +31,12 @@ const RateContainer = ({ productId }: RateContainerProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [widgetKey, setWidgetKey] = useState(0);
 
+  // حماية متزامنة من الإرسال المزدوج: الـ state لا يتحدّث فورًا بين نقرتين سريعتين
+  const submittingRef = useRef(false);
+
   const fetchReviews = () => {
     setLoading(true);
+    setError("");
     api
       .get(`/review/product/${productId}`)
       .then((res) => setReviews(res.data.reviews))
@@ -41,7 +45,7 @@ const RateContainer = ({ productId }: RateContainerProps) => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line -- استدعاء ضروري عند تحميل المكوّن أو تغيّر productId، نفس النمط المطبَّق في ProductDetails.tsx
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- جلب التقييمات عند التحميل أو تغيّر productId
     fetchReviews();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchReviews تُعاد إنشاؤها كل رسم، إضافتها للمصفوفة تُسبّب حلقة لا نهائية
   }, [productId]);
@@ -52,7 +56,9 @@ const RateContainer = ({ productId }: RateContainerProps) => {
       : 0;
 
   const handleSubmit = async () => {
-    if (userRating === 0 || comment.trim() === "" || submitting) return;
+    if (userRating === 0 || comment.trim() === "" || submittingRef.current)
+      return;
+    submittingRef.current = true;
     setSubmitting(true);
     setError("");
 
@@ -71,12 +77,14 @@ const RateContainer = ({ productId }: RateContainerProps) => {
         : "Something went wrong";
       setError(message);
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
 
   const handleDeleteReview = async (reviewId: string) => {
     const previous = reviews;
+    setError("");
     setReviews((prev) => prev.filter((r) => r._id !== reviewId));
 
     try {
@@ -122,16 +130,15 @@ const RateContainer = ({ productId }: RateContainerProps) => {
             onChange={(e) => setComment(e.target.value)}
             placeholder="Write your comment..."
             rows={3}
-            className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900 
-            placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40"
+            maxLength={1000}
+            className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40"
           />
 
           <button
             type="button"
             onClick={handleSubmit}
             disabled={userRating === 0 || comment.trim() === "" || submitting}
-            className="self-start rounded-lg bg-sky-500 px-6 py-2 text-sm font-semibold text-white transition-colors 
-            hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-sky-500">
+            className="self-start rounded-lg bg-sky-500 px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-sky-500">
             {submitting ? "Posting..." : "Leave a comment"}
           </button>
         </>
@@ -159,18 +166,21 @@ const RateContainer = ({ productId }: RateContainerProps) => {
             <RateItem
               key={review._id}
               name={review.user?.username ?? "Unknown user"}
+              {...(review.user?.avatar ? { avatar: review.user.avatar } : {})}
+              verified={review.verified === true}
               score={review.rating}
               description={review.comment}
+              // !!user أولًا: بدونه يصبح undefined === undefined صحيحًا لزائر أمام تقييم بلا مستخدم
               canDelete={
-                user?.role === "admin" || user?.id === review.user?._id
+                !!user &&
+                (user.role === "admin" ||
+                  (!!review.user && user.id === review.user._id))
               }
               onDelete={() => handleDeleteReview(review._id)}
             />
           ))}
         </div>
       )}
-
-      <PaginationComponent />
     </div>
   );
 };

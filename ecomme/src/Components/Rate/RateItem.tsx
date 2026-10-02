@@ -1,32 +1,30 @@
 /** @format */
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { BadgeCheck, Trash2 } from "lucide-react";
 import RatingBadge from "./RatingBadge";
 import { ConfirmDialog } from "../Utility/AppAlerts";
+import UserAvatar from "../Utility/UserAvatar";
 
 interface RateItemProps {
   name: string;
+  avatar?: string;
   score: number;
   description: string;
+  verified?: boolean;
   canDelete?: boolean;
   onDelete?: () => void;
 }
 
 const RateItem = ({
   name,
+  avatar,
   score,
   description,
+  verified = false,
   canDelete = false,
   onDelete,
 }: RateItemProps) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  const initials = name
-    .split(" ")
-    .map((word) => word[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 
   const handleConfirm = () => {
     setConfirmOpen(false);
@@ -35,18 +33,19 @@ const RateItem = ({
 
   return (
     <div className="flex gap-3 py-4">
-      <div
-        aria-hidden="true"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full 
-        bg-sky-50 text-xs font-bold text-sky-600">
-        {initials}
-      </div>
+      <UserAvatar name={name} src={avatar} size={36} />
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-semibold text-gray-900">{name}</span>
             <RatingBadge score={score} />
+            {verified && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700">
+                <BadgeCheck size={14} />
+                Verified buyer
+              </span>
+            )}
           </div>
 
           {canDelete && (
@@ -54,7 +53,7 @@ const RateItem = ({
               type="button"
               onClick={() => setConfirmOpen(true)}
               aria-label={`Delete review by ${name}`}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-gray-400 
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-gray-400
               transition-colors hover:bg-red-50 hover:text-red-500">
               <Trash2 size={15} />
             </button>

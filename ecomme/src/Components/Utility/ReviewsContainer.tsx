@@ -10,11 +10,13 @@ interface ReviewsContainerProps {
   pathText?: string;
 }
 
+// نفس شكل رد الباك إند (reviewService.ts → ReviewResponse)
 interface RawReview {
   _id: string;
   rating: number;
   comment: string;
-  user: { _id: string; username: string } | null;
+  user: { _id: string; username: string; avatar?: string } | null;
+  verified?: boolean;
 }
 
 const ReviewsContainer = ({
@@ -26,14 +28,23 @@ const ReviewsContainer = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     api
       .get("/review/featured")
-      .then((res) => setReviews(res.data.reviews))
-      .catch(() => setReviews([]))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (!cancelled) setReviews(res.data.reviews ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setReviews([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // لا يوجد نظام تحقق من الشراء الفعلي بعد، فلا نعرض شارة "Verified Buyer" كاذبة
   if (loading || reviews.length === 0) return null;
 
   return (
@@ -47,9 +58,11 @@ const ReviewsContainer = ({
           <ReviewCard
             key={item._id}
             name={item.user?.username ?? "Anonymous"}
+            {...(item.user?.avatar ? { avatar: item.user.avatar } : {})}
             rating={item.rating}
             review={item.comment}
-            verified={false}
+            // من الباك إند: كاتب التقييم استلم طلبًا فيه هذا المنتج
+            verified={item.verified === true}
           />
         ))}
       </div>

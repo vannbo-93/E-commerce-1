@@ -1,25 +1,36 @@
 /** @format */
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { CircleUser, Heart, LayoutDashboard, LogIn, LogOut, MapPin, Package, User, UserPlus,
+import {
+  CircleUser,
+  Heart,
+  LayoutDashboard,
+  LogIn,
+  LogOut,
+  MapPin,
+  Package,
+  User,
+  UserPlus,
 } from "lucide-react";
+import UserAvatar from "./UserAvatar";
 
 interface AccountMenuProps {
-  user?: { name: string; email?: string } | null; // null = زائر غير مسجّل
+  // null = زائر غير مسجّل
+  user?: { name: string; email?: string; avatar?: string | undefined } | null;
   isAdmin?: boolean;
   onLogout?: () => void;
 }
 
-// عدّل المسارات حسب صفحاتك
+// المسارات مطابقة لـ App.tsx (ثلاثة منها كانت تقود إلى "Page not found")
 const userItems = [
   { label: "My Profile", path: "/user/profile", icon: User },
-  { label: "My Orders", path: "/user/orders", icon: Package },
-  { label: "Wishlist", path: "/user/favorite", icon: Heart },
-  { label: "Addresses", path: "/user/addresses", icon: MapPin },
+  { label: "My Orders", path: "/user/allorders", icon: Package },
+  { label: "Wishlist", path: "/user/favoriteproducts", icon: Heart },
+  { label: "Addresses", path: "/user/address", icon: MapPin },
 ];
 
 const itemClass =
-  "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-sky-500";
+  "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 no-underline transition-colors hover:bg-gray-100 hover:text-sky-500";
 
 const AccountMenu = ({
   user = null,
@@ -58,26 +69,34 @@ const AccountMenu = ({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 
+        className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100
         hover:text-sky-500">
-        <CircleUser size={24} />
+        {/* المسجّل يرى صورته (أو حروفه الأولى)، والزائر الأيقونة العامة */}
+        {user ? (
+          <UserAvatar name={user.name} src={user.avatar} size={32} />
+        ) : (
+          <CircleUser size={24} />
+        )}
       </button>
 
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-2 w-60 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
+          className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
           {user ? (
             <>
-              <div className="border-b border-gray-100 px-3 pb-3 pt-2">
-                <div className="truncate text-sm font-semibold text-gray-900">
-                  {user.name}
-                </div>
-                {user.email ? (
-                  <div className="truncate text-xs text-gray-500">
-                    {user.email}
+              <div className="flex items-center gap-3 border-b border-gray-100 px-3 pb-3 pt-2">
+                <UserAvatar name={user.name} src={user.avatar} size={40} />
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-gray-900">
+                    {user.name}
                   </div>
-                ) : null}
+                  {user.email ? (
+                    <div className="truncate text-xs text-gray-500">
+                      {user.email}
+                    </div>
+                  ) : null}
+                </div>
               </div>
 
               <div className="py-2">
@@ -95,7 +114,7 @@ const AccountMenu = ({
 
                 {isAdmin ? (
                   <Link
-                    to="/admin/allproducts"
+                    to="/admin/allorders"
                     role="menuitem"
                     onClick={close}
                     className={itemClass}>

@@ -8,6 +8,8 @@ export interface IUser extends Document {
   email: string;
   password: string; // يخزّن الهاش، لا كلمة المرور الصريحة أبدًا
   role: "user" | "admin";
+  // رابط الصورة الشخصية (Cloudinary أو محلي). فارغ = تُعرض الحروف الأولى بلون ثابت
+  avatar: string;
   // آخر تغيير لكلمة المرور: أي توكن صدر قبله يُرفض في protect
   passwordChangedAt?: Date | undefined;
   comparePassword: (candidate: string) => Promise<boolean>;
@@ -43,6 +45,10 @@ const userSchema = new Schema<IUser>(
     },
     passwordChangedAt: {
       type: Date,
+    },
+    avatar: {
+      type: String,
+      default: "",
     },
   },
   { timestamps: true },

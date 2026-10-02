@@ -2,6 +2,7 @@
 import User, { type IUser } from "../models/userModel.js";
 import { generateToken } from "../utils/generateToken.js";
 import { AppError } from "../utils/AppError.js";
+import { deleteImage } from "../utils/imageStorage.js";
 
 export interface RegisterInput {
   username: string;
@@ -20,6 +21,7 @@ export interface SafeUser {
   username: string;
   email: string;
   role: "user" | "admin";
+  avatar: string;
 }
 
 const toSafeUser = (user: IUser): SafeUser => ({
@@ -27,6 +29,7 @@ const toSafeUser = (user: IUser): SafeUser => ({
   username: user.username,
   email: user.email,
   role: user.role,
+  avatar: user.avatar ?? "",
 });
 
 const isDuplicateKeyError = (err: unknown) =>
@@ -161,4 +164,46 @@ export const changePassword = async (
   // توكن جديد للجلسة الحالية: كل الجلسات الأخرى أصبحت مرفوضة في protect
   const token = generateToken({ id: user._id.toString(), role: user.role });
   return { user: toSafeUser(user), token };
+};
+
+// يضع صورة جديدة، ويحذف القديمة بعد نجاح الحفظ فقط
+export const setAvatar = async (
+  id: string,
+  avatarUrl: string,
+): Promise<SafeUser> => {
+  const previous = await User.findById(id).select("avatar");
+  if (!previous) {
+    throw new AppError("User not found", 404);
+  }
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    { avatar: avatarUrl },
+    { new: true },
+  );
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  if (previous.avatar && previous.avatar !== avatarUrl) {
+    await deleteImage(previous.avatar);
+  }
+  return toSafeUser(user);
+};
+
+export const removeAvatar = async (id: string): Promise<SafeUser> => {
+  const previous = await User.findById(id).select("avatar");
+  if (!previous) {
+    throw new AppError("User not found", 404);
+  }
+
+  const user = await User.findByIdAndUpdate(id, { avatar: "" }, { new: true });
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  if (previous.avatar) {
+    await deleteImage(previous.avatar);
+  }
+  return toSafeUser(user);
 };

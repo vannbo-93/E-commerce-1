@@ -1,9 +1,10 @@
 /** @format */
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { isAxiosError } from "axios";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import api from "../../Api/baseURL";
 import { useAuth, type AuthUser } from "../../context/AuthContext";
+import UserAvatar from "../Utility/UserAvatar";
 
 const inputClass =
   "w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 disabled:cursor-not-allowed disabled:opacity-60";
@@ -29,6 +30,123 @@ const Feedback = ({ status, text }: { status: Status; text: string }) =>
       {text}
     </p>
   ) : null;
+
+// ===== الصورة الشخصية =====
+
+const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const AVATAR_MAX_BYTES = 2 * 1024 * 1024; // نفس حد الباك إند
+
+const PhotoForm = ({ user }: { user: AuthUser }) => {
+  const { login } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [busy, setBusy] = useState<"upload" | "remove" | null>(null);
+  const [status, setStatus] = useState<Status>("idle");
+  const [text, setText] = useState("");
+
+  const run = async (
+    kind: "upload" | "remove",
+    request: () => Promise<AuthUser>,
+  ) => {
+    setBusy(kind);
+    setStatus("idle");
+    setText("");
+    try {
+      // يحدّث المستخدم في AuthContext: الصورة تتغير فورًا في الـ NavBar أيضًا
+      login(await request());
+      setStatus("success");
+      setText(kind === "upload" ? "Photo updated." : "Photo removed.");
+    } catch (err) {
+      setStatus("error");
+      setText(errorMessage(err));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // يسمح باختيار نفس الملف مجددًا
+    if (!file) return;
+
+    // تحقق مسبق: رسالة فورية بدل انتظار رفض الباك إند
+    if (!AVATAR_TYPES.includes(file.type)) {
+      setStatus("error");
+      setText("Please choose a JPEG, PNG or WEBP image.");
+      return;
+    }
+    if (file.size > AVATAR_MAX_BYTES) {
+      setStatus("error");
+      setText("Image is too large (maximum 2 MB).");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+    void run("upload", async () => {
+      const res = await api.patch("/user/me/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res.data.user;
+    });
+  };
+
+  const handleRemove = () =>
+    run("remove", async () => {
+      const res = await api.delete("/user/me/avatar");
+      return res.data.user;
+    });
+
+  return (
+    <section className={cardClass}>
+      <h2 className="text-lg font-semibold text-gray-900">Profile photo</h2>
+
+      <div className="mt-4 flex flex-wrap items-center gap-5">
+        <div className={`relative ${busy ? "opacity-60" : ""}`}>
+          <UserAvatar name={user.username} src={user.avatar} size={80} />
+          {busy === "upload" && (
+            <span className="absolute inset-0 flex items-center justify-center rounded-full bg-white/60 text-xs font-medium 
+            text-gray-700">
+              Uploading...
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={AVATAR_TYPES.join(",")}
+              onChange={handleFile}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={busy !== null}
+              className={buttonClass}>
+              {user.avatar ? "Change photo" : "Upload photo"}
+            </button>
+            {user.avatar && (
+              <button
+                type="button"
+                onClick={() => void handleRemove()}
+                disabled={busy !== null}
+                className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors 
+                hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                {busy === "remove" ? "Removing..." : "Remove"}
+              </button>
+            )}
+          </div>
+          <span className="text-xs text-gray-400">
+            JPEG, PNG or WEBP, up to 2 MB. Shown next to your reviews.
+          </span>
+          <Feedback status={status} text={text} />
+        </div>
+      </div>
+    </section>
+  );
+};
 
 // ===== بيانات الحساب =====
 
@@ -173,8 +291,8 @@ const PasswordField = ({
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center 
-          justify-center rounded-md text-gray-400 hover:text-gray-600">
+          className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md 
+          text-gray-400 hover:text-gray-600">
           {visible ? <IconEyeOff size={18} /> : <IconEye size={18} />}
         </button>
       </div>
@@ -293,6 +411,7 @@ const UserProfile = () => {
   return (
     <div className="flex flex-col gap-5">
       <h1 className="text-xl font-bold text-gray-900">Profile</h1>
+      <PhotoForm user={user} />
       {/* key: يعيد ضبط النموذج إن تغيّر المستخدم (تسجيل دخول بحساب آخر) */}
       <AccountForm key={user.id} user={user} />
       <PasswordForm />

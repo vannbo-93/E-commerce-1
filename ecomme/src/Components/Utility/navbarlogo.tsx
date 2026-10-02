@@ -1,14 +1,15 @@
 /** @format */
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Heart, Menu, Search, ShoppingCart, X } from "lucide-react";
+import { Heart, Menu, ShoppingCart, X } from "lucide-react";
 import shop from "../../../src/images/Logo/shop.png";
 import AccountMenu from "./AccountMenu";
+import SearchBox from "./SearchBox";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 
-// مسار واحد لصفحة المنتجات، يُستخدم في الروابط والبحث معًا
+// مسار صفحة المنتجات (البحث في SearchBox.tsx يستخدم نفس المسار)
 // عدّله إن كان المسار الفعلي في الـ Router مختلفًا
 const PRODUCTS_PATH = "/products";
 
@@ -29,17 +30,8 @@ function NavBarLogo() {
   const favoritesCount = wishlistIds.size;
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [query, setQuery] = useState("");
 
   const closeMenu = () => setMenuOpen(false);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) return;
-    navigate(`${PRODUCTS_PATH}?search=${encodeURIComponent(q)}`);
-    closeMenu();
-  };
 
   const handleLogout = async () => {
     try {
@@ -54,25 +46,6 @@ function NavBarLogo() {
     `text-sm font-medium transition-colors duration-200 hover:text-sky-500 ${
       isActive ? "text-sky-500" : "text-gray-700"
     }`;
-
-  const searchForm = (className: string) => (
-    <form onSubmit={handleSearch} role="search" className={className}>
-      <Search
-        size={16}
-        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-      />
-      <input
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search"
-        aria-label="Search products"
-        className="w-full rounded-lg border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-sm
-        text-gray-900 outline-none
-        transition-colors placeholder:text-gray-400 focus:border-sky-400"
-      />
-    </form>
-  );
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
@@ -97,7 +70,7 @@ function NavBarLogo() {
 
         {/* الجهة اليمنى */}
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          {searchForm("relative hidden w-40 md:block lg:w-64")}
+          <SearchBox className="hidden w-40 md:block lg:w-64" />
 
           <Link
             to="/user/favoriteproducts"
@@ -131,7 +104,15 @@ function NavBarLogo() {
           </Link>
 
           <AccountMenu
-            user={user ? { name: user.username, email: user.email } : null}
+            user={
+              user
+                ? {
+                    name: user.username,
+                    email: user.email,
+                    avatar: user.avatar,
+                  }
+                : null
+            }
             isAdmin={user?.role === "admin"}
             onLogout={handleLogout}
           />
@@ -152,7 +133,7 @@ function NavBarLogo() {
       {/* قائمة الموبايل */}
       {menuOpen ? (
         <div className="absolute left-0 right-0 top-full border-b border-gray-200 bg-white px-4 pb-4 pt-3 shadow-md md:hidden">
-          {searchForm("relative mb-3")}
+          <SearchBox className="mb-3" onNavigate={closeMenu} />
           <div className="flex flex-col">
             {navItems.map((item) => (
               <NavLink

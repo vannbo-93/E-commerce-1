@@ -26,11 +26,7 @@ const HomePage = () => {
         btntitle="View All"
         pathText="/products"
       />
-      <BrandFeatured
-        title="Top Brands"
-        btntitle="View All"
-        pathText="/allbrand"
-      />
+      <BrandFeatured title="Top Brands" />
       <ReviewsContainer title="Customer Reviews" />
       <Newsletter />
     </>

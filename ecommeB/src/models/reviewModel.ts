@@ -6,6 +6,8 @@ export interface IReview extends Document {
   user: Types.ObjectId;
   rating: number;
   comment: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const reviewSchema = new Schema<IReview>(
