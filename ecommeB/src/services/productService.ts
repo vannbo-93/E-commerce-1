@@ -5,8 +5,7 @@ import Category from "../models/categoryModel.js";
 import Brand from "../models/brandModel.js";
 import SubCategory from "../models/subCategoryModel.js";
 import { AppError } from "../utils/AppError.js";
-import fs from "fs";
-import path from "path";
+import { deleteImages } from "../utils/imageStorage.js";
 
 export interface CreateProductInput {
   name: string;
@@ -316,16 +315,6 @@ export const deleteProduct = async (id: string): Promise<void> => {
     throw new AppError("Product not found", 404);
   }
 
-  // يحذف كل ملفات الصور المرتبطة، لا صورة واحدة فقط
-  for (const imageUrl of product.images) {
-    try {
-      const filename = path.basename(imageUrl);
-      const filePath = path.join("uploads", filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    } catch (err) {
-      console.error("Failed to delete product image file:", imageUrl, err);
-    }
-  }
+  // يحذف كل صور المنتج، من Cloudinary أو من القرص بحسب رابط كل صورة
+  await deleteImages(product.images);
 };

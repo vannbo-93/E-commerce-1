@@ -1,23 +1,12 @@
 /** @format */
 import multer from "multer";
-import path from "path";
-import fs from "fs";
+import type { Request, Response, NextFunction } from "express";
 
-const UPLOAD_DIR = "uploads";
-
-// ينشئ المجلد تلقائيًا إن لم يكن موجودًا، بدل أن يفشل multer بصمت
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR);
-}
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-  filename: (_req, file, cb) => {
-    // اسم فريد يمنع تصادم الملفات: الوقت الحالي + امتداد الملف الأصلي
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
-  },
-});
+// الصور تُحفظ في الذاكرة مؤقتًا، لا على القرص مباشرة.
+// imageStorage.ts يقرر بعدها: Cloudinary في الإنتاج، أو مجلد uploads/ محليًا.
+// وفائدة إضافية: لا تُكتب أي صورة قبل نجاح التحقق من باقي النموذج،
+// فالطلب الناقص لم يعد يترك ملفات يتيمة
+const storage = multer.memoryStorage();
 
 const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
   const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -37,9 +26,9 @@ export const upload = multer({
 // إلى أي معالج أخطاء عام آخر في المشروع، ويعيد رسالة JSON واضحة بدلها
 export const handleUploadError = (
   err: unknown,
-  _req: import("express").Request,
-  res: import("express").Response,
-  next: import("express").NextFunction,
+  _req: Request,
+  res: Response,
+  next: NextFunction,
 ) => {
   if (err instanceof multer.MulterError) {
     return res.status(400).json({ message: `Upload error: ${err.message}` });

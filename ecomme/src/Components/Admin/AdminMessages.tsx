@@ -204,7 +204,9 @@ const AdminMessages = () => {
           Loading messages...
         </p>
       ) : data.messages.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-4 py-14 text-center shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
+        <div
+          className="flex flex-col items-center gap-3 rounded-2xl bg-white px-4 py-14 text-center 
+        shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-500">
             <IconInbox size={26} />
           </div>
@@ -272,7 +274,8 @@ const AdminMessages = () => {
                     <div className="mt-4 flex flex-wrap items-center gap-2">
                       <a
                         href={buildReplyLink(m)}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-white no-underline hover:bg-sky-600">
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold 
+                        text-white no-underline hover:bg-sky-600">
                         <IconMail size={16} />
                         Reply by email
                       </a>
@@ -281,7 +284,8 @@ const AdminMessages = () => {
                           type="button"
                           onClick={() => void setStatus(m, "read")}
                           disabled={busy}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2 text-sm 
+                          font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
                           <IconInbox size={16} />
                           Move to inbox
                         </button>
@@ -291,7 +295,8 @@ const AdminMessages = () => {
                             type="button"
                             onClick={() => void setStatus(m, "new")}
                             disabled={busy || m.status === "new"}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2 text-sm 
+                            font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
                             <IconMailOpened size={16} />
                             Mark as unread
                           </button>
@@ -299,7 +304,8 @@ const AdminMessages = () => {
                             type="button"
                             onClick={() => void setStatus(m, "archived")}
                             disabled={busy}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2 text-sm 
+                            font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
                             <IconArchive size={16} />
                             Archive
                           </button>

@@ -3,8 +3,7 @@ import Category, { type ICategory } from "../models/categoryModel.js";
 import SubCategory from "../models/subCategoryModel.js";
 import Product from "../models/productModel.js";
 import { AppError } from "../utils/AppError.js";
-import fs from "fs";
-import path from "path";
+import { deleteImage } from "../utils/imageStorage.js";
 
 export interface CreateCategoryInput {
   name: string;
@@ -49,19 +48,31 @@ export const updateCategory = async (
     }
   }
 
+  // الصورة القديمة: تُحذف بعد نجاح التحديث إن تغيّرت
+  const previous = await Category.findById(id).select("image");
+  if (!previous) {
+    throw new AppError("Category not found", 404);
+  }
+
   const category = await Category.findByIdAndUpdate(id, data, {
     new: true, // يُعيد المستند بعد التحديث، لا قبله
-    runValidators: true, // يُطبّق قواعد الـ schema (minlength وغيرها) حتى عند التحديث
+    runValidators: true, // يُطبّق قواعد الـ schema حتى عند التحديث
   });
 
   if (!category) {
     throw new AppError("Category not found", 404);
   }
+
+  // الحذف بعد نجاح التحديث لا قبله، وإلا بقي السجل يشير إلى صورة محذوفة
+  if (data.image && previous.image && previous.image !== data.image) {
+    await deleteImage(previous.image);
+  }
+
   return category;
 };
 
 export const deleteCategory = async (id: string): Promise<void> => {
-  // يمنع حذف تصنيف له منتجات مرتبطة، بدل حذفها معه تلقائيًا أو تركها بمرجع معطوب
+  // يمنع حذف category له منتجات مرتبطة، بدل تركها بمرجع معطوب
   const productCount = await Product.countDocuments({ category: id });
   if (productCount > 0) {
     throw new AppError(
@@ -79,15 +90,6 @@ export const deleteCategory = async (id: string): Promise<void> => {
   // لمنع بقاء مراجع معطوبة تشير إلى تصنيف لم يعد موجودًا
   await SubCategory.deleteMany({ category: id });
 
-  // يحذف الملف الفعلي أيضًا، لا فقط سجل قاعدة البيانات، لمنع بقايا صور يتيمة
-  try {
-    const filename = path.basename(category.image);
-    const filePath = path.join("uploads", filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-  } catch (err) {
-    // لا نُفشل عملية الحذف كاملة بسبب فشل حذف الملف فقط؛ نسجّله فقط للمراجعة
-    console.error("Failed to delete category image file:", err);
-  }
+  // يحذف الصورة أيضًا، من Cloudinary أو من القرص بحسب رابطها
+  await deleteImage(category.image);
 };

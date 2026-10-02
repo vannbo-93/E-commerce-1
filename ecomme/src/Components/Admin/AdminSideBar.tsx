@@ -50,7 +50,8 @@ const AdminSideBar = () => {
             key={link.to}
             to={link.to}
             className={({ isActive }) =>
-              `relative flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium no-underline transition-colors duration-200 ${
+              `relative flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium no-underline 
+            transition-colors duration-200 ${
                 isActive
                   ? "bg-sky-500 text-white"
                   : "text-gray-700 hover:bg-sky-50 hover:text-sky-600"
