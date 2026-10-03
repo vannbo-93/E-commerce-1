@@ -2,13 +2,18 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import slide1 from "@/images/slide/slide-1-audio-mobile.webp";
+import slide2 from "@/images/slide/slide-2-smart-home.webp";
+import slide3 from "@/images/slide/slide-3-creator-gear.webp";
+import slide4 from "@/images/slide/slide-4-gaming.webp";
+import slide5 from "@/images/slide/slide-5-wearables.webp";
 
 const defaultSlides = [
-  { id: 1, image: "src/images/slide/slide-1-audio-mobile.webp", alt: "show 1" },
-  { id: 2, image: "src/images/slide/slide-2-smart-home.webp", alt: "show 2" },
-  { id: 3, image: "src/images/slide/slide-3-creator-gear.webp", alt: "show 3" },
-  { id: 4, image: "src/images/slide/slide-4-gaming.webp", alt: "show 4" },
-  { id: 5, image: "src/images/slide/slide-5-wearables.webp", alt: "show 5" },
+  { id: 1, image: slide1, alt: "show 1" },
+  { id: 2, image: slide2, alt: "show 2" },
+  { id: 3, image: slide3, alt: "show 3" },
+  { id: 4, image: slide4, alt: "show 4" },
+  { id: 5, image: slide5, alt: "show 5" },
 ];
 
 function Slide({ slides = defaultSlides }) {
