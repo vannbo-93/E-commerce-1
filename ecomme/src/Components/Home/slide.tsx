@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import slide1 from "@/images/slide/slide-1-audio-mobile.webp";
-import slide2 from "@/images/slide/slide-2-smart-home.webp";
-import slide3 from "@/images/slide/slide-3-creator-gear.webp";
-import slide4 from "@/images/slide/slide-4-gaming.webp";
-import slide5 from "@/images/slide/slide-5-wearables.webp";
+import slide1 from "@/images/Slide/slide-1-audio-mobile.webp";
+import slide2 from "@/images/Slide/slide-2-smart-home.webp";
+import slide3 from "@/images/Slide/slide-3-creator-gear.webp";
+import slide4 from "@/images/Slide/slide-4-gaming.webp";
+import slide5 from "@/images/Slide/slide-5-wearables.webp";
 
 const defaultSlides = [
   { id: 1, image: slide1, alt: "show 1" },
