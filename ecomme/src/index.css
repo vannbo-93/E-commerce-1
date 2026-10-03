@@ -20,12 +20,9 @@
 ========================= */
 
 @layer base {
-  :root {
-    color-scheme: light;
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  html {
+    scroll-behavior: smooth;
+    overflow-y: scroll;
   }
 
   html,
@@ -34,7 +31,6 @@
     color: #6b6375;
     line-height: 1.45;
   }
-
   /* عرض الموقع الأقصى، مع خطين رفيعين على الجانبين */
   #root {
     width: 1126px;
@@ -45,7 +41,4 @@
     display: flex;
     flex-direction: column;
   }
-}
-html {
-  scroll-behavior: smooth;
 }

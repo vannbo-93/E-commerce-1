@@ -16,7 +16,7 @@ export default function Reveal({ children, className = "", delay = 0 }: Props) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // من فعّل "تقليل الحركة" في نظامه يرى المحتوى مباشرة
+    // من فعّل "تقليل الحركة" في نظامه يرى المحتوى مباشرة ودائمًا
     if (
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -25,12 +25,16 @@ export default function Reveal({ children, className = "", delay = 0 }: Props) {
     }
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) {
+        if (!entry) return;
+        if (entry.isIntersecting) {
           setVisible(true);
-          observer.disconnect(); // يظهر مرة واحدة ولا يختفي عند الرجوع
+        } else if (entry.boundingClientRect.top > 0) {
+          // خرج من أسفل الشاشة (المستخدم صعد): يختفي ليظهر من جديد عند النزول
+          setVisible(false);
         }
+        // خرج من الأعلى (المستخدم نزل): يبقى ظاهرًا
       },
-      { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+      { threshold: 0.15, rootMargin: "0px 0px -30% 0px" },
     );
     observer.observe(el);
     return () => observer.disconnect();

@@ -158,7 +158,10 @@ async function start() {
     await mongoose.connect(process.env.MONGO_URI as string);
     console.log("Mongo connected!");
 
-    await ensureIndexes();
+    // بناء الفهارس عند التطوير فقط. على Vercel يتكرر مع كل بداية باردة ويؤخر أول رد
+    if (!isProduction) {
+      await ensureIndexes();
+    }
 
     app.listen(PORT, () => {
       console.log(`server is running on port ${PORT}`);
