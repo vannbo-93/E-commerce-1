@@ -11,7 +11,6 @@ import express, {
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import helmet from "helmet";
 import multer from "multer";
 import userRoute from "./routes/userRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
@@ -27,6 +26,9 @@ import addressRoute from "./routes/addressRoute.js";
 import orderRoute from "./routes/orderRoute.js";
 import { AppError } from "./utils/AppError.js";
 import { apiLimiter } from "./middlewares/rateLimiters.js";
+import helmetImport from "helmet";
+const helmet: (...args: any[]) => any =
+  (helmetImport as any).default ?? helmetImport;
 
 // ===================== المتغيرات الإلزامية =====================
 
