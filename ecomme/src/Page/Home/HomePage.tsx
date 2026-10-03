@@ -8,7 +8,7 @@ import BrandFeatured from "../Brand/BrandFeatured";
 import FeaturesBar from "@/Components/Utility/Featuresbar";
 import ReviewsContainer from "../../Components/Utility/ReviewsContainer";
 import Newsletter from "../../Components/Utility/Newsletter";
-import Reveal from "../../Components/Reveal";
+import Reveal from "@/Components/Reveal";
 
 function HomePage() {
   return (

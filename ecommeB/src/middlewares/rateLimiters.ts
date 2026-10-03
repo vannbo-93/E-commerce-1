@@ -34,10 +34,12 @@ const limiter = (options: {
   });
 
 // ===== عام: لكل الـ API =====
-// واسع بما يكفي ألا يلاحظه مستخدم عادي، ويوقف السكربتات التي تُغرق السيرفر
+// حدود الطلبات لكل عنوان IP. التخزين في ذاكرة الدالة.
+// على Vercel قد تعمل عدة نسخ من الدالة، ولكل منها عدّاد مستقل يُصفَّر مع كل تشغيل جديد،
+// فالحد الفعلي أرخى مما هو مكتوب. لحماية صارمة يلزم مخزن مشترك (مثل Upstash Redis).
 export const apiLimiter = limiter({
   windowMs: 5 * MINUTE,
-  limit: 300,
+  limit: 1000,
   message:
     "Too many requests. Please slow down and try again in a few minutes.",
 });
