@@ -8,29 +8,46 @@ import BrandFeatured from "../Brand/BrandFeatured";
 import FeaturesBar from "@/Components/Utility/Featuresbar";
 import ReviewsContainer from "../../Components/Utility/ReviewsContainer";
 import Newsletter from "../../Components/Utility/Newsletter";
+import Reveal from "../../Components/Reveal";
 
-const HomePage = () => {
+function HomePage() {
   return (
     <>
       <Slide />
-      <HomeCategory />
-      <CardProductsContainer
-        title="Featured Products"
-        btntitle="View All"
-        pathText="/products?sort=rating"
-      />
-      <DiscountSection />
-      <FeaturesBar />
-      <NewArrivals
-        title="New Arrivals"
-        btntitle="View All"
-        pathText="/products"
-      />
-      <BrandFeatured title="Top Brands" />
-      <ReviewsContainer title="Customer Reviews" />
-      <Newsletter />
+      <Reveal>
+        <HomeCategory />
+      </Reveal>
+      <Reveal>
+        <CardProductsContainer
+          title="Featured Products"
+          btntitle="View All"
+          pathText="/products?sort=rating"
+        />
+      </Reveal>
+      <Reveal>
+        <DiscountSection />
+      </Reveal>
+      <Reveal>
+        <FeaturesBar />
+      </Reveal>
+      <Reveal>
+        <NewArrivals
+          title="New Arrivals"
+          btntitle="View All"
+          pathText="/products"
+        />
+      </Reveal>
+      <Reveal>
+        <BrandFeatured title="Top Brands" />
+      </Reveal>
+      <Reveal>
+        <ReviewsContainer title="Customer Reviews" />
+      </Reveal>
+      <Reveal>
+        <Newsletter />
+      </Reveal>
     </>
   );
-};
+}
 
 export default HomePage;
