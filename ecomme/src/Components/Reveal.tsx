@@ -34,7 +34,7 @@ export default function Reveal({ children, className = "", delay = 0 }: Props) {
         }
         // خرج من الأعلى (المستخدم نزل): يبقى ظاهرًا
       },
-      { threshold: 0.15, rootMargin: "0px 0px -30% 0px" },
+      { threshold: 0, rootMargin: "0px 0px -20% 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
