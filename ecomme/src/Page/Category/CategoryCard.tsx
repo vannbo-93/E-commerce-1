@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Trash2 } from "lucide-react";
 import { ConfirmDialog } from "../../Components/Utility/AppAlerts";
+import { optimizeImage } from "@/utils/cloudinary";
 
 interface CategoryCardProps {
   id: string;
@@ -33,8 +34,9 @@ const CategoryCard = ({
         to={`/products?category=${id}`}
         className="flex flex-col items-center rounded-xl p-3 text-gray-900 no-underline transition-all duration-300 hover:-translate-y-1">
         <img
-          src={img}
+          src={optimizeImage(img, 300)}
           alt=""
+          loading="lazy"
           className="h-28 w-28 rounded-xl object-cover shadow-sm transition-transform duration-300 group-hover:scale-105"
         />
         <h3 className="mt-3 text-sm font-semibold transition-colors duration-300 group-hover:text-sky-500">

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SubTitle from "../../Components/Utility/SubTitle";
 import { cachedGet } from "../../Api/cachedGet";
+import { optimizeImage } from "@/utils/cloudinary";
 
 interface Brand {
   _id: string;
@@ -80,7 +81,7 @@ const BrandFeatured = ({ title }: BrandFeaturedProps) => {
         group-hover:opacity-50 hover:opacity-100! hover:scale-110 focus-visible:opacity-100! focus-visible:scale-110
         focus-visible:outline-none">
       <img
-        src={brand.image}
+        src={optimizeImage(brand.image, 240)}
         alt={brand.name}
         loading="lazy"
         draggable={false}
