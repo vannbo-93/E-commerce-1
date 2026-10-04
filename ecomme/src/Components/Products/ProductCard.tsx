@@ -9,6 +9,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { isOutOfStock, stockLabel } from "../Utility/stock";
+import { optimizeImage } from "@/utils/cloudinary";
 
 // عدّله إن كان مسار صفحة الدخول مختلفًا في الـ Router
 const LOGIN_PATH = "/login";
@@ -91,8 +92,9 @@ const ProductCard = ({
             )}
             {image ? (
               <img
-                src={image}
+                src={optimizeImage(image)}
                 alt={title}
+                loading="lazy"
                 className={`max-h-[90%] max-w-[100%] rounded-2xl object-contain ${outOfStock ? "opacity-50 grayscale" : ""}`}
               />
             ) : (

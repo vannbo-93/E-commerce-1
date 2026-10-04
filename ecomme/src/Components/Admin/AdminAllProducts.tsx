@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AdminAllProductsCard from "./AdminAllProductsCard";
 import { ConfirmDialog, Toast } from "./AppAlerts";
 import api from "../../Api/baseURL";
+import { optimizeImage } from "@/utils/cloudinary";
 
 interface RawProduct {
   _id: string;
@@ -51,7 +52,7 @@ const AdminAllProducts = () => {
         if (cancelled) return;
         const mapped: Product[] = res.data.products.map((p: RawProduct) => ({
           id: p._id,
-          image: p.images?.[0] ?? "",
+          image: optimizeImage(p.images?.[0], 400),
           title: p.name,
           rate: p.rating?.value ?? 0,
           price: p.price,

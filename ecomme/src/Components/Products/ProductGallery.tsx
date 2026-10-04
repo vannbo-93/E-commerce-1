@@ -8,6 +8,7 @@ import ImageGallery, {
 } from "react-image-gallery";
 import LeftButton from "./LeftButton";
 import RightButton from "./RightButton";
+import { optimizeImage } from "@/utils/cloudinary";
 
 interface ProductGalleryProps {
   images: string[];
@@ -16,8 +17,10 @@ interface ProductGalleryProps {
 
 const ProductGallery = ({ images, title }: ProductGalleryProps) => {
   const galleryImages: GalleryItem[] = images.map((src) => ({
-    original: src,
+    original: optimizeImage(src, 800),
+    thumbnail: optimizeImage(src, 160),
     originalAlt: title,
+    thumbnailAlt: title,
   }));
 
   const renderRightNav = useCallback(
@@ -51,6 +54,7 @@ const ProductGallery = ({ images, title }: ProductGalleryProps) => {
       `}</style>
       <ImageGallery
         items={galleryImages}
+        lazyLoad
         showThumbnails={galleryImages.length > 1}
         showPlayButton={false}
         showNav={galleryImages.length > 1}

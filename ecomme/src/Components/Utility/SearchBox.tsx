@@ -10,6 +10,7 @@ import {
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import api from "../../Api/baseURL";
+import { optimizeImage } from "@/utils/cloudinary";
 
 const PRODUCTS_PATH = "/products";
 const MIN_CHARS = 2;
@@ -221,7 +222,7 @@ const SearchBox = ({ className = "", onNavigate }: SearchBoxProps) => {
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-50">
                     {p.images[0] && (
                       <img
-                        src={p.images[0]}
+                        src={optimizeImage(p.images[0], 160)}
                         alt=""
                         className="h-full w-full object-contain p-1"
                       />
