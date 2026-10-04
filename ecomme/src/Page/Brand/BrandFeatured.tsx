@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SubTitle from "../../Components/Utility/SubTitle";
-import api from "../../Api/baseURL";
+import { cachedGet } from "../../Api/cachedGet";
 
 interface Brand {
   _id: string;
@@ -49,10 +49,9 @@ const BrandFeatured = ({ title }: BrandFeaturedProps) => {
 
   useEffect(() => {
     let cancelled = false;
-    api
-      .get("/brand")
-      .then((res) => {
-        if (!cancelled) setBrands(res.data.brands ?? []);
+    cachedGet<{ brands?: Brand[] }>("/brand")
+      .then((data) => {
+        if (!cancelled) setBrands(data.brands ?? []);
       })
       .catch(() => {
         // فشل الجلب يخفي القسم فقط

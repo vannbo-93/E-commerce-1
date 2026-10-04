@@ -19,7 +19,10 @@ const CategoryContainer = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [toastOpen, setToastOpen] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    severity: "success" | "error";
+  } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,10 +51,17 @@ const CategoryContainer = () => {
     try {
       await api.delete(`/category/${id}`);
       invalidateCache("/category");
-      setToastOpen(true);
+      setToast({
+        message: "Category deleted successfully",
+        severity: "success",
+      });
     } catch {
+      // نُعيد القائمة ونُبقيها ظاهرة، والخطأ في تنبيه لا يحل محل الصفحة
       setCategories(previous);
-      setError("Failed to delete the category. Please try again.");
+      setToast({
+        message: "Failed to delete the category. Please try again.",
+        severity: "error",
+      });
     }
   };
 
@@ -97,10 +107,10 @@ const CategoryContainer = () => {
       </div>
 
       <Toast
-        open={toastOpen}
-        message="Category deleted successfully"
-        severity="success"
-        onClose={() => setToastOpen(false)}
+        open={toast !== null}
+        message={toast?.message ?? ""}
+        severity={toast?.severity ?? "success"}
+        onClose={() => setToast(null)}
       />
     </div>
   );

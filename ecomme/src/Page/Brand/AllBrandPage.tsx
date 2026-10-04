@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import BrandCard from "./BrandCard.js";
 import SubTitle from "../../Components/Utility/SubTitle.js";
 import api from "../../Api/baseURL";
+import { cachedGet, invalidateCache } from "../../Api/cachedGet";
 import { useAuth } from "../../context/AuthContext";
 import { Toast } from "../../Components/Utility/AppAlerts";
 
@@ -25,15 +26,17 @@ const AllBrandPage = ({
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [toastOpen, setToastOpen] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    severity: "success" | "error";
+  } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    api
-      .get("/brand")
-      .then((res) => {
-        if (!cancelled) setBrands(res.data.brands);
+    cachedGet<{ brands?: Brand[] }>("/brand")
+      .then((data) => {
+        if (!cancelled) setBrands(data.brands ?? []);
       })
       .catch(() => {
         if (!cancelled) setError("Failed to load brands.");
@@ -53,10 +56,15 @@ const AllBrandPage = ({
 
     try {
       await api.delete(`/brand/${id}`);
-      setToastOpen(true);
+      invalidateCache("/brand");
+      setToast({ message: "Brand deleted successfully", severity: "success" });
     } catch {
+      // نُعيد القائمة ونُبقيها ظاهرة، والخطأ في تنبيه لا يحل محل الصفحة
       setBrands(previous);
-      setError("Failed to delete the brand. Please try again.");
+      setToast({
+        message: "Failed to delete the brand. Please try again.",
+        severity: "error",
+      });
     }
   };
 
@@ -96,10 +104,10 @@ const AllBrandPage = ({
       )}
 
       <Toast
-        open={toastOpen}
-        message="Brand deleted successfully"
-        severity="success"
-        onClose={() => setToastOpen(false)}
+        open={toast !== null}
+        message={toast?.message ?? ""}
+        severity={toast?.severity ?? "success"}
+        onClose={() => setToast(null)}
       />
     </div>
   );

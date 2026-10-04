@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import AdminImageNameForm from "./AdminImageNameForm";
 import api from "../../Api/baseURL";
+import { invalidateCache } from "../../Api/cachedGet";
 import { isAxiosError } from "axios";
 
 const AdminAddBrand = () => {
@@ -14,7 +15,7 @@ const AdminAddBrand = () => {
       nameLabel="Brand name"
       namePlaceholder="Enter brand name"
       onSave={async (data) => {
-        if (!data.file) return;
+        if (!data.file) throw new Error("Please choose an image.");
 
         // multipart/form-data ضروري هنا لأن data.file ملف حقيقي، لا نص
         const formData = new FormData();
@@ -25,13 +26,18 @@ const AdminAddBrand = () => {
           await api.post("/brand", formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
-          navigate("/allbrand");
         } catch (err) {
-          const message = isAxiosError(err)
-            ? (err.response?.data?.message ?? "Something went wrong")
-            : "Something went wrong";
-          console.error(message);
+          throw new Error(
+            isAxiosError(err)
+              ? (err.response?.data?.message ?? "Something went wrong")
+              : "Something went wrong",
+            { cause: err },
+          );
         }
+
+        // قبل الانتقال: صفحة الماركات وفلاتر المتجر تقرأ من الذاكرة المؤقتة
+        invalidateCache("/brand");
+        navigate("/allbrand");
       }}
     />
   );
