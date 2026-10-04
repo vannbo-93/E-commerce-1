@@ -1,7 +1,7 @@
 /** @format */
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import api from "../../Api/baseURL";
+import { cachedGet } from "../../Api/cachedGet";
 
 interface CategoryOption {
   _id: string;
@@ -19,10 +19,9 @@ const CategoryHeader = () => {
 
   useEffect(() => {
     let cancelled = false;
-    api
-      .get("/category")
-      .then((res) => {
-        if (!cancelled) setCategories(res.data.categories ?? []);
+    cachedGet<{ categories?: CategoryOption[] }>("/category")
+      .then((data) => {
+        if (!cancelled) setCategories(data.categories ?? []);
       })
       .catch(() => {
         // فشل الجلب يخفي الشريط فقط، ولا يمنع عرض المنتجات

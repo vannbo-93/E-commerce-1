@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import CategoryCard from "./CategoryCard";
 import api from "../../Api/baseURL";
+import { cachedGet, invalidateCache } from "../../Api/cachedGet";
 import { useAuth } from "../../context/AuthContext";
 import { Toast } from "../../Components/Utility/AppAlerts";
 
@@ -23,10 +24,9 @@ const CategoryContainer = () => {
   useEffect(() => {
     let cancelled = false;
 
-    api
-      .get("/category")
-      .then((res) => {
-        if (!cancelled) setCategories(res.data.categories);
+    cachedGet<{ categories?: Category[] }>("/category")
+      .then((data) => {
+        if (!cancelled) setCategories(data.categories ?? []);
       })
       .catch(() => {
         if (!cancelled) setError("Failed to load categories.");
@@ -47,9 +47,9 @@ const CategoryContainer = () => {
 
     try {
       await api.delete(`/category/${id}`);
+      invalidateCache("/category");
       setToastOpen(true);
     } catch {
-      // فشل الحذف فعليًا في الخادم: نُعيد العنصر إلى القائمة بدل ترك واجهة كاذبة
       setCategories(previous);
       setError("Failed to delete the category. Please try again.");
     }

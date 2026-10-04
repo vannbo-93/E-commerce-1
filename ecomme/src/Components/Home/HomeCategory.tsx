@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import SubTitle from "../Utility/SubTitle";
 import CategoryCard from "../../Page/Category/CategoryCard";
-import api from "../../Api/baseURL";
+import { cachedGet } from "../../Api/cachedGet";
 
 interface Category {
   _id: string;
@@ -20,13 +20,10 @@ const HomeCategory = () => {
 
   useEffect(() => {
     let cancelled = false;
-    api
-      .get("/category")
-      .then((res) => {
+    cachedGet<{ categories?: Category[] }>("/category")
+      .then((data) => {
         if (!cancelled) {
-          setCategories(
-            (res.data.categories ?? []).slice(0, MAX_HOME_CATEGORIES),
-          );
+          setCategories((data.categories ?? []).slice(0, MAX_HOME_CATEGORIES));
         }
       })
       .catch(() => {

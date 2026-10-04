@@ -2,7 +2,7 @@
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { IconX } from "@tabler/icons-react";
-import api from "../../Api/baseURL";
+import { cachedGet } from "../../Api/cachedGet";
 
 // أسماء معاملات الرابط: نفس ما يقبله GET /product في الباك إند
 const PARAM = {
@@ -199,11 +199,14 @@ const SideFilter = () => {
   useEffect(() => {
     let cancelled = false;
 
-    Promise.all([api.get("/category"), api.get("/brand")])
-      .then(([catRes, brandRes]) => {
+    Promise.all([
+      cachedGet<{ categories?: FilterOption[] }>("/category"),
+      cachedGet<{ brands?: FilterOption[] }>("/brand"),
+    ])
+      .then(([catData, brandData]) => {
         if (cancelled) return;
-        setCategories(catRes.data.categories ?? []);
-        setBrands(brandRes.data.brands ?? []);
+        setCategories(catData.categories ?? []);
+        setBrands(brandData.brands ?? []);
       })
       .catch(() => {
         // فشل جلب الخيارات لا يمنع عرض المنتجات؛ تبقى القوائم فارغة
@@ -259,7 +262,8 @@ const SideFilter = () => {
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-gray-900">Filters</h2>
           {activeCount > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 px-1.5 text-xs 
+            <span
+              className="flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 px-1.5 text-xs 
             font-semibold text-white">
               {activeCount}
             </span>
