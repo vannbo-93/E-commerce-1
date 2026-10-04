@@ -11,8 +11,6 @@ A full-stack e-commerce web application built with **React + TypeScript** on the
 
 ## 📸 Screenshots
 
-<!-- Replace with your own screenshots (e.g. put them in /docs/screenshots) -->
-
 | Home | Shop |
 |---|---|
 | ![Home](docs/screenshots/home.png) | ![Shop](docs/screenshots/shop.png) |
@@ -92,6 +90,7 @@ A few decisions worth mentioning:
 - **Faster cold starts.** Index synchronization (`createIndexes`) runs only in development. On serverless it ran on every cold start; removing it from production cut the first-request time from **~2.3 s to ~0.4–0.5 s**.
 - **Rate limiting on serverless.** Limits use an in-memory store, so each function instance keeps its own counter. This is acceptable for a demo; a shared store (e.g. Redis) would be needed for strict limits in production.
 - **Monorepo.** One repository, two independent Vercel projects (`ecomme` for the frontend, `ecommeB` for the API).
+- **Request deduplication.** Several components fetched categories and brands independently, sending duplicate requests on every page. A small shared cache (`cachedGet`) now serves them once per session window and is invalidated after admin changes.
 
 ---
 
@@ -188,7 +187,7 @@ VITE_API_URL=http://localhost:3001
 
 ## 🗺️ Roadmap
 
-- [ ] Client-side caching (TanStack Query) to avoid refetching on navigation
+- [ ] Extend client-side caching to all data (e.g. TanStack Query)
 - [ ] Skeleton loaders
 - [ ] Code-splitting routes to reduce the main bundle size
 - [ ] Online payments
@@ -197,4 +196,4 @@ VITE_API_URL=http://localhost:3001
 
 ## 👤 Author
 
-**[Mohamed El Aissaoui]** — [LinkedIn](https://www.linkedin.com/in/mohamed-el-aissaoui-101125335/?isSelfProfile=true) · [GitHub](https://github.com/vannbo-93)
+**Mohamed El Aissaoui** — [LinkedIn](https://www.linkedin.com/in/mohamed-el-aissaoui-101125335/) · [GitHub](https://github.com/vannbo-93)
