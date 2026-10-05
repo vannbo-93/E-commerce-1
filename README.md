@@ -40,7 +40,8 @@ A full-stack e-commerce web application built with **React + TypeScript** on the
 - Live search with suggestions
 - Product details with image gallery, ratings and reviews
 - Shopping cart and wishlist
-- Saved addresses, cash-on-delivery checkout, order tracking and cancellation
+- Saved addresses, order tracking and cancellation
+- Cash-on-delivery checkout (the dominant payment method in Morocco); online card payment is on the roadmap
 - Newsletter with double opt-in (confirmation email) and contact form
 - Responsive design (mobile → desktop)
 
