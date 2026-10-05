@@ -27,12 +27,9 @@ A full-stack e-commerce web application built with **React + TypeScript** on the
 
 ## 🧪 Demo account
 
-<!-- Create a regular (non-admin) demo customer account and put it here.
-     Never publish admin credentials in a public repository. -->
-
 | Role | Email | Password |
 |---|---|---|
-| Customer | `adam2010isawi@gmail.com` | `123456` |
+| Customer | `analowal93@gmail.com` | `123456` |
 
 ---
 
@@ -40,16 +37,18 @@ A full-stack e-commerce web application built with **React + TypeScript** on the
 
 ### Customer
 - Browse products with filters (category, brand, on-sale) and sorting
-- Product details with ratings and reviews
+- Live search with suggestions
+- Product details with image gallery, ratings and reviews
 - Shopping cart and wishlist
-- Saved addresses and order placement / order history
-- Newsletter subscription and contact form
+- Saved addresses, cash-on-delivery checkout, order tracking and cancellation
+- Newsletter with double opt-in (confirmation email) and contact form
 - Responsive design (mobile → desktop)
 
 ### Admin
 - Manage products, categories, subcategories and brands
 - Image uploads stored on Cloudinary
-- Manage orders and customer messages
+- Order workflow (pending → confirmed → shipped → delivered) with status history and automatic stock restore on cancellation
+- Customer messages with unread counter
 
 ### Security & reliability
 - JWT authentication stored in **httpOnly cookies** (works cross-domain between frontend and API)
@@ -58,7 +57,7 @@ A full-stack e-commerce web application built with **React + TypeScript** on the
 - **Rate limiting** on the whole API, with stricter limits on login, register, password change, contact and newsletter
 - Strict **CORS** allow-list
 - Centralized error handling with consistent JSON error responses
-- Fails fast at startup if required environment variables are missing
+- Fails fast at startup if required environment variables are missing; refuses to fall back to a test inbox in production
 
 ---
 
@@ -70,7 +69,7 @@ A full-stack e-commerce web application built with **React + TypeScript** on the
 | Backend | Node.js, Express 5, TypeScript, Mongoose |
 | Database | MongoDB Atlas |
 | Media | Cloudinary |
-| Email | Nodemailer |
+| Email | Nodemailer + Brevo (SMTP) |
 | Deployment | Vercel (frontend + serverless API) |
 
 ---
@@ -81,16 +80,18 @@ A full-stack e-commerce web application built with **React + TypeScript** on the
 Browser ──► Vercel (frontend, static)
    │
    └────► Vercel Function – Paris (cdg1) ──► MongoDB Atlas – Paris (eu-west-3)
-                                         └─► Cloudinary (images)
+                                         ├─► Cloudinary (images)
+                                         └─► Brevo SMTP (email)
 ```
 
 A few decisions worth mentioning:
 
 - **Co-located regions.** The API function initially ran in Washington (`iad1`) while the database is in Paris, so every query crossed the Atlantic. Moving the function to Paris (`cdg1`) reduced typical API response times from **~240–490 ms to ~80–150 ms**.
 - **Faster cold starts.** Index synchronization (`createIndexes`) runs only in development. On serverless it ran on every cold start; removing it from production cut the first-request time from **~2.3 s to ~0.4–0.5 s**.
+- **Image delivery.** Product images were served at their original upload size (128–391 KB PNG each). Adding Cloudinary transformations at render time (`f_auto,q_auto,w_<size>`) serves WebP/AVIF at the displayed width: **~95% smaller (5–19 KB) and ~10× faster to load**, with no change to stored images.
+- **Request deduplication.** Several components fetched categories and brands independently, sending duplicate requests on every page. A small shared cache (`cachedGet`) now serves them once per session window and is invalidated after admin changes.
 - **Rate limiting on serverless.** Limits use an in-memory store, so each function instance keeps its own counter. This is acceptable for a demo; a shared store (e.g. Redis) would be needed for strict limits in production.
 - **Monorepo.** One repository, two independent Vercel projects (`ecomme` for the frontend, `ecommeB` for the API).
-- **Request deduplication.** Several components fetched categories and brands independently, sending duplicate requests on every page. A small shared cache (`cachedGet`) now serves them once per session window and is invalidated after admin changes.
 
 ---
 
@@ -100,14 +101,16 @@ A few decisions worth mentioning:
 E-commerce-1/
 ├── ecomme/          # Frontend (React + Vite)
 │   └── src/
-│       ├── Api/         # API base URL and requests
+│       ├── Api/         # API base URL, requests and shared cache
 │       ├── Components/  # Reusable UI components
 │       ├── Page/        # Route pages
+│       ├── utils/       # Helpers (e.g. Cloudinary image optimization)
 │       └── images/
 └── ecommeB/         # Backend (Express API)
     └── src/
         ├── routes/
         ├── middlewares/
+        ├── services/
         ├── scripts/     # seed admin, stock helpers
         ├── utils/
         └── index.ts
@@ -121,6 +124,7 @@ E-commerce-1/
 - Node.js **20.11+**
 - A MongoDB database (local or Atlas)
 - A Cloudinary account (for image uploads)
+- Optional: an SMTP provider (e.g. Brevo). Without it, emails go to an [Ethereal](https://ethereal.email) test inbox and a preview link is printed in the terminal.
 
 ### 1. Clone
 
@@ -161,12 +165,13 @@ VITE_API_URL=http://localhost:3001
 |---|---|
 | `MONGO_URI` | MongoDB connection string (include the database name) |
 | `JWT_SECRET` | Secret used to sign auth tokens |
-| `CLIENT_ORIGIN` | Allowed frontend origin(s) for CORS, comma-separated |
+| `CLIENT_ORIGIN` | Allowed origins for CORS, comma-separated (frontend URL, plus the API URL for the newsletter pages) |
 | `FRONTEND_URL` | Public frontend URL (used in emails/links) |
-| `API_BASE_URL` | Public API URL |
+| `API_BASE_URL` | Public API URL (used in email links) |
 | `ADMIN_USERNAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Used by `npm run seed:admin` |
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Image storage |
-| `MAIL_FROM` / `SUPPORT_EMAIL` | Email sender and support address |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | SMTP server (required in production) |
+| `MAIL_FROM` / `SUPPORT_EMAIL` | Email sender (must be a verified sender) and support address |
 | `NEWSLETTER_SECRET` | Secret for newsletter confirmation links |
 | `RATE_LIMIT_DISABLED` | Set to `true` only for automated tests |
 
@@ -190,10 +195,11 @@ VITE_API_URL=http://localhost:3001
 - [ ] Extend client-side caching to all data (e.g. TanStack Query)
 - [ ] Skeleton loaders
 - [ ] Code-splitting routes to reduce the main bundle size
+- [ ] Edit pages for categories and brands
 - [ ] Online payments
 
 ---
 
 ## 👤 Author
 
-**Mohamed El Aissaoui** — [LinkedIn](www.linkedin.com/in/mohamed-el-aissaoui7/) · [GitHub](https://github.com/vannbo-93)
+**Mohamed El Aissaoui** — [LinkedIn](https://www.linkedin.com/in/mohamed-el-aissaoui7/) · [GitHub](https://github.com/vannbo-93)
