@@ -22,6 +22,12 @@ const createTransporter = async (): Promise<Transporter> => {
     });
   }
 
+  // لا يوجد SMTP_HOST. في الإنتاج لا نرسل إلى صندوق وهمي أبدًا:
+  // الأفضل أن يفشل الطلب بوضوح من أن يرى الزائر "تحقق من بريدك" وبريد لن يصل
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("[mailer] SMTP_HOST is not set in production");
+  }
+
   const testAccount = await nodemailer.createTestAccount();
   console.log(
     "[mailer] SMTP_HOST not set: using Ethereal test inbox. Emails will NOT reach real people.",

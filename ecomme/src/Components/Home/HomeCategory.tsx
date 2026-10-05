@@ -43,7 +43,7 @@ const HomeCategory = () => {
     <>
       <SubTitle
         title="Shop by Category"
-        btnTitle="View All Category"
+        btnTitle="View All"
         pathText="/allcategory"
       />
       <div className="mx-4 my-2 flex flex-wrap items-start justify-center gap-6 md:mx-12 md:justify-between">

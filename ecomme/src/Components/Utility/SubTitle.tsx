@@ -12,37 +12,31 @@ const SubTitle = ({
   pathText?: string;
 }) => {
   return (
-    <div className="flex items-center justify-between gap-2 py-3 pt-5">
-      {/* مسافة فارغة يسار - توازن الزر لتمركز العنوان فعليًا */}
-      <div className="flex-1 min-w-0" />
+    <div className="flex items-center justify-between gap-3 px-4 pb-3 pt-5 sm:px-0">
+      {/* مسافة يسار توازن الزر: على الشاشات الواسعة فقط، لتمركز العنوان */}
+      <div className="hidden flex-1 sm:block" />
 
-      {/* العنوان مع الخطوط - قابلة للانكماش تدريجيًا بلا قفزات */}
-      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-        <span className="h-px w-4 sm:w-24 min-w-[8px] shrink bg-sky-500" />
-        <h2 className="text-base sm:text-2lg font-semibold text-gray-900 whitespace-nowrap shrink-0">
+      {/* العنوان: يسارًا على الهاتف، ومتمركزًا بخطين على الشاشات الواسعة */}
+      <div className="flex min-w-0 items-center gap-4">
+        <span className="hidden h-px w-24 shrink-0 bg-sky-500 sm:block" />
+        <h2 className="truncate text-lg font-semibold text-gray-900 sm:text-2xl">
           {title}
         </h2>
-        <span className="h-px w-4 sm:w-24 min-w-[8px] shrink bg-sky-500" />
+        <span className="hidden h-px w-24 shrink-0 bg-sky-500 sm:block" />
       </div>
 
-      {/* زر View All Category - أقصى اليمين دائمًا */}
-      <div className="flex-1 flex justify-end min-w-0">
+      {/* الزر: لا ينكمش أبدًا تحت عرض محتواه، فلا يتداخل مع العنوان */}
+      <div className="flex shrink-0 justify-end sm:flex-1">
         {btnTitle && pathText ? (
-          <Link to={pathText} className="shrink-0">
-            <div
-              className="flex items-center font-bold hover:bg-gray-50 cursor-pointer text-sky-400
-              hover:-translate-y-0.5 transition-all duration-200 p-4">
-              <button
-                className="text-sky px-2 sm:px-3 py-1.5 rounded-lg
-                font-medium text-sm sm:text-base transition-colors duration-300
-                whitespace-nowrap">
-                {btnTitle}
-              </button>
-              <MoveRight
-                strokeWidth={3}
-                className="text-gray-400 w-4 h-4 sm:w-5 sm:h-5 shrink-0"
-              />
-            </div>
+          <Link
+            to={pathText}
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-semibold
+            text-sky-500 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 sm:px-3 sm:text-base">
+            {btnTitle}
+            <MoveRight
+              strokeWidth={3}
+              className="h-4 w-4 shrink-0 text-gray-400 sm:h-5 sm:w-5"
+            />
           </Link>
         ) : null}
       </div>
