@@ -52,7 +52,7 @@ function Slide({ slides = defaultSlides }) {
       <span
         className="font-semibold tracking-wide text-sky-400"
         style={{ fontSize: "0.9em" }}>
-        NEW COLLECTION 2026
+        NEW COLLECTION {new Date().getFullYear()}
       </span>
       <h1
         className="font-bold leading-none text-gray-900"
