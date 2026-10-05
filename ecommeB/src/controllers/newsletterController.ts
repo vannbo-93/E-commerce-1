@@ -26,6 +26,9 @@ const renderPage = (
   title: string,
   body: string,
 ) => {
+  // helmet يضبط no-referrer، فيرسل المتصفح Origin: null عند إرسال النموذج،
+  // ويرفضه CORS. same-origin يُرسل عنوان الـ API نفسه للطلبات داخل نفس الموقع فقط
+  res.set("Referrer-Policy", "same-origin");
   res.status(status).type("html").send(`<!doctype html>
 <html lang="en">
 <head>

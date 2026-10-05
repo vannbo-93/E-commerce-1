@@ -196,4 +196,4 @@ VITE_API_URL=http://localhost:3001
 
 ## 👤 Author
 
-**Mohamed El Aissaoui** — [LinkedIn](https://www.linkedin.com/in/mohamed-el-aissaoui-101125335/) · [GitHub](https://github.com/vannbo-93)
+**Mohamed El Aissaoui** — [LinkedIn](www.linkedin.com/in/mohamed-el-aissaoui7/) · [GitHub](https://github.com/vannbo-93)
