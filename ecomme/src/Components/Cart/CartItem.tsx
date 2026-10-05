@@ -2,6 +2,7 @@
 import React from "react";
 import { ImageOff, Minus, Plus, Trash2 } from "lucide-react";
 import { LOW_STOCK_THRESHOLD } from "../Utility/stock";
+import { optimizeImage } from "@/utils/cloudinary";
 
 interface CartItemProps {
   image: string | null;
@@ -57,7 +58,7 @@ const CartItem: React.FC<CartItemProps> = ({
         {image ? (
           <img
             className="h-full w-full object-contain p-2"
-            src={image}
+            src={optimizeImage(image, 300)}
             alt={title}
           />
         ) : (

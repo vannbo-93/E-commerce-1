@@ -21,6 +21,7 @@ import {
   type OrderDetail,
   type OrderStatus,
 } from "../User/orderUi";
+import { optimizeImage } from "@/utils/cloudinary";
 
 // نص كل زر حسب الحالة التي ينقل إليها الطلب
 const ACTION_LABEL: Partial<Record<OrderStatus, string>> = {
@@ -245,8 +246,9 @@ const AdminOrderDetalis = () => {
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-50">
                   {item.image ? (
                     <img
-                      src={item.image}
+                      src={optimizeImage(item.image, 160)}
                       alt={item.name}
+                      loading="lazy"
                       className="h-full w-full object-contain p-1"
                     />
                   ) : (

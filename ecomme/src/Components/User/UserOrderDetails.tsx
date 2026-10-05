@@ -19,6 +19,7 @@ import {
   type OrderDetail,
   type OrderStatus,
 } from "./orderUi";
+import { optimizeImage } from "@/utils/cloudinary";
 
 // مراحل الطلب الطبيعية بالترتيب (الإلغاء يُعرض منفصلًا)
 const FLOW: OrderStatus[] = ["pending", "confirmed", "shipped", "delivered"];
@@ -213,7 +214,7 @@ const UserOrderDetails = () => {
               <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-50">
                 {item.image ? (
                   <img
-                    src={item.image}
+                    src={optimizeImage(item.image, 160)}
                     alt={item.name}
                     className="h-full w-full object-contain p-1"
                   />
